@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/run"
+        android:title="运行"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/undo"
+        android:title="撤销"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/redo"
+        android:title="重做"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/compile"
+        android:title="编译"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/save"
+        android:title="保存"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/close"
+        android:title="关闭"
+        app:showAsAction="never" />
+
+</menu>

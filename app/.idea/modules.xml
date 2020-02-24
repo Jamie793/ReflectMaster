@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../ReflectMaster2.iml" filepath="$PROJECT_DIR$/../ReflectMaster2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ScriptParser/ScriptParser.iml" filepath="$PROJECT_DIR$/../ScriptParser/ScriptParser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Test/Test.iml" filepath="$PROJECT_DIR$/../Test/Test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app.iml" filepath="$PROJECT_DIR$/app.iml" />
+    </modules>
+  </component>
+</project>
