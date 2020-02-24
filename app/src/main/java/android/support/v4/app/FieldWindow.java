@@ -496,24 +496,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         button.setText("我的脚本");
         button.setOnClickListener(p1 -> {
             WindowManager am = (WindowManager) act.getSystemService(act.WINDOW_SERVICE);
-//                WindowList list = new WindowList(act, am);
-//                list.setTitle("脚本类型");
-//                list.setItems(new String[]{"Fake脚本", "Lua脚本"});
-//                list.setListener(new OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                        if (position == 0) {
-//                            try {
-//                                loadScriptButton();
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//                        } else if (position == 1) {
-//                                loadLuaScriptButton();
-//                        }
-//                    }
-//                });
-//                list.show();
             loadLuaScriptButton();
         });
         buttonLayout.addView(button);
@@ -602,6 +584,8 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
 
     private void loadLuaScriptButton() {
+        luaitems.clear();
+        names.clear();
         File file = new File(Utils.BASEPATH + "/script");
         if (file.exists()) {
             File[] files = file.listFiles();
@@ -610,9 +594,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 if (fi.isFile() && (name.endsWith(".lua") || name.endsWith(".luaj"))) {
                     if (name.endsWith(".lua"))
                         names.add(name.replace(".lua", ""));
-//                    else
-//                        names.add("*"+name.replace(".luaj", ""));
-
                     luaitems.add(Utils.readText(fi.toString()));
                 }
 
@@ -623,7 +604,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         listView.setItems(names);
         listView.setTitle("Lua脚本");
         listView.setListener((adapterView, view, i, l) -> {
-            ScriptWindow sc = new ScriptWindow(lpparam, param, act, object,luaitems.get(i));
+            ScriptWindow sc = new ScriptWindow(lpparam, param, act, object, luaitems.get(i));
             sc.show(wm, null);
         });
         listView.show();

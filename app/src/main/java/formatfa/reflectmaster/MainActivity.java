@@ -5,6 +5,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,7 +42,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebView;
@@ -242,6 +242,26 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         return true;
     }
 
+
+    private boolean checkAppInstalled(Context context, String pkgName) {
+        if (pkgName == null || pkgName.isEmpty()) {
+            return false;
+        }
+        PackageInfo packageInfo;
+        try {
+            packageInfo = context.getPackageManager().getPackageInfo(pkgName, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            packageInfo = null;
+            e.printStackTrace();
+        }
+        if (packageInfo == null) {
+            return false;
+        } else {
+            return true;//true为安装了，false为未安装
+        }
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.exit) {
@@ -270,17 +290,14 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             Intent i = new Intent(MainActivity.this, CoreInstall.class);
             startActivity(i);
 
-        } else if (item.getItemId() == R.id.fake_script) {
-
-            Intent i = new Intent(MainActivity.this, ScriptManager.class);
-            i.putExtra("mode", 0);
-            startActivity(i);
-
         } else if (item.getItemId() == R.id.lua_script) {
+            if (checkAppInstalled(this, "com.androlua")) {
+                Intent intent = this.getPackageManager().getLaunchIntentForPackage("com.androlua");
+                startActivity(intent);
+            } else {
+                Utils.showToast(this, "请先安装Androlua", 0);
+            }
 
-            Intent i = new Intent(MainActivity.this, LuaScriptManager.class);
-            i.putExtra("mode", 0);
-            startActivity(i);
 
         } else if (item.getItemId() == R.id.setting) {
 
@@ -292,56 +309,38 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
 
             se.setTextColor(Color.WHITE);
             se.setText(String.valueOf(sp.getInt("width", 700)));
-            view.findViewById(R.id.preview).setOnClickListener(new OnClickListener() {
+            view.findViewById(R.id.preview).setOnClickListener(p1 -> {
+                int i = Integer.parseInt(se.getText().toString());
 
-                @Override
-                public void onClick(View p1) {
-                    int i = Integer.parseInt(se.getText().toString());
+                WindowDialog wd1 = new WindowDialog(MainActivity.this);
+                ReflectView2 re = new ReflectView2(MainActivity.this, sp.getBoolean("rotate", true));
 
-                    WindowDialog wd = new WindowDialog(MainActivity.this);
-                    ReflectView2 re = new ReflectView2(MainActivity.this, sp.getBoolean("rotate", true));
-
-                    wd.setTitle("预览");
-                    wd.setView(re);
-                    wd.show(i, i);
+                wd1.setTitle("预览");
+                wd1.setView(re);
+                wd1.show(i, i);
 
 
-                }
             });
 
-            view.findViewById(R.id.ok).setOnClickListener(new OnClickListener() {
+            view.findViewById(R.id.ok).setOnClickListener(p1 -> {
+                int i = Integer.parseInt(se.getText().toString());
 
-                @Override
-                public void onClick(View p1) {
-                    int i = Integer.parseInt(se.getText().toString());
-
-                    sp.edit().putInt("width", i).commit();
-                    Toast.makeText(MainActivity.this, "ojbk", Toast.LENGTH_SHORT).show();
+                sp.edit().putInt("width", i).commit();
+                Toast.makeText(MainActivity.this, "ojbk", Toast.LENGTH_SHORT).show();
 
 
-                }
             });
 
             CheckBox box = view.findViewById(R.id.setting_windowsearch);
             box.setChecked(sp.getBoolean("windowsearch", false));
-            box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    sp.edit().putBoolean("windowsearch", b).apply();
-                    Registers.isUseWindowSearch = b;
+            box.setOnCheckedChangeListener((compoundButton, b) -> {
+                sp.edit().putBoolean("windowsearch", b).apply();
+                Registers.isUseWindowSearch = b;
 
-                }
             });
             CheckBox showfloat = view.findViewById(R.id.setting_float);
             showfloat.setChecked(sp.getBoolean("float", true));
-            showfloat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    sp.edit().putBoolean("float", b).apply();
-
-
-                }
-            });
+            showfloat.setOnCheckedChangeListener((compoundButton, b) -> sp.edit().putBoolean("float", b).apply());
 
 
             CheckBox rotate = view.findViewById(R.id.setting_rotate);
