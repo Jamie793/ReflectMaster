@@ -36,6 +36,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.luajava.LuaException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -45,18 +47,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import formatfa.reflectmaster.LuaDexLoaders;
 import formatfa.reflectmaster.ScriptItem;
 
 public class FieldWindow extends Window implements OnItemClickListener, OnItemLongClickListener {
 
 
-    Button undeclared;
-    ClassLoader classLoader;
+    private Button undeclared;
+    private ClassLoader classLoader;
     private List<String> luaitems = new ArrayList<>();
-    private List<ScriptItem> items = new ArrayList<>();
     private List<String> names = new ArrayList<>();
+    private LuaExecutor luaExecutor;
+    private LuaDexLoaders luaDexLoader;
+
+
+
+    public FieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
+        super(lpparam, param, act, object);
+        classLoader = act.getClassLoader();
+        this.wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+        sp = act.getSharedPreferences(object.getClass().getCanonicalName(), act.MODE_PRIVATE);
+        this.luaExecutor = new LuaExecutor(act, this);
+        luaDexLoader = new LuaDexLoaders(act);
+        myShared = new MyShared(sp, "fieldfaviroylte2");
+    }
 
     @Override
     public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
@@ -554,33 +571,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         });
         editWindow.show(wm, lp);
     }
-//
-//    private void loadScriptButton() throws JSONException {
-//        XSharedPreferences sharedPreferences = new XSharedPreferences("formatfa.reflectmaster", "package");
-//        sharedPreferences.reload();
-//
-//
-//        List<String> names = new ArrayList<>();
-//        String data = sharedPreferences.getString("script", null);
-//        final ArrayList<ScriptItem> items = new ArrayList<>();
-//        if (data != null) {
-//            JSONArray ja = null;
-//            try {
-//                ja = new JSONArray(data);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            for (int i = 0; i < ja.length(); i += 1) {
-//                JSONObject object = ja.getJSONObject(i);
-//                items.add(new ScriptItem(object.getString("name"), object.getString("code")));
-//                names.add(object.getString("name"));
-//
-//
-//            }
-//        }
-//
-//
-//    }
 
 
     private void loadLuaScriptButton() {
@@ -604,9 +594,15 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         listView.setItems(names);
         listView.setTitle("Lua脚本");
         listView.setListener((adapterView, view, i, l) -> {
+            this.luaExecutor.executeLua(act, luaitems.get(i));
+        });
+
+        listView.setOnItemLongClickListener((adapterView, view, i, l) -> {
             ScriptWindow sc = new ScriptWindow(lpparam, param, act, object, luaitems.get(i));
             sc.show(wm, null);
+            return true;
         });
+
         listView.show();
 
 
@@ -633,15 +629,11 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
         Button save = new Button(act);
         save.setText("收藏");
-        save.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                myShared.putData(edit.getText().toString(), m.toGenericString());
-                wm.removeView(layout);
-                myShared.save();
-                Toast.makeText(act, "似乎收藏成功了", Toast.LENGTH_SHORT).show();
-            }
+        save.setOnClickListener(p1 -> {
+            myShared.putData(edit.getText().toString(), m.toGenericString());
+            wm.removeView(layout);
+            myShared.save();
+            Toast.makeText(act, "似乎收藏成功了", Toast.LENGTH_SHORT).show();
         });
         layout.addView(edit);
         layout.addView(save);
@@ -713,13 +705,21 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         return result.toArray(new Field[0]);
     }
 
-    public FieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
-        super(lpparam, param, act, object);
-        classLoader = act.getClassLoader();
-        this.wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
-        sp = act.getSharedPreferences(object.getClass().getCanonicalName(), act.MODE_PRIVATE);
-        myShared = new MyShared(sp, "fieldfaviroylte2");
+    public ArrayList<ClassLoader> getClassLoaders() {
+        // TODO: Implement this method
+        return luaDexLoader.getClassLoaders();
     }
+
+
+    public HashMap<String, String> getLibrarys() {
+        return luaDexLoader.getLibrarys();
+    }
+
+    public DexClassLoader loadDex(String path) throws LuaException {
+        return luaDexLoader.loadDex(path);
+    }
+
+
 
 
 }

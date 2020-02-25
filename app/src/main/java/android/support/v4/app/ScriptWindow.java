@@ -2,11 +2,9 @@ package android.support.v4.app;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Environment;
 import android.os.Handler;
@@ -21,10 +19,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.luajava.JavaFunction;
 import com.luajava.LuaException;
-import com.luajava.LuaState;
-import com.luajava.LuaStateFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,16 +33,15 @@ import java.util.HashMap;
 import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import formatfa.reflectmaster.LuaDexLoaders;
 
 
 public class ScriptWindow extends Window {
-    private LuaState L;
-    final StringBuilder output = new StringBuilder();
-    LuaDexLoaders luaDexLoader;
+
+    private LuaDexLoaders luaDexLoader;
     private static int screenW, screenH;
+    private LuaExecutor luaExecutor;
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -238,9 +232,11 @@ public class ScriptWindow extends Window {
         execute.setOnClickListener(p1 -> {
             log.setText("");
             if (Registers.newThread) {
-                new Thread(this::executeLua).start();
+                new Thread(()->{
+                    luaExecutor.executeLua(getAct(),this.script.toString());
+                }).start();
             }
-            executeLua();
+            luaExecutor.executeLua(getAct(),this.script.getText().toString());
         });
 
 //        Button copy = new Button(act);
@@ -350,152 +346,23 @@ public class ScriptWindow extends Window {
         return false;
     }
 
-    private void executeLua() {
-        String code = script.getText().toString();
-        try {
-            exeLua(code);
-        } catch (LuaException e) {
-            output.insert(0, e.toString());
-        }
-        new AlertDialog.Builder(getAct())
-                .setTitle("运行结果：")
-                .setMessage(output.toString())
-                .setPositiveButton("确定", null)
-                .setNegativeButton("复制", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Utils.writeClipboard(getAct(), output.toString());
-                        Toast.makeText(getAct(), "已复制到剪切板", Toast.LENGTH_SHORT).show();
-                    }
-                }).setNeutralButton("清空", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                output.setLength(0);
-            }
-        }).show().setCancelable(false);
-    }
+
 
     public void loadFile(String file, String key) {
-
-        doFile(file, new Object[0]);
+        luaExecutor.doFile(file, new Object[0]);
     }
 
-    @SuppressLint("UnsafeDynamicallyLoadedCode")
-    public void loadLuaScriptAndAddJavaMethod() {
-        L = LuaStateFactory.newLuaState();
-        L.openLibs();
-        L.pushJavaObject(getAct());
-        L.setGlobal("this");
-        L.pushJavaObject(getAct());
-        L.setGlobal("activity");
-        L.pushJavaObject(this);
-        L.setGlobal("jf");
-//        L.pushJavaObject(getAct().getClass().getClassLoader());
-//        L.setGlobal("jfclass");
-        L.getGlobal("package");
-        L.pushString(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lua/?.lua");
-        L.setField(-2, "path");
-//        L.pushString("456");
-//        L.setField(-2, "cpath");
-        L.pop(1);
-        JavaFunction print = new JavaFunction(L) {
-            @Override
-            public int execute() {
-                for (int i = 2; i <= L.getTop(); i++) {
-                    int type = L.type(i);
-                    String stype = L.typeName(type);
-                    String val = null;
-                    if (stype.equals("userdata")) {
-                        Object obj = L.toJavaObject(i);
-                        if (obj != null)
-                            val = obj.toString();
-                    } else if (stype.equals("boolean")) {
-                        val = L.toBoolean(i) ? "true" : "false";
-                    } else {
-                        val = L.toString(i);
-                    }
-                    if (val == null)
-                        val = stype;
-                    output.insert(0, val);
-                    output.insert(0, "\t");
-                }
-
-                output.insert(0, "\n");
-                return 0;
-            }
-        };
-        print.register("print");
-
-    }
 
     public Object dofile(String s) {
-        return doFile(s, new Object[0]);
-    }
-
-    public Object doFile(String filePath, Object[] args) {
-        int ok = 0;
-        try {
-            //if (filePath.charAt(0) != '/')
-            filePath = Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lua/" + filePath + ".lua";
-
-            L.setTop(0);
-            ok = L.LloadFile(filePath);
-
-            if (ok == 0) {
-                L.getGlobal("debug");
-                L.getField(-1, "traceback");
-                L.remove(-2);
-                L.insert(-2);
-                int l = args.length;
-                for (int i = 0; i < l; i++) {
-                    L.pushObjectValue(args[i]);
-                }
-                ok = L.pcall(l, 1, -2 - l);
-                if (ok == 0) {
-                    return L.toJavaObject(-1);
-                }
-            }
-            throw new LuaException(errorReason(ok) + ": " + L.toString(-1));
-        } catch (LuaException e) {
-            output.insert(0, e.toString());
-        }
-
-        return null;
+        return luaExecutor.doFile(s, new Object[0]);
     }
 
 
-    private String errorReason(int error) {
-        switch (error) {
-            case 4:
-                return "Out of memory";
-            case 3:
-                return "Syntax error";
-            case 2:
-                return "Runtime error";
-            case 1:
-                return "Yield error";
-        }
-        return "Unknown error " + error;
-    }
 
-    private String exeLua(String src) throws LuaException {
-        L.setTop(0);
-        int ok = L.LloadString(src);
-        if (ok == 0) {
-            L.getGlobal("debug");
-            L.getField(-1, "traceback");
-            L.remove(-2);
-            L.insert(-2);
-            ok = L.pcall(0, 0, -2);
-            if (ok == 0) {
-                String res = output.toString();
-                return res;
-            }
-        }
-        throw new LuaException(errorReason(ok) + ": " + L.toString(-1));
-        //return null;
 
-    }
+
+
+
 
     private XC_LoadPackage.LoadPackageParam lpparam;
 
@@ -530,10 +397,12 @@ public class ScriptWindow extends Window {
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
         screenW = displayMetrics.widthPixels;
         screenH = displayMetrics.heightPixels;
-        loadLuaScriptAndAddJavaMethod();
+        this.luaExecutor = new LuaExecutor(getAct(),this);
         luaDexLoader = new LuaDexLoaders(getAct());
 
     }
+
+
 
     public ArrayList<ClassLoader> getClassLoaders() {
         // TODO: Implement this method
