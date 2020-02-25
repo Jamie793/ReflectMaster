@@ -12,13 +12,19 @@ import com.luajava.LuaException;
 import com.luajava.LuaState;
 import com.luajava.LuaStateFactory;
 
+import dalvik.system.PathClassLoader;
+import de.robv.android.xposed.XposedBridge;
+
 public class LuaExecutor {
 
     private LuaState L;
     final StringBuilder output = new StringBuilder();
+    public PathClassLoader pathClassLoader;
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public LuaExecutor(Context activity, Window jf) {
+        this.pathClassLoader = new PathClassLoader(activity.getPackageName(),this.getClass().getClassLoader());
+        XposedBridge.log("Package=>"+activity.getPackageName());
         L = LuaStateFactory.newLuaState();
         L.openLibs();
         L.pushJavaObject(activity);
@@ -27,6 +33,9 @@ public class LuaExecutor {
         L.setGlobal("activity");
         L.pushJavaObject(jf);
         L.setGlobal("jf");
+        L.pushJavaObject(this);
+        L.setGlobal("jc");
+
 //        L.pushJavaObject(getAct().getClass().getClassLoader());
 //        L.setGlobal("jfclass");
         L.getGlobal("package");
@@ -62,6 +71,9 @@ public class LuaExecutor {
             }
         };
         print.register("print");
+
+
+//        exeLua("j");
 
     }
 
@@ -104,6 +116,15 @@ public class LuaExecutor {
 
     }
 
+
+    public void imp(String name) {
+        try {
+            exeLua("luajava.loaded[\""+name+"\"] = jc.pathClassLoader.loadClass(\""+name+"\")\n"+
+                    "import('\""+name+"\")");
+        } catch (LuaException e) {
+            e.printStackTrace();
+        }
+    }
 
     private String errorReason(int error) {
         switch (error) {
