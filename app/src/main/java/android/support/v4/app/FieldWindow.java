@@ -51,7 +51,6 @@ import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import formatfa.reflectmaster.LuaDexLoaders;
-import formatfa.reflectmaster.ScriptItem;
 
 public class FieldWindow extends Window implements OnItemClickListener, OnItemLongClickListener {
 
@@ -62,7 +61,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     private List<String> names = new ArrayList<>();
     private LuaExecutor luaExecutor;
     private LuaDexLoaders luaDexLoader;
-
 
 
     public FieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
@@ -292,20 +290,25 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             }
         });
         clsname.setOnLongClickListener(v -> {
-            clsname.setText("当前：" + object.getClass().getCanonicalName());
+//            clsname.setText("当前：" + object.getClass().getCanonicalName());
+//
+//            Class clas = object.getClass();
+//            //(superCls.getCanonicalName());
+//            try {
+//                object = clas.newInstance();
+//                fields = object.getClass().getDeclaredFields();
+//                undeclared.setText("非私有变量");
+//                isundeclear = false;
+//                adapter = new FieldAdapter(act, fields, object);
+//                list.setAdapter(adapter);
+//            } catch (Exception e) {
+//                Utils.showToast(act, e.toString(), 1);
+//            }
 
-            Class clas = object.getClass();
-            //(superCls.getCanonicalName());
-            try {
-                object = clas.newInstance();
-                fields = object.getClass().getDeclaredFields();
-                undeclared.setText("非私有变量");
-                isundeclear = false;
-                adapter = new FieldAdapter(act, fields, object);
-                list.setAdapter(adapter);
-            } catch (Exception e) {
-                Utils.showToast(act, e.toString(), 1);
-            }
+//            ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
+//            cm.setPrimaryClip(ClipData.newPlainText("test", "" + object));
+            Utils.writeClipboard(act, clsname.getText().toString().replace("当前：", ""));
+            Utils.showToast(act, "已复制类名", 0);
 
             return true;
         });
@@ -397,19 +400,10 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         if (Registers.isUseWindowSearch) {
             fa = new Button(act);
             fa.setText("搜索");
-            fa.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View p1) {
-                    EditWindow window = new EditWindow(lpparam, param, act, "搜索变量", "");
-                    window.setListener(new EditWindow.EditWindowListener() {
-                        @Override
-                        public void onEdited(String str) {
-                            list.setFilterText(str);
-                        }
-                    });
-                    window.show(amanager, lp);
-                }
+            fa.setOnClickListener(p1 -> {
+                EditWindow window = new EditWindow(lpparam, param, act, "搜索变量", "");
+                window.setListener(str -> list.setFilterText(str));
+                window.show(amanager, lp);
             });
             buttonLayout.addView(fa);
 
@@ -419,13 +413,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
         Button add = new Button(act);
         add.setText("临时保存起来");
-        add.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                Registers.add(act, object);
-            }
-        });
+        add.setOnClickListener(p1 -> Registers.add(act, object));
         buttonLayout.addView(add);
 
 
@@ -434,13 +422,9 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             Toast.makeText(act, "这可能是一个Bitmap图片", Toast.LENGTH_SHORT).show();
             Button viewImage = new Button(act);
             viewImage.setText("查看图片");
-            viewImage.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View p1) {
-                    ImageWindow img = new ImageWindow(lpparam, param, act, object);
-                    img.show(wm, lp);
-                }
+            viewImage.setOnClickListener(p1 -> {
+                ImageWindow img = new ImageWindow(lpparam, param, act, object);
+                img.show(wm, lp);
             });
             buttonLayout.addView(viewImage);
 
@@ -718,8 +702,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     public DexClassLoader loadDex(String path) throws LuaException {
         return luaDexLoader.loadDex(path);
     }
-
-
 
 
 }

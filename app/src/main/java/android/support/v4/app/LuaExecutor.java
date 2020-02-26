@@ -40,7 +40,13 @@ public class LuaExecutor {
         L.pushJavaObject(jf);
         L.setGlobal("jf");
         L.pushJavaObject(this);
-        L.setGlobal("jc");
+        L.setGlobal("jl");
+        try {
+            L.pushJavaObject(Class.forName("android.support.v4.app.Registers"));
+            L.setGlobal("jr");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         L.getGlobal("package");
         L.pushString(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lua/?.lua");
         L.setField(-2, "path");
@@ -248,5 +254,11 @@ public class LuaExecutor {
 
         return null;
     }
+
+
+//    public void add(Context context,Object object){
+//        Registers.add(context,object);
+//    }
+
 
 }
