@@ -71,7 +71,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         this.wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         sp = act.getSharedPreferences(object.getClass().getCanonicalName(), act.MODE_PRIVATE);
         this.luaExecutor = new LuaExecutor(act, this);
-        luaDexLoader = new LuaDexLoaders(act);
+        this.luaDexLoader = new LuaDexLoaders(act);
         myShared = new MyShared(sp, "fieldfaviroylte2");
     }
 

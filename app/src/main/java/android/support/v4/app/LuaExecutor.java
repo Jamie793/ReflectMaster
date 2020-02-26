@@ -3,28 +3,33 @@ package android.support.v4.app;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.v4.app.reflectmaster.Utils.Utils;
 import android.widget.Toast;
 
+import com.androlua.LuaDexClassLoader;
 import com.luajava.JavaFunction;
 import com.luajava.LuaException;
 import com.luajava.LuaState;
 import com.luajava.LuaStateFactory;
 
-import dalvik.system.PathClassLoader;
-import de.robv.android.xposed.XposedBridge;
+import java.io.File;
+import java.util.HashMap;
+
+import dalvik.system.DexClassLoader;
 
 public class LuaExecutor {
 
     private LuaState L;
-    final StringBuilder output = new StringBuilder();
-    public PathClassLoader pathClassLoader;
+    private Context context;
+    private final StringBuilder output = new StringBuilder();
+    private final HashMap<String, LuaDexClassLoader> dexCache = new HashMap<>();
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public LuaExecutor(Context activity, Window jf) {
-        this.pathClassLoader = new PathClassLoader(activity.getPackageName(),this.getClass().getClassLoader());
-        XposedBridge.log("Package=>"+activity.getPackageName());
+        this.context = activity;
         L = LuaStateFactory.newLuaState();
         L.openLibs();
         L.pushJavaObject(activity);
@@ -35,14 +40,9 @@ public class LuaExecutor {
         L.setGlobal("jf");
         L.pushJavaObject(this);
         L.setGlobal("jc");
-
-//        L.pushJavaObject(getAct().getClass().getClassLoader());
-//        L.setGlobal("jfclass");
         L.getGlobal("package");
         L.pushString(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lua/?.lua");
         L.setField(-2, "path");
-//        L.pushString("456");
-//        L.setField(-2, "cpath");
         L.pop(1);
         JavaFunction print = new JavaFunction(L) {
             @Override
@@ -75,6 +75,46 @@ public class LuaExecutor {
 
 //        exeLua("j");
 
+    }
+
+
+    public LuaDexClassLoader loadApp(String pkg) {
+        try {
+            LuaDexClassLoader dex = dexCache.get(pkg);
+            if (dex == null) {
+                PackageManager manager = this.context.getPackageManager();
+                ApplicationInfo info = manager.getPackageInfo(pkg, 0).applicationInfo;
+                dex = new LuaDexClassLoader(info.publicSourceDir, this.context.getDir("odex", 0).toString(), info.nativeLibraryDir, this.context.getClassLoader());
+                dexCache.put(pkg, dex);
+            }
+            return dex;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public DexClassLoader load(String path) throws LuaException {
+        LuaDexClassLoader dex = dexCache.get(path);
+        if (dex == null)
+            dex = loadApp(path);
+        if (dex == null) {
+            if (!new File(path).exists())
+                if (new File(path + ".dex").exists())
+                    path += ".dex";
+                else if (new File(path + ".jar").exists())
+                    path += ".jar";
+                else
+                    throw new LuaException(path + " not found");
+            dex = dexCache.get(path);
+
+            if (dex == null) {
+                dex = new LuaDexClassLoader(path, this.context.getDir("odex", 0).toString(), this.context.getApplicationInfo().nativeLibraryDir, this.context.getClassLoader());
+                dexCache.put(path, dex);
+            }
+        }
+        return dex;
     }
 
 
@@ -117,14 +157,10 @@ public class LuaExecutor {
     }
 
 
-    public void imp(String name) {
-        try {
-            exeLua("luajava.loaded[\""+name+"\"] = jc.pathClassLoader.loadClass(\""+name+"\")\n"+
-                    "import('\""+name+"\")");
-        } catch (LuaException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void imp(String name) {
+//        sourceCode.append("luajava.loaded[\"" + name + "\"] = jc.getClass().getClassLoader().loadClass(\"" + name + "\")");
+//        sourceCode.append("import \"" + name + "\"");
+//    }
 
     private String errorReason(int error) {
         switch (error) {
