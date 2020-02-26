@@ -2,15 +2,14 @@ package android.support.v4.app;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.reflectmaster.Utils.Utils;
 import android.view.KeyEvent;
-
-import java.io.File;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -48,18 +47,24 @@ public class Entry implements IXposedHookLoadPackage {
 //        File path2 = new File(new File(lpparam.appInfo.sourceDir).getParent() + "/lib/arm");
 
 
-//        XposedHelpers.findAndHookMethod(System.class, "loadLibrary", String.class, new XC_MethodHook() {
+//        XposedHelpers.findAndHookMethod(System.class, "loadLibrary", String.class, new XC_MethodReplacement() {
+//            @Override
+//            protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+//                if (methodHookParam.args[0].toString().contains("luajava")) {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                        System.loadLibrary(methodHookParam.args[0].toString());
+//                    } else {
+//                        System.loadLibrary(Environment.getDownloadCacheDirectory().toString() + "/ReflectMaster/lib/libluajava.so");
+//                    }
+//                }
+//                return null;
+//            }
+
 //            @Override
 //            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 //                super.beforeHookedMethod(param);
 //                if (param.args[0].toString().contains("luajava")) {
-////                    String path = Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lib/libluajava.so";
-//                    File path2 = new File(new File(lpparam.appInfo.sourceDir).getParent() + "/lib/arm");
-//                    XposedBridge.log("File path=>"+path2.toString());
-////                    if (!path2.exists())
-////                        path2.mkdirs();
-////                    if (!new File(path2.toString() + "/libluajava.so").exists())
-////                        Utils.copyFile(path, path2.toString() + "/libluajava.so");
+//                    if()
 //                }
 //            }
 //        });
@@ -81,8 +86,9 @@ public class Entry implements IXposedHookLoadPackage {
 
 
         LogUtils.loge("the aim app had hook");
-        XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onCreate", Bundle.class, new onCreate_Hook(lpparam));
-        XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onResume", new onResume_Hook());
+//        XposedHelpers.findAndHookMethod("android.app.Application",lpparam.classLoader, "attach", Context.class,new HOnApp());
+        XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onCreate", Bundle.class, new HOnCreate(lpparam));
+        XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onResume", new HOnResume());
         XposedHelpers.findAndHookMethod("android.app.Dialog", lpparam.classLoader, "onKeyDown", int.class, KeyEvent.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {

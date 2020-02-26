@@ -10,6 +10,7 @@ import android.support.v4.app.reflectmaster.Utils.Utils;
 import android.widget.Toast;
 
 import com.androlua.LuaDexClassLoader;
+import com.androlua.LuaThread;
 import com.luajava.JavaFunction;
 import com.luajava.LuaException;
 import com.luajava.LuaState;
@@ -44,6 +45,12 @@ public class LuaExecutor {
         L.pushString(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lua/?.lua");
         L.setField(-2, "path");
         L.pop(1);
+        initLuaFunction();
+
+    }
+
+
+    private void initLuaFunction() {
         JavaFunction print = new JavaFunction(L) {
             @Override
             public int execute() {
@@ -73,8 +80,39 @@ public class LuaExecutor {
         print.register("print");
 
 
-//        exeLua("j");
+        JavaFunction set = new JavaFunction(L) {
+            @Override
+            public int execute() {
+                LuaThread thread = (LuaThread) L.toJavaObject(2);
 
+                thread.set(L.toString(3), L.toJavaObject(4));
+                return 0;
+            }
+        };
+        set.register("set");
+
+
+        JavaFunction call = new JavaFunction(L) {
+            @Override
+            public int execute() {
+                LuaThread thread = (LuaThread) L.toJavaObject(2);
+
+                int top = L.getTop();
+                if (top > 3) {
+                    Object[] args = new Object[top - 3];
+                    for (int i = 4; i <= top; i++) {
+                        args[i - 4] = L.toJavaObject(i);
+                    }
+                    thread.call(L.toString(3), args);
+                } else if (top == 3) {
+                    thread.call(L.toString(3));
+                }
+
+                return 0;
+            }
+
+        };
+        call.register("call");
     }
 
 
@@ -119,11 +157,13 @@ public class LuaExecutor {
 
 
     public void executeLua(Context activity, String code) {
+
         try {
             exeLua(code);
         } catch (LuaException e) {
             output.insert(0, e.toString());
         }
+
         if (output.length() > 0) {
             new AlertDialog.Builder(activity)
                     .setTitle("运行结果：")
@@ -134,6 +174,7 @@ public class LuaExecutor {
                         Toast.makeText(activity, "已复制到剪切板", Toast.LENGTH_SHORT).show();
                     }).setNeutralButton("清空", (dialog, which) -> output.setLength(0)).show().setCancelable(false);
         }
+
     }
 
 
