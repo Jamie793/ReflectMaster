@@ -148,7 +148,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     public static void newWindow(final XC_LoadPackage.LoadPackageParam lpparam, final XC_MethodHook.MethodHookParam param, final Context act, final Object object, final WindowManager wm) {
 
         try {
-            if (object.getClass().getCanonicalName().endsWith(("[]")) && !Registers.isBaseArray(object.getClass().getCanonicalName())) {
+            if (object.getClass().getCanonicalName().endsWith(("[]")) && !MasterUtils.isBaseArray(object.getClass().getCanonicalName())) {
                 Toast.makeText(act, "这是一个数组来的", Toast.LENGTH_SHORT).show();
 
 
@@ -163,7 +163,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 String[] arr = new String[len + 1];
                 arr[0] = "直接查看数组";
                 for (int i = 0; i < ob.length; i += 1) {
-                    arr[i] = i + " " + Registers.getObjectString(ob[i]);
+                    arr[i] = i + " " + MasterUtils.getObjectString(ob[i]);
                 }
                 WindowList list = new WindowList(act, wm);
                 list.setItems(arr);
@@ -222,14 +222,14 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         else {
-            if (Registers.isUseWindowSearch)
+            if (MasterUtils.isUseWindowSearch)
                 lp.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
             else
                 lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         }
 
-        lp.width = Registers.windowSize;
-        lp.height = Registers.windowSize;
+        lp.width = MasterUtils.windowSize;
+        lp.height = MasterUtils.windowSize;
 
 
         if (object == null) {
@@ -241,18 +241,15 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         //lp.height=-2;
         final LinearLayout layout = new LinearLayout(act);
         layout.setBackgroundColor(0xFF303030);
-        final ActionWindow ac = new ActionWindow(act, wm, lp, layout, !Registers.isUseWindowSearch);
+        final ActionWindow ac = new ActionWindow(act, wm, lp, layout, !MasterUtils.isUseWindowSearch);
 
-        if (!Registers.isUseWindowSearch)
-            ac.setSearchCallback(new ActionSearchCallback() {
-                @Override
-                public void onTextChange(EditText edit, String text) {
+        if (!MasterUtils.isUseWindowSearch)
+            ac.setSearchCallback((edit, text) -> {
 
-                    if (TextUtils.isEmpty(text))
-                        list.clearTextFilter();
-                    else
-                        list.setFilterText(text);
-                }
+                if (TextUtils.isEmpty(text))
+                    list.clearTextFilter();
+                else
+                    list.setFilterText(text);
             });
         //layout.setBackgroundColor(Color.BLACK);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -261,32 +258,29 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 clsname = new TextView(act);
 //		Toast.makeText(act,"获取类名:"+object.getClass())
         clsname.setText("当前：" + object.getClass().getCanonicalName());
-        clsname.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (superCls == null) {
-                    superCls = object.getClass().getSuperclass();
-                } else
-                    superCls = superCls.getClass();
-                if (superCls == null) superCls = object.getClass();
-                //if(superCls.getCanonicalName().equals("java.lang.Class"))return;
-                clsname.setText("当前：" + superCls.getCanonicalName());
+        clsname.setOnClickListener(view -> {
+            if (superCls == null) {
+                superCls = object.getClass().getSuperclass();
+            } else
+                superCls = superCls.getClass();
+            if (superCls == null) superCls = object.getClass();
+            //if(superCls.getCanonicalName().equals("java.lang.Class"))return;
+            clsname.setText("当前：" + superCls.getCanonicalName());
+            try {
+                Class clas = act.getClass().getClassLoader().loadClass(superCls.getCanonicalName());
+                //(superCls.getCanonicalName());
                 try {
-                    Class clas = act.getClass().getClassLoader().loadClass(superCls.getCanonicalName());
-                    //(superCls.getCanonicalName());
-                    try {
-                        object = clas.newInstance();
-                        fields = object.getClass().getDeclaredFields();
-                        undeclared.setText("非私有变量");
-                        isundeclear = false;
-                        adapter = new FieldAdapter(act, fields, object);
-                        list.setAdapter(adapter);
-                    } catch (Exception e) {
-                        Utils.showToast(act, e.toString(), 1);
-                    }
-                } catch (ClassNotFoundException e) {
+                    object = clas.newInstance();
+                    fields = object.getClass().getDeclaredFields();
+                    undeclared.setText("非私有变量");
+                    isundeclear = false;
+                    adapter = new FieldAdapter(act, fields, object);
+                    list.setAdapter(adapter);
+                } catch (Exception e) {
                     Utils.showToast(act, e.toString(), 1);
                 }
+            } catch (ClassNotFoundException e) {
+                Utils.showToast(act, e.toString(), 1);
             }
         });
         clsname.setOnLongClickListener(v -> {
@@ -349,40 +343,32 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
         metbod = new Button(act);
         metbod.setText("构造方法");
-        metbod.setOnClickListener(new OnClickListener() {
+        metbod.setOnClickListener(p1 -> {
+            ConstructorWindow mw = new ConstructorWindow(lpparam, param, act, object);
 
-            @Override
-            public void onClick(View p1) {
-                ConstructorWindow mw = new ConstructorWindow(lpparam, param, act, object);
-
-                mw.show(wm, lp);
-            }
+            mw.show(wm, lp);
         });
         buttonLayout.addView(metbod);
 
 
         undeclared = new Button(act);
         undeclared.setText("私有变量");
-        undeclared.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                if (isundeclear) {
-                    fields = object.getClass().getDeclaredFields();
-                    adapter.setFields(fields);
-                    adapter.notifyDataSetChanged();
-                    isundeclear = false;
-                    undeclared.setText("非私有变量");
-                } else {
-                    fields = object.getClass().getFields();
-                    adapter.setFields(fields);
-                    adapter.notifyDataSetChanged();
-                    isundeclear = true;
-                    undeclared.setText("私有变量");
-                }
-
-
+        undeclared.setOnClickListener(p1 -> {
+            if (isundeclear) {
+                fields = object.getClass().getDeclaredFields();
+                adapter.setFields(fields);
+                adapter.notifyDataSetChanged();
+                isundeclear = false;
+                undeclared.setText("非私有变量");
+            } else {
+                fields = object.getClass().getFields();
+                adapter.setFields(fields);
+                adapter.notifyDataSetChanged();
+                isundeclear = true;
+                undeclared.setText("私有变量");
             }
+
+
         });
         buttonLayout.addView(undeclared);
         Button fa = new Button(act);
@@ -397,7 +383,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         //buttonLayout.addView(fa);
 
 
-        if (Registers.isUseWindowSearch) {
+        if (MasterUtils.isUseWindowSearch) {
             fa = new Button(act);
             fa.setText("搜索");
             fa.setOnClickListener(p1 -> {
@@ -413,7 +399,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
         Button add = new Button(act);
         add.setText("临时保存起来");
-        add.setOnClickListener(p1 -> Registers.add(act, object));
+        add.setOnClickListener(p1 -> MasterUtils.add(act, object));
         buttonLayout.addView(add);
 
 

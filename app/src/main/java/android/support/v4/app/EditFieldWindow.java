@@ -40,7 +40,7 @@ public class EditFieldWindow extends Window {
             ok = new Button(act);
             ok.setText("修改");
             ok.setOnClickListener(p1 -> {
-                Object result = Registers.baseTypeParse(field.getType().getCanonicalName(), value.getText().toString());
+                Object result = MasterUtils.baseTypeParse(field.getType().getCanonicalName(), value.getText().toString());
                 try {
                     field.set(object, result);
                 } catch (IllegalAccessException e) {

@@ -2,15 +2,13 @@ package android.support.v4.app.widget;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
 import android.support.v4.app.ActionWindow;
 import android.support.v4.app.Adapter.TextAdapter;
-import android.support.v4.app.Registers;
+import android.support.v4.app.MasterUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -37,8 +35,8 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         this.context = context;
         this.manager = manager;
         layoutParam = new WindowManager.LayoutParams();
-        layoutParam.width = Registers.windowSize;
-        layoutParam.height = Registers.windowSize;
+        layoutParam.width = MasterUtils.windowSize;
+        layoutParam.height = MasterUtils.windowSize;
         layoutParam.x = 0;
         layoutParam.y = 0;
         layoutParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;

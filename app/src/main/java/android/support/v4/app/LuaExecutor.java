@@ -42,7 +42,7 @@ public class LuaExecutor {
         L.pushJavaObject(this);
         L.setGlobal("jl");
         try {
-            L.pushJavaObject(Class.forName("android.support.v4.app.Registers"));
+            L.pushJavaObject(Class.forName("android.support.v4.app.MasterUtils"));
             L.setGlobal("jr");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -257,7 +257,7 @@ public class LuaExecutor {
 
 
 //    public void add(Context context,Object object){
-//        Registers.add(context,object);
+//        MasterUtils.add(context,object);
 //    }
 
 

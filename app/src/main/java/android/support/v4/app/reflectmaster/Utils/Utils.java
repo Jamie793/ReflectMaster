@@ -61,39 +61,7 @@ public class Utils {
     }
 
 
-    public static void copyFile(String path, String path2) {
-        FileInputStream fileInputStream = null;
-        FileOutputStream fileOutputStream = null;
-        try {
-            fileInputStream = new FileInputStream(path);
-            fileOutputStream = new FileOutputStream(path2);
-            byte[] byt = new byte[8 * 1024];
-            int len;
-            while ((len = fileInputStream.read(byt, 0, byt.length)) != -1) {
-                fileOutputStream.write(byt, 0, len);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fileOutputStream != null) {
-                try {
-                    fileOutputStream.flush();
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+
 
     private static int[] $(int i) {
         int[] ii = new int[4];

@@ -5,7 +5,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,7 +24,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FWindow;
-import android.support.v4.app.Registers;
+import android.support.v4.app.MasterUtils;
 import android.support.v4.app.reflectmaster.Adapter.ApkAdapter;
 import android.support.v4.app.reflectmaster.CoreInstall;
 import android.support.v4.app.reflectmaster.Utils.Utils;
@@ -335,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             box.setChecked(sp.getBoolean("windowsearch", false));
             box.setOnCheckedChangeListener((compoundButton, b) -> {
                 sp.edit().putBoolean("windowsearch", b).apply();
-                Registers.isUseWindowSearch = b;
+                MasterUtils.isUseWindowSearch = b;
 
             });
             CheckBox showfloat = view.findViewById(R.id.setting_float);
@@ -369,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             newThread.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    Registers.newThread = b;
+                    MasterUtils.newThread = b;
                     sp.edit().putBoolean("newthread", b).apply();
 
 
@@ -534,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        Version.isTestMode = true;
-        Registers.nowAct = this;
+        MasterUtils.nowAct = this;
         luaDexLoader = new LuaDexLoaders(this);
         FWindow window = new FWindow(this, null);
 
@@ -575,9 +574,9 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             showHelp();
 
         }
-        Registers.windowSize = sp.getInt("width", 700);
+        MasterUtils.windowSize = sp.getInt("width", 700);
 
-        Registers.rotate = sp.getBoolean("rotate", true);
+        MasterUtils.rotate = sp.getBoolean("rotate", true);
         EditText sear = findViewById(R.id.seartext);
         list.requestFocus();
         sear.addTextChangedListener(new TextWatcher() {

@@ -2,7 +2,7 @@ package android.support.v4.app.ClassHandle;
 
 import android.content.Context;
 import android.support.v4.app.FieldWindow;
-import android.support.v4.app.Registers;
+import android.support.v4.app.MasterUtils;
 import android.support.v4.app.widget.WindowList;
 import android.view.View;
 import android.view.WindowManager;
@@ -59,7 +59,7 @@ public class Handle_Set extends ClassHandle {
         int i = 0;
         while (iterator.hasNext()) {
             Object ob = iterator.next();
-            st.add(i + " " + Registers.getObjectString(ob));
+            st.add(i + " " + MasterUtils.getObjectString(ob));
             objects.add(ob);
         }
         wl.setItems(st);

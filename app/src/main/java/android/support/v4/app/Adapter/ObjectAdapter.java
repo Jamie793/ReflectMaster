@@ -2,7 +2,7 @@ package android.support.v4.app.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v4.app.Registers;
+import android.support.v4.app.MasterUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -60,7 +60,7 @@ public class ObjectAdapter extends BaseAdapter {
             name.setText(objects.get(p1).getClass().getCanonicalName());
         }
 
-           value.setText(Registers.getObjectString(ob));
+           value.setText(MasterUtils.getObjectString(ob));
 
 
         name.setTextColor(Color.RED);

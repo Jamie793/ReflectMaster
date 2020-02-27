@@ -25,7 +25,7 @@ public class Application_hook extends XC_MethodHook {
     protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
         XposedBridge.log(lpparam.packageName + "service has hook by F");
 
-        Registers.add((Application) param.thisObject, param.thisObject);
+        MasterUtils.add((Application) param.thisObject, param.thisObject);
         //FWindow win=new FWindow(lpparam,param);
         // TODO: Implement this method
         super.afterHookedMethod(param);

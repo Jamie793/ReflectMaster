@@ -65,7 +65,7 @@ public class FWindow {
     }
 
     public FWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam method) {
-        if (!Registers.isFloating) return;
+        if (!MasterUtils.isFloating) return;
         this.lpparam = lpparam;
         this.param = method;
 
@@ -80,7 +80,7 @@ public class FWindow {
 
     public FWindow(Context activity, Dialog dialog) {
 
-        if (!Registers.isFloating) return;
+        if (!MasterUtils.isFloating) return;
         act = activity;
         obj = act;
         this.dialog = dialog;
@@ -94,7 +94,7 @@ public class FWindow {
     }
 
     public FWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam method, Object object) {
-        if (!Registers.isFloating) return;
+        if (!MasterUtils.isFloating) return;
         this.lpparam = lpparam;
         this.param = method;
 
@@ -294,7 +294,7 @@ public class FWindow {
 
             @Override
             public void onClick(View p1) {
-                showObjects("我的变量", Registers.objects);
+                showObjects("我的变量", MasterUtils.objects);
 
             }
         });
@@ -308,7 +308,7 @@ public class FWindow {
 //				@Override
 //				public void onClick(View p1)
 //				{
-//					showObjects(",服务",Registers.serviceobjects);
+//					showObjects(",服务",MasterUtils.serviceobjects);
 //
 //				}
 //			});
@@ -467,7 +467,7 @@ public class FWindow {
             layoutParam.height = 170;
             if (!isExit) {
                 if (floating == null) {
-                    floating = new ReflectView2(act, Registers.rotate);
+                    floating = new ReflectView2(act, MasterUtils.rotate);
                     floating.setOnTouchListener(new OnTouchListener() {
 
                         int x;
@@ -595,7 +595,7 @@ public class FWindow {
         if (dialog != null)
             showViewsLine(dialog.getWindow(), p0);
         else
-            showViewsLine(Registers.nowAct.getWindow(), p0);
+            showViewsLine(MasterUtils.nowAct.getWindow(), p0);
     }
 
 

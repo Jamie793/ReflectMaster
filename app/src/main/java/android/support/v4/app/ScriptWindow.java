@@ -6,7 +6,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.reflectmaster.Utils.Utils;
@@ -131,8 +130,8 @@ public class ScriptWindow extends Window {
         }
 
         public static Object getTempVar(int position) {
-            if (position < Registers.objects.size())
-                return Registers.objects.get(position);
+            if (position < MasterUtils.objects.size())
+                return MasterUtils.objects.get(position);
             else
                 return null;
         }
@@ -216,8 +215,8 @@ public class ScriptWindow extends Window {
         layoutParams = new WindowManager.LayoutParams();
         layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        layoutParams.width = Registers.windowSize;
-        layoutParams.height = Registers.windowSize;
+        layoutParams.width = MasterUtils.windowSize;
+        layoutParams.height = MasterUtils.windowSize;
         layout = new LinearLayout(act);
         layout.setBackgroundColor(Color.WHITE);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -231,7 +230,7 @@ public class ScriptWindow extends Window {
         execute.setWidth(screenW);
         execute.setOnClickListener(p1 -> {
             log.setText("");
-            if (Registers.newThread) {
+            if (MasterUtils.newThread) {
                 new Thread(()->{
                     luaExecutor.executeLua(getAct(),this.script.toString());
                 }).start();

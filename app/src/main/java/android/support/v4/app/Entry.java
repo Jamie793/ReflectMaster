@@ -1,15 +1,14 @@
 package android.support.v4.app;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.os.Build;
+import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.KeyEvent;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -47,32 +46,23 @@ public class Entry implements IXposedHookLoadPackage {
 //        File path2 = new File(new File(lpparam.appInfo.sourceDir).getParent() + "/lib/arm");
 
 
-//        XposedHelpers.findAndHookMethod(System.class, "loadLibrary", String.class, new XC_MethodReplacement() {
-//            @Override
-//            protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-//                if (methodHookParam.args[0].toString().contains("luajava")) {
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                        System.loadLibrary(methodHookParam.args[0].toString());
-//                    } else {
-//                        System.loadLibrary(Environment.getDownloadCacheDirectory().toString() + "/ReflectMaster/lib/libluajava.so");
-//                    }
-//                }
-//                return null;
-//            }
-
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                super.beforeHookedMethod(param);
-//                if (param.args[0].toString().contains("luajava")) {
-//                    if()
-//                }
-//            }
-//        });
+        XposedHelpers.findAndHookMethod(System.class, "load", String.class, new XC_MethodHook() {
+            @SuppressLint("SdCardPath")
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                String path = ((Context) param.thisObject).getApplicationInfo().dataDir + "/app_lib/libluajava.so";
+                XposedBridge.log("APP_DATA_PATH=>" + path);
+                if (param.args[0].toString().contains("ReflectMaster/lib/libluajava.so")) {
+                    param.args[0] = path;
+                }
+            }
+        });
 
 
-        Registers.isUseWindowSearch = sp.getBoolean("windowsearch", false);
-        Registers.isFloating = sp.getBoolean("float", true);
-        Registers.newThread = sp.getBoolean("newthread", false);
+        MasterUtils.isUseWindowSearch = sp.getBoolean("windowsearch", false);
+        MasterUtils.isFloating = sp.getBoolean("float", true);
+        MasterUtils.newThread = sp.getBoolean("newthread", false);
 
 
         id = sp.getString("fid", "");
@@ -80,9 +70,9 @@ public class Entry implements IXposedHookLoadPackage {
         register = sp.getString("register", "");
 
         XposedBridge.log("aim hooked");
-        Registers.windowSize = sp.getInt("width", 700);
-        Registers.rotate = sp.getBoolean("rotate", true);
-        XposedBridge.log("set Window size:" + Registers.windowSize);
+        MasterUtils.windowSize = sp.getInt("width", 700);
+        MasterUtils.rotate = sp.getBoolean("rotate", true);
+        XposedBridge.log("set Window size:" + MasterUtils.windowSize);
 
 
         LogUtils.loge("the aim app had hook");
@@ -98,7 +88,7 @@ public class Entry implements IXposedHookLoadPackage {
 
 
                 if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                    FWindow win = new FWindow(Registers.nowAct, dialog);
+                    FWindow win = new FWindow(MasterUtils.nowAct, dialog);
                     //win.setDialog(dialog);
 
                 }
@@ -114,7 +104,7 @@ public class Entry implements IXposedHookLoadPackage {
 
 
                 if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                    Registers.nowAct = (Activity) param.thisObject;
+                    MasterUtils.nowAct = (Activity) param.thisObject;
                     FWindow win = new FWindow(lpparam, param);
 
                 }

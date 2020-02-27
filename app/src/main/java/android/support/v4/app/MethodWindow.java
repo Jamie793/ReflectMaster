@@ -145,8 +145,8 @@ public class MethodWindow extends Window implements OnItemClickListener {
 
         final LinearLayout l = new LinearLayout(act);
         l.setBackgroundColor(Color.BLACK);
-        lp.width = Registers.windowSize;
-        lp.height = Registers.windowSize;
+        lp.width = MasterUtils.windowSize;
+        lp.height = MasterUtils.windowSize;
         ActionWindow ac = new ActionWindow(act, wm, lp, l);
 
 
@@ -217,7 +217,7 @@ public class MethodWindow extends Window implements OnItemClickListener {
                         Class c = m.getParameterTypes()[i];
                         String s = valuesEdit[i].getText().toString();
                         if (s.startsWith("$F")) {
-                            values[i] = Registers.objects.get(Integer.parseInt(s.substring(2)));
+                            values[i] = MasterUtils.objects.get(Integer.parseInt(s.substring(2)));
                         } else if (s.equals("$null")) {
                             values[i] = null;
                         } else {
@@ -303,7 +303,7 @@ public class MethodWindow extends Window implements OnItemClickListener {
         WindowList elist = new WindowList(act, wm);
         elist.setTitle("selece var");
         List<String> name = new ArrayList<String>();
-        for (Object o : Registers.objects) {
+        for (Object o : MasterUtils.objects) {
 
             name.add(o.getClass().getCanonicalName());
 
@@ -417,13 +417,13 @@ public class MethodWindow extends Window implements OnItemClickListener {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         else {
-            if (Registers.isUseWindowSearch)
+            if (MasterUtils.isUseWindowSearch)
                 lp.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
             else
                 lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         }
-        lp.width = Registers.windowSize;
-        lp.height = Registers.windowSize;
+        lp.width = MasterUtils.windowSize;
+        lp.height = MasterUtils.windowSize;
 
         final LinearLayout root = new LinearLayout(act);
 
@@ -433,9 +433,9 @@ public class MethodWindow extends Window implements OnItemClickListener {
         root.addView(title);
 
 
-        acw = new ActionWindow(act, manager, lp, root, !Registers.isUseWindowSearch);
+        acw = new ActionWindow(act, manager, lp, root, !MasterUtils.isUseWindowSearch);
 
-        if (!Registers.isUseWindowSearch)
+        if (!MasterUtils.isUseWindowSearch)
             acw.setSearchCallback(new ActionSearchCallback() {
                 @Override
                 public void onTextChange(EditText edit, String text) {
@@ -504,7 +504,7 @@ public class MethodWindow extends Window implements OnItemClickListener {
             }
         });
         buttonLayout.addView(fa);
-        if (Registers.isUseWindowSearch) {
+        if (MasterUtils.isUseWindowSearch) {
             fa = new Button(act);
             fa.setText("搜索");
             fa.setOnClickListener(new OnClickListener() {

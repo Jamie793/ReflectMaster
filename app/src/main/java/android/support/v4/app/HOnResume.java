@@ -10,7 +10,7 @@ public class HOnResume extends XC_MethodHook {
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
         super.afterHookedMethod(param);
 
-        Registers.nowAct = (Activity) param.thisObject;
+        MasterUtils.nowAct = (Activity) param.thisObject;
 
 
     }

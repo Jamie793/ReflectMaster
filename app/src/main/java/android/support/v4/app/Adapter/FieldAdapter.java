@@ -2,7 +2,7 @@ package android.support.v4.app.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v4.app.Registers;
+import android.support.v4.app.MasterUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -77,7 +77,7 @@ public class FieldAdapter extends BaseAdapter implements Filterable {
 
 
             try {
-                value.setText(Registers.getObjectString(fields[p1].get(obj)));
+                value.setText(MasterUtils.getObjectString(fields[p1].get(obj)));
             } catch (IllegalAccessException e) {
             } catch (IllegalArgumentException e) {
         }

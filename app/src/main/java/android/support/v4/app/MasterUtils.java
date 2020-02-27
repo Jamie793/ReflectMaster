@@ -11,7 +11,7 @@ import java.util.List;
 
 import android.widget.Button;
 
-public class Registers {
+public class MasterUtils {
     public static Activity nowAct;
 
     //旋转

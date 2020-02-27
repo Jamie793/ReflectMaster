@@ -30,7 +30,7 @@ public class Fragment_hook extends XC_MethodHook {
 
         XposedBridge.log(lpparam.packageName + "  Fragment has hook by F");
 
-        Registers.add(null, param.thisObject);
+        MasterUtils.add(null, param.thisObject);
         //FWindow win=new FWindow(lpparam,param,param.thisObject);
 
         // TODO: Implement this method

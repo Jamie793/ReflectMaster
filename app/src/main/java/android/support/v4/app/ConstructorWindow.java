@@ -114,8 +114,8 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
 
         final LinearLayout l = new LinearLayout(act);
         l.setBackgroundColor(Color.BLACK);
-        lp.width = Registers.windowSize;
-        lp.height = Registers.windowSize;
+        lp.width = MasterUtils.windowSize;
+        lp.height = MasterUtils.windowSize;
         ActionWindow ac = new ActionWindow(act, wm, lp, l);
 
 
@@ -171,7 +171,7 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
                         Class c = m.getParameterTypes()[i];
                         String s = valuesEdit[i].getText().toString();
                         if (s.startsWith("$F")) {
-                            values[i] = Registers.objects.get(Integer.parseInt(s.substring(2)));
+                            values[i] = MasterUtils.objects.get(Integer.parseInt(s.substring(2)));
                         } else {
                             switch (c.getCanonicalName()) {
                                 case "int":
@@ -252,7 +252,7 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         WindowList elist = new WindowList(act, wm);
         elist.setTitle("selece var");
         List<String> name = new ArrayList<String>();
-        for (Object o : Registers.objects) {
+        for (Object o : MasterUtils.objects) {
 
             name.add(o.getClass().getCanonicalName());
 
@@ -289,13 +289,13 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         else {
-            if (Registers.isUseWindowSearch)
+            if (MasterUtils.isUseWindowSearch)
                 lp.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
             else
                 lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         }
-        lp.width = Registers.windowSize;
-        lp.height = Registers.windowSize;
+        lp.width = MasterUtils.windowSize;
+        lp.height = MasterUtils.windowSize;
 
         final LinearLayout root = new LinearLayout(act);
 
@@ -305,9 +305,9 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         root.addView(title);
 
 
-        acw = new ActionWindow(act, manager, lp, root, !Registers.isUseWindowSearch);
+        acw = new ActionWindow(act, manager, lp, root, !MasterUtils.isUseWindowSearch);
 
-        if (!Registers.isUseWindowSearch)
+        if (!MasterUtils.isUseWindowSearch)
             acw.setSearchCallback(new ActionSearchCallback() {
                 @Override
                 public void onTextChange(EditText edit, String text) {
@@ -368,7 +368,7 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
 
         Button fa = null;
 
-        if (Registers.isUseWindowSearch) {
+        if (MasterUtils.isUseWindowSearch) {
             fa = new Button(act);
             fa.setText("搜索");
             fa.setOnClickListener(new View.OnClickListener() {
