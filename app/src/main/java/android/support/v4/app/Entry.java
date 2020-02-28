@@ -43,21 +43,15 @@ public class Entry implements IXposedHookLoadPackage {
             return;
         }
 
-//        File path2 = new File(new File(lpparam.appInfo.sourceDir).getParent() + "/lib/arm");
 
 
-        XposedHelpers.findAndHookMethod(System.class, "load", String.class, new XC_MethodHook() {
-            @SuppressLint("SdCardPath")
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-                String path = ((Context) param.thisObject).getApplicationInfo().dataDir + "/app_lib/libluajava.so";
-                XposedBridge.log("APP_DATA_PATH=>" + path);
-                if (param.args[0].toString().contains("ReflectMaster/lib/libluajava.so")) {
-                    param.args[0] = path;
-                }
-            }
-        });
+//        XposedHelpers.findAndHookMethod(System.class, "load", String.class, new XC_MethodHook() {
+//            @Override
+//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                super.beforeHookedMethod(param);
+//
+//            }
+//        });
 
 
         MasterUtils.isUseWindowSearch = sp.getBoolean("windowsearch", false);

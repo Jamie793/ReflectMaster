@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -16,28 +17,23 @@ import java.security.NoSuchAlgorithmException;
 public class FileUtils {
 
     public static boolean putString(String path, String content) {
-        FileOutputStream fileOutputStream = null;
-        BufferedWriter bufferedWriter = null;
+        FileWriter fileWriter = null;
         try {
-            fileOutputStream = new FileOutputStream(path);
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
-            bufferedWriter.write(content);
+            File file = new File(path);
+            if(!file.exists())
+                file.createNewFile();
+
+            fileWriter = new FileWriter(path);
+            fileWriter.write(content);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (fileOutputStream != null) {
+
+            if (fileWriter != null) {
                 try {
-                    fileOutputStream.flush();
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (bufferedWriter != null) {
-                try {
-                    bufferedWriter.flush();
-                    bufferedWriter.close();
+                    fileWriter.flush();
+                    fileWriter.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -84,7 +80,7 @@ public class FileUtils {
     }
 
 
-    public static boolean writeFile(String path, byte[] byt) throws FileNotFoundException {
+    public static boolean writeFile(String path, byte[] byt) {
         FileOutputStream fileOutputStream = null;
         try {
             fileOutputStream = new FileOutputStream(path);

@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import dalvik.system.DexClassLoader;
+import de.robv.android.xposed.XposedBridge;
 
 public class LuaExecutor {
 
@@ -30,8 +31,9 @@ public class LuaExecutor {
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public LuaExecutor(Context activity, Window jf) {
+        XposedBridge.log("Path=>" + formatfa.reflectmaster.Utils.Utils.getLuaJavaSoPath());
         this.context = activity;
-        L = LuaStateFactory.newLuaState();
+        L = LuaStateFactory.newLuaState(formatfa.reflectmaster.Utils.Utils.getLuaJavaSoPath());
         L.openLibs();
         L.pushJavaObject(activity);
         L.setGlobal("this");
@@ -65,7 +67,12 @@ public class LuaExecutor {
                     String stype = L.typeName(type);
                     String val = null;
                     if (stype.equals("userdata")) {
-                        Object obj = L.toJavaObject(i);
+                        Object obj = null;
+                        try {
+                            obj = L.toJavaObject(i);
+                        } catch (LuaException e) {
+                            e.printStackTrace();
+                        }
                         if (obj != null)
                             val = obj.toString();
                     } else if (stype.equals("boolean")) {
@@ -89,9 +96,18 @@ public class LuaExecutor {
         JavaFunction set = new JavaFunction(L) {
             @Override
             public int execute() {
-                LuaThread thread = (LuaThread) L.toJavaObject(2);
+                LuaThread thread = null;
+                try {
+                    thread = (LuaThread) L.toJavaObject(2);
+                } catch (LuaException e) {
+                    e.printStackTrace();
+                }
 
-                thread.set(L.toString(3), L.toJavaObject(4));
+                try {
+                    thread.set(L.toString(3), L.toJavaObject(4));
+                } catch (LuaException e) {
+                    e.printStackTrace();
+                }
                 return 0;
             }
         };
@@ -101,13 +117,22 @@ public class LuaExecutor {
         JavaFunction call = new JavaFunction(L) {
             @Override
             public int execute() {
-                LuaThread thread = (LuaThread) L.toJavaObject(2);
+                LuaThread thread = null;
+                try {
+                    thread = (LuaThread) L.toJavaObject(2);
+                } catch (LuaException e) {
+                    e.printStackTrace();
+                }
 
                 int top = L.getTop();
                 if (top > 3) {
                     Object[] args = new Object[top - 3];
                     for (int i = 4; i <= top; i++) {
-                        args[i - 4] = L.toJavaObject(i);
+                        try {
+                            args[i - 4] = L.toJavaObject(i);
+                        } catch (LuaException e) {
+                            e.printStackTrace();
+                        }
                     }
                     thread.call(L.toString(3), args);
                 } else if (top == 3) {
