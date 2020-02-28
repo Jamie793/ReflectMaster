@@ -18,6 +18,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androlua.LuaEditor;
 import com.luajava.LuaException;
 
 import java.io.File;
@@ -81,7 +82,7 @@ public class ScriptWindow extends Window {
     private WindowManager.LayoutParams layoutParams;
     private ActionWindow actionWindow;
     private Button execute;
-    private EditText script;
+    private LuaEditor script;
     private TextView log;
 
     public TextView getLog() {
@@ -258,13 +259,13 @@ public class ScriptWindow extends Window {
         });
         buttonLayout.addView(execute);
         // buttonLayout.addView(copy);
-        script = new EditText(act);
-        script.setHeight(this.screenW / 4);
+        script = new LuaEditor(act);
+//        script.setHeight(this.screenW / 4);
         script.setTextColor(Color.BLACK);
         log = new TextView(act);
 
         log.setTextColor(Color.RED);
-        script.setMaxHeight(this.screenH / 2);
+//        script.setMaxHeight(this.screenH / 2);
         layout.addView(actionWindow.getActionBar());
         layout.addView(buttonLayout);
         layout.addView(script);
