@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.widget.Toast;
 
@@ -335,6 +336,21 @@ public class Utils {
         }
         return stringBuilder.toString();
     }
+
+
+    public static String getCpu() {
+        String CPU_ABI = null;
+        if (Build.VERSION.SDK_INT >= 21) {
+            String[] CPU_ABIS = Build.SUPPORTED_ABIS;
+            if (CPU_ABIS.length > 0) {
+                CPU_ABI = CPU_ABIS[0];
+            }
+        } else {
+            CPU_ABI = Build.CPU_ABI;
+        }
+        return CPU_ABI;
+    }
+
 
 
     public static int zipDe(String from, String to, String name) {

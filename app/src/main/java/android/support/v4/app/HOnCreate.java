@@ -42,8 +42,9 @@ public class HOnCreate extends XC_MethodHook {
 
         String luajavaPath = ((Context) param.thisObject).getApplicationInfo().dataDir + "/app_lib";
 
-        String cpu = getCpu();
+        String cpu = android.support.v4.app.reflectmaster.Utils.Utils.getCpu();
         XposedBridge.log("CPU=>" + cpu);
+
         File[] files = new File(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lib/" + cpu).listFiles();
         for (File f : files) {
             FileUtils.copyFile(f.getAbsolutePath(), luajavaPath + "/" + f.getName(), false, true);
@@ -58,18 +59,7 @@ public class HOnCreate extends XC_MethodHook {
         super.afterHookedMethod(param);
     }
 
-    private String getCpu() {
-        String CPU_ABI = null;
-        if (Build.VERSION.SDK_INT >= 21) {
-            String[] CPU_ABIS = Build.SUPPORTED_ABIS;
-            if (CPU_ABIS.length > 0) {
-                CPU_ABI = CPU_ABIS[0];
-            }
-        } else {
-            CPU_ABI = Build.CPU_ABI;
-        }
-        return CPU_ABI;
-    }
+
 
 
 }

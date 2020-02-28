@@ -2,14 +2,13 @@ package android.support.v4.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import android.widget.Button;
 
 public class MasterUtils {
     public static Activity nowAct;
@@ -36,6 +35,10 @@ public class MasterUtils {
         objects.add(obj);
         if (context != null)
             Toast.makeText(context, "添加到临时存储器v" + p + "成功！", Toast.LENGTH_SHORT).show();
+    }
+
+    public static Object get(int i) {
+        return objects.get(i);
     }
 
     public static void addService(Context context, Object obj) {

@@ -230,11 +230,11 @@ public class ScriptWindow extends Window {
         execute.setWidth(screenW);
         execute.setOnClickListener(p1 -> {
             log.setText("");
-            if (MasterUtils.newThread) {
-                new Thread(()->{
-                    luaExecutor.executeLua(getAct(),this.script.toString());
-                }).start();
-            }
+//            if (MasterUtils.newThread) {
+//                new Thread(()->{
+//                    luaExecutor.executeLua(getAct(),this.script.toString());
+//                }).start();
+//            }
             luaExecutor.executeLua(getAct(),this.script.getText().toString());
         });
 
