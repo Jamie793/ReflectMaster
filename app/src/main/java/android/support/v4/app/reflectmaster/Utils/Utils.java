@@ -350,7 +350,7 @@ public class Utils {
                 if (zname.indexOf(name) != -1) {
                     String na = zname.replace(name, "");
                     File f = new File(to, na);
-                    if (!f.exists())
+                    if (!f.getParentFile().exists())
                         f.getParentFile().mkdirs();
                     FileOutputStream fileOutputStream = new FileOutputStream(f);
                     int len = 0;
@@ -373,6 +373,8 @@ public class Utils {
         }
         return 0;
     }
+
+
 
     public static Boolean stringtosd(String str, String path) {
         File f = new File(path);

@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FWindow;
 import android.support.v4.app.MasterUtils;
+import android.support.v4.app.Utils.FileUtils;
 import android.support.v4.app.reflectmaster.Adapter.ApkAdapter;
 import android.support.v4.app.reflectmaster.CoreInstall;
 import android.support.v4.app.reflectmaster.Utils.Utils;
@@ -764,33 +765,42 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         //创建文件夹复制文件等
         final File file = new File(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lua");
         final File file2 = new File(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lib");
-        if (!file2.exists()) file2.mkdirs();
-        Utils.zipDe(getApplicationInfo().sourceDir, file2.toString(), "lib/armeabi-v7a/");
+
+
+        @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Utils.showToast(MainActivity.this, msg.obj.toString(), 0);
+                super.handleMessage(msg);
+            }
+        };
+
+
         if (!file.isDirectory()) {
             file.mkdirs();
-            Utils.showToast(this, "解压资源中...", 0);
-            @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                    Utils.showToast(MainActivity.this, msg.obj.toString(), 0);
-                    super.handleMessage(msg);
-                }
-            };
+            Utils.showToast(this, "解压Lua资源中...", 0);
+
             new Thread(() -> {
-                int code = Utils.zipDe(getApplicationInfo().sourceDir, file.toString(), "assets/lua/");
-                switch (code) {
-                    case 0:
-                        handler.obtainMessage(0, "解压完成").sendToTarget();
-                        break;
-                    case -1:
-                        handler.obtainMessage(0, "找不到文件").sendToTarget();
-                        break;
-                    case -2:
-                        handler.obtainMessage(0, "IO异常").sendToTarget();
-                        break;
+                boolean status = FileUtils.deZip(getApplicationInfo().sourceDir, file.toString(), "assets/lua/");
+                if (status) {
+                    handler.obtainMessage(22,"解压Lua完成").sendToTarget();
+                } else {
+                    handler.obtainMessage(22,"解压Lua出现错误").sendToTarget();
                 }
             }).start();
 
+        }
+
+        if (!file2.exists()) {
+            Utils.showToast(this, "解压So资源中...", 0);
+            new Thread(() -> {
+                boolean status = FileUtils.deZip(getApplicationInfo().sourceDir, file2.toString(), "lib");
+                if (status) {
+                    handler.obtainMessage(22,"解压So完成").sendToTarget();
+                } else {
+                    handler.obtainMessage(22,"解压So出现错误").sendToTarget();
+                }
+            }).start();
         }
     }
 

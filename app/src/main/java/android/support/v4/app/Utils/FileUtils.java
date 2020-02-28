@@ -1,7 +1,6 @@
 package android.support.v4.app.Utils;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,9 +9,10 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class FileUtils {
 
@@ -20,7 +20,7 @@ public class FileUtils {
         FileWriter fileWriter = null;
         try {
             File file = new File(path);
-            if(!file.exists())
+            if (!file.exists())
                 file.createNewFile();
 
             fileWriter = new FileWriter(path);
@@ -246,13 +246,59 @@ public class FileUtils {
         return false;
     }
 
-//    public static boolean makeDir(String path){
-//        File file = new File(path);
-//        if(file.exists())
-//            return false;
-//        file.mkdirs();
-//        return true;
-//    }
+
+    public static boolean deZip(String from, String to, String name) {
+        ZipInputStream zipInputStream = null;
+        FileOutputStream fileOutputStream = null;
+        try {
+            if (!name.endsWith("/"))
+                name += "/";
+            zipInputStream = new ZipInputStream(new FileInputStream(from));
+            ZipEntry zipEntry = null;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (!zipEntry.isDirectory()) {
+                    String entryName = zipEntry.getName();
+                    if (entryName.startsWith(name)) {
+                        entryName = entryName.replace(name, "");
+                        File file = new File(to, entryName);
+                        if (!file.getParentFile().exists())
+                            file.getParentFile().mkdirs();
+//
+//                        //开始写出文件
+                        fileOutputStream = new FileOutputStream(new File(to, entryName));
+                        byte[] byt = new byte[8 * 1024];
+                        int len = -1;
+                        while ((len = zipInputStream.read(byt, 0, byt.length)) != -1) {
+                            fileOutputStream.write(byt, 0, len);
+                        }
+                    }
+                }
+            }
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (zipInputStream != null) {
+                try {
+                    zipInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
+    }
 
 
 }

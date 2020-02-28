@@ -44,16 +44,6 @@ public class Entry implements IXposedHookLoadPackage {
         }
 
 
-
-//        XposedHelpers.findAndHookMethod(System.class, "load", String.class, new XC_MethodHook() {
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                super.beforeHookedMethod(param);
-//
-//            }
-//        });
-
-
         MasterUtils.isUseWindowSearch = sp.getBoolean("windowsearch", false);
         MasterUtils.isFloating = sp.getBoolean("float", true);
         MasterUtils.newThread = sp.getBoolean("newthread", false);
