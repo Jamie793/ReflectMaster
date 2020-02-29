@@ -1,8 +1,11 @@
 <resources>
-    <string name="app_name">反射大师</string>
+    <string name="app_name">ReflectMaster</string>
 
 
     <string name="about">作者：FormatFa and JamieXu\n当前版本:J10p_2020-2-22更新\n1.使用新的Lua脚本方式代替Fake-script脚本简单使用功能强大，支持植入运行java代码\n2.替换五角星为六芒星\n3.显示系统应用\n4.新增若干未知bug\n反射大师是一款软件，本软件造成的问题由使用者负责，如果你同意以上要求，请点击同意，否则请点击不同意退出软件</string>
+    <string name="edit_filter_hint">请输入搜索的程序</string>
+    <string name="apk_list_title">这里是软件的名字</string>
+    <string name="todo">TODO</string>
 
 
 </resources>

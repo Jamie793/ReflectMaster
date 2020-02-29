@@ -1,150 +1,90 @@
 package android.support.v4.app.reflectmaster.Adapter;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import formatfa.reflectmaster.ApkInfo;
+import formatfa.reflectmaster.MainActivity;
 import formatfa.reflectmaster.R;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class ApkAdapter extends BaseAdapter implements Filterable {
+
     private Context context;
-    private List<PackageInfo> rawApps;
-    private List<PackageInfo> apps;
+    private ArrayList<ApkInfo> apkInfos;
 
-    private PackageManager pm;
-    private HashMap<String, Drawable> icons;
-    private HashMap<String, String> names;
-
-    private List<String> aimPackage;
-
-    public ApkAdapter(Context context, List<PackageInfo> apps) {
+    public ApkAdapter(Context context, ArrayList<ApkInfo> apkInfos) {
         this.context = context;
-        this.apps = apps;
-        rawApps = apps;
-        pm = context.getPackageManager();
-        icons = new HashMap<String, Drawable>();
-        names = new HashMap<String, String>();
-
-        for (PackageInfo info : apps) {
-            names.put(info.packageName, info.applicationInfo.loadLabel(pm).toString());
-            icons.put(info.packageName, info.applicationInfo.loadIcon(pm));
-
-        }
-    }
-
-    public void setAimPackage(List<String> aimPackage) {
-        this.aimPackage = aimPackage;
-    }
-
-    public List<String> getAimPackage() {
-        return aimPackage;
-    }
-
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                List<PackageInfo> apps = new ArrayList<PackageInfo>();
-                for (PackageInfo info : rawApps) {
-                    if (info.packageName.contains(constraint.toString().toUpperCase()) || info.applicationInfo.loadLabel(pm).toString().toUpperCase().contains(constraint.toString().toUpperCase())) {
-                        apps.add(info);
-                    }
-                }
-
-                FilterResults results = new FilterResults();
-                results.count = apps.size();
-                results.values = apps;
-                return results;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-
-                if (results.count > 0) {
-                    apps = (List<PackageInfo>) results.values;
-                    ApkAdapter.this.notifyDataSetChanged();
-                } else {
-                    ApkAdapter.this.notifyDataSetInvalidated();
-                }
-                ApkAdapter.this.notifyDataSetChanged();
-            }
-        };
-    }
-
-
-    class ViewHolder {
-
-        ImageView image;
-
-        TextView name;
+        this.apkInfos = apkInfos;
     }
 
     @Override
     public int getCount() {
-
-        return apps.size();
+        return this.apkInfos.size();
     }
 
     @Override
-    public Object getItem(int p1) {
-
-        return apps.get(p1);
+    public ApkInfo getItem(int position) {
+        return this.apkInfos.get(position);
     }
 
     @Override
-    public long getItemId(int p1) {
-        // TODO: Implement this method
-        return apps.get(p1).hashCode();
+    public long getItemId(int position) {
+        return 0;
     }
 
     @Override
-    public View getView(int p1, View p2, ViewGroup p3) {
-        ViewHolder vh = null;
-        if (p2 == null) {
-            vh = new ViewHolder();
-            LayoutInflater in = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            p2 = in.inflate(R.layout.item_apk, null);
-            vh.image = (ImageView) p2.findViewById(R.id.icon);
-            vh.name = (TextView) p2.findViewById(R.id.name);
-            p2.setTag(vh);
-        } else
-            vh = (ViewHolder) p2.getTag();
-        Drawable d = icons.get(apps.get(p1).packageName);
-        String n = names.get(apps.get(p1).packageName);
-
-        vh.image.setImageDrawable(d);
-        vh.name.setText(n);
-        if (vh.name.getPaint().getColor() == Color.RED) {
-
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ApkInfo apkInfo = getItem(position);
+        View view;
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            view = LayoutInflater.from(this.context).inflate(R.layout.item_apk, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.img_icon = view.findViewById(R.id.item_apk_icon);
+            viewHolder.tv_title = view.findViewById(R.id.item_apk_title);
+            viewHolder.btn_selection = view.findViewById(R.id.item_apk_selection);
+            viewHolder.btn_open = view.findViewById(R.id.item_apk_open);
+            viewHolder.btn_info = view.findViewById(R.id.item_apk_info);
+            view.setTag(viewHolder);
+        } else {
+            view = convertView;
+            viewHolder = (ViewHolder) convertView.getTag();
         }
-        boolean has = false;
-        if (aimPackage != null) {
-            for (String pack : aimPackage)
-                if (pack.equals(apps.get(p1).packageName))
-                    has = true;
-        }
+        viewHolder.img_icon.setImageDrawable(apkInfo.getIcon());
+        viewHolder.tv_title.setText(apkInfo.getTitle());
+        viewHolder.btn_selection.setOnClickListener((v)->{
+            String packages = MainActivity.sharedPreferences.getString("packages","");
+            MainActivity.sharedPreferences.edit().putString("packages",packages+";"+apkInfo.getPackageName()).apply();
+        });
+        viewHolder.btn_open.setOnClickListener((v)->{
+            System.out.println(123);
+        });
+        viewHolder.btn_info.setOnClickListener((v)->{
+            System.out.println(123);
+        });
 
-        if (has)
-            vh.name.setTextColor(Color.RED);
-        else vh.name.setTextColor(Color.WHITE);
-        return p2;
+
+        return view;
     }
 
+    @Override
+    public Filter getFilter() {
+        return null;
+    }
 
+    class ViewHolder {
+        ImageView img_icon;
+        TextView tv_title;
+        Button btn_selection, btn_open, btn_info;
+    }
 }

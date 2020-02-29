@@ -8,17 +8,16 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.reflectmaster.Utils.Utils;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androlua.LuaEditor;
+import com.androlua.LuaEditorFactory;
 import com.luajava.LuaException;
 
 import java.io.File;
@@ -26,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,6 +40,33 @@ public class ScriptWindow extends Window {
     private LuaDexLoaders luaDexLoader;
     private static int screenW, screenH;
     private LuaExecutor luaExecutor;
+    private LuaEditor luaEditor;
+    private XC_LoadPackage.LoadPackageParam lpparam;
+    private XC_MethodHook.MethodHookParam param;
+    private Context act;
+    private Object object;
+    private String code;
+
+
+    public ScriptWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object, String code) {
+        super(lpparam, param, act, object);
+        this.lpparam = lpparam;
+        this.param = param;
+        this.object = object;
+        this.act = act;
+        this.code = code;
+        Activity activity = (Activity) act;
+        activity.getWindow().setSoftInputMode(0x10);
+        WindowManager windowManager = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+        screenW = displayMetrics.widthPixels;
+        screenH = displayMetrics.heightPixels;
+        this.luaExecutor = new LuaExecutor(getAct(), this);
+        luaDexLoader = new LuaDexLoaders(getAct());
+        this.luaEditor = LuaEditorFactory.getInstance(act);
+    }
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -82,7 +107,6 @@ public class ScriptWindow extends Window {
     private WindowManager.LayoutParams layoutParams;
     private ActionWindow actionWindow;
     private Button execute;
-    private LuaEditor script;
     private TextView log;
 
     public TextView getLog() {
@@ -236,7 +260,7 @@ public class ScriptWindow extends Window {
 //                    luaExecutor.executeLua(getAct(),this.script.toString());
 //                }).start();
 //            }
-            luaExecutor.executeLua(getAct(),this.script.getText().toString());
+            luaExecutor.executeLua(getAct(), this.luaEditor.getText().toString());
         });
 
 //        Button copy = new Button(act);
@@ -259,16 +283,14 @@ public class ScriptWindow extends Window {
         });
         buttonLayout.addView(execute);
         // buttonLayout.addView(copy);
-        script = new LuaEditor(act);
-//        script.setHeight(this.screenW / 4);
-        script.setTextColor(Color.BLACK);
+        this.luaEditor = new LuaEditor(act);
+        this.luaEditor.setTextColor(Color.BLACK);
         log = new TextView(act);
 
         log.setTextColor(Color.RED);
-//        script.setMaxHeight(this.screenH / 2);
         layout.addView(actionWindow.getActionBar());
         layout.addView(buttonLayout);
-        layout.addView(script);
+        layout.addView(this.luaEditor);
 
         ScrollView scrollView = new ScrollView(act);
         scrollView.addView(log);
@@ -284,68 +306,14 @@ public class ScriptWindow extends Window {
             }
         });
         if (code == null) {
-            script.setText("require \"import\"\n" +
+            this.luaEditor.setText("require \"import\"\n" +
                     "import \"java.lang.*\"\n" +
                     "import \"java.io.*\"\n" +
                     "import \"dalvik.system.DexClassLoader\"");
         } else {
-            script.setText(code);
+            this.luaEditor.setText(code);
         }
-//
-//            if (checkCompiled(dataCode)) {
-//                final EditText editText = new EditText(act);
-//                editText.setHint("输入密钥");
-//                new AlertDialog.Builder(act).setTitle("密钥：").setView(editText).setPositiveButton("确认", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        String k = editText.getText().toString().trim();
-//                        if (!k.equals("")) {
-//                            byte[] byt = deCompile(dataCode, k);
-//                            if (byt != null) {
-//                                script.setText(new String(byt));
-//                            } else {
-//                                Utils.showToast(act, "密钥错误", 0);
-//                            }
-//                        }
-//
-//                    }
-//                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//
-//                    }
-//                }).show().setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                    @Override
-//                    public void onCancel(DialogInterface dialog) {
-//
-//                    }
-//                });
-//            } else {
-//                script.setText(new String(dataCode));
-//            }
-//        }
-
     }
-
-
-    private byte[] deCompile(byte[] data, String key) {
-        try {
-            byte[] newbyte = new byte[data.length - 4];
-            System.arraycopy(data, 4, newbyte, 0, newbyte.length);
-            return Utils.Encryption(newbyte, key.getBytes("utf-8"), 2);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private boolean checkCompiled(byte[] data) {
-        if (data.length < 4) return false;
-        String s = new String(data, 0, 4);
-        if (s.toUpperCase().indexOf("LUAJ") != -1) return true;
-        return false;
-    }
-
 
 
     public void loadFile(String file, String key) {
@@ -357,18 +325,6 @@ public class ScriptWindow extends Window {
         return luaExecutor.doFile(s, new Object[0]);
     }
 
-
-
-
-
-
-
-
-    private XC_LoadPackage.LoadPackageParam lpparam;
-
-    private XC_MethodHook.MethodHookParam param;
-    private Context act;
-
     public XC_LoadPackage.LoadPackageParam getLpparam() {
         return lpparam;
     }
@@ -376,32 +332,6 @@ public class ScriptWindow extends Window {
     public XC_MethodHook.MethodHookParam getParam() {
         return param;
     }
-
-    //
-    private Object object;
-    String code;
-//    private byte[] dataCode;
-
-    public ScriptWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object, String code) {
-        super(lpparam, param, act, object);
-        this.lpparam = lpparam;
-        this.param = param;
-        this.object = object;
-        this.act = act;
-        this.code = code;
-//        this.dataCode = dataCode;l
-        Activity activity = (Activity) act;
-        activity.getWindow().setSoftInputMode(0x10);
-        WindowManager windowManager = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-        screenW = displayMetrics.widthPixels;
-        screenH = displayMetrics.heightPixels;
-        this.luaExecutor = new LuaExecutor(getAct(),this);
-        luaDexLoader = new LuaDexLoaders(getAct());
-
-    }
-
 
 
     public ArrayList<ClassLoader> getClassLoaders() {

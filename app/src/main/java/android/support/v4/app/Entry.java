@@ -1,9 +1,7 @@
 package android.support.v4.app;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
@@ -13,49 +11,42 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import formatfa.reflectmaster.MainActivity;
 
 public class Entry implements IXposedHookLoadPackage {
-
-
-    static final String PACKAGENAME = "formatfa.android.f.reflectmaster";
-
     public static String id;
-    private static String register;
-    private static int statu;
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        XSharedPreferences sp = new XSharedPreferences("formatfa.reflectmaster", "package");
-        sp.reload();
+        XSharedPreferences sharedPreferences = new XSharedPreferences("formatfa.reflectmaster", "package");
+        sharedPreferences.reload();
 
-        String[] s = sp.getString(MainActivity.KEY, "").split(",");
+        String[] s = sharedPreferences.getString("packages", "").split(";");
         boolean is = false;
         for (String g : s) {
-
             if (g.equals(lpparam.packageName)) {
-//
+                XposedBridge.log("Hook packagename is:" + g);
                 is = true;
                 break;
             }
         }
+
         if (!is) {
             return;
         }
 
 
-        MasterUtils.isUseWindowSearch = sp.getBoolean("windowsearch", false);
-        MasterUtils.isFloating = sp.getBoolean("float", true);
-        MasterUtils.newThread = sp.getBoolean("newthread", false);
+        MasterUtils.isUseWindowSearch = sharedPreferences.getBoolean("windowsearch", false);
+        MasterUtils.isFloating = sharedPreferences.getBoolean("float", true);
+        MasterUtils.newThread = sharedPreferences.getBoolean("newthread", false);
 
 
-        id = sp.getString("fid", "");
-        statu = sp.getInt("statu", 0);
-        register = sp.getString("register", "");
+        id = sharedPreferences.getString("fid", "");
+        int statu = sharedPreferences.getInt("statu", 0);
+        String register = sharedPreferences.getString("register", "");
 
         XposedBridge.log("aim hooked");
-        MasterUtils.windowSize = sp.getInt("width", 700);
-        MasterUtils.rotate = sp.getBoolean("rotate", true);
+        MasterUtils.windowSize = sharedPreferences.getInt("width", 700);
+        MasterUtils.rotate = sharedPreferences.getBoolean("rotate", true);
         XposedBridge.log("set Window size:" + MasterUtils.windowSize);
 
 

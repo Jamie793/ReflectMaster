@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,36 +12,36 @@
         android:layout_height="wrap_content" />
 
     <TextView
+        android:id="@+id/statu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/statu" />
+        android:layout_height="wrap_content" />
 
     <EditText
+        android:id="@+id/input"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/input" />
+        android:layout_height="wrap_content" />
 
     <Button
-        android:text="注册"
+        android:id="@+id/register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/register" />
+        android:text="注册" />
 
     <Button
-        android:text="复制注册码"
+        android:id="@+id/copy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/copy" />
+        android:text="复制注册码" />
 
     <Button
-        android:text="联系扣扣购买注册码"
+        android:id="@+id/buy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/buy" />
+        android:text="联系扣扣购买注册码" />
 
     <Button
-        android:text="联系扣扣购买注册码2"
+        android:id="@+id/buy2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/buy2" />
+        android:text="联系扣扣购买注册码2" />
 </LinearLayout>
