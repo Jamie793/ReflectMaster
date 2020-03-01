@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,7 +20,6 @@ import android.support.v4.app.MasterUtils;
 import android.support.v4.app.Utils.FileUtils;
 import android.support.v4.app.reflectmaster.CoreInstall;
 import android.support.v4.app.reflectmaster.Utils.Utils;
-import android.support.v4.app.widget.ReflectView2;
 import android.support.v4.app.widget.WindowDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -33,8 +31,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -51,7 +47,7 @@ import java.util.HashSet;
 import dalvik.system.DexClassLoader;
 
 
-public class MainActivity extends AppCompatActivity implements OnItemClickListener {
+public class MainActivity extends AppCompatActivity {
     private LuaDexLoaders luaDexLoader;
     public static final String BASE_PATH = Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/";
     //    public static final String APP_INFO = "反射大师1.1\nauthor:FormatFa and JamieXu";
@@ -83,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     }
 
     private void initData() {
-        sharedPreferences = getSharedPreferences("package", MODE_WORLD_WRITEABLE);
+        sharedPreferences = getSharedPreferences("package", MODE_WORLD_READABLE);
         MasterUtils.windowSize = sharedPreferences.getInt("width", 700);
         MasterUtils.rotate = sharedPreferences.getBoolean("rotate", true);
 
@@ -101,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     private void initView() {
         this.list = findViewById(R.id.listview);
         this.list.setTextFilterEnabled(true);
-        this.list.setOnItemClickListener(this);
         this.edit_search = findViewById(R.id.edite_filter);
         this.swipeRefreshLayout = findViewById(R.id.swipeLayout);
         this.swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
@@ -143,17 +138,10 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         }
     }
 
-
-    @Override
-    public void onItemClick(AdapterView<?> p1, View v, final int position, long id) {
-
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater in = getMenuInflater();
         in.inflate(R.menu.main, menu);
-
         return true;
     }
 
@@ -168,22 +156,6 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             // 未安装手Q或安装的版本不支持
         }
     }
-
-//    private void save() {
-//        StringBuilder sb = new StringBuilder();
-//        for (String s : this.packs) {
-//            sb.append(s);
-//            sb.append(";");
-//        }
-//        sharedPreferences.edit().putString(this.PACKAGE_NAME, sb.toString()).apply();
-//    }
-//
-//    private void refresh() {
-//        String s = sharedPreferences.getString(this.PACKAGE_NAME, null);
-//        if (s == null) return;
-//        String[] all = s.split(",");
-//        packs.addAll(Arrays.asList(all));
-//    }
 
     private void showHelp() {
         AlertDialog.Builder ab = new AlertDialog.Builder(this);
@@ -254,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     }
 
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.exit) {
@@ -295,61 +268,44 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
 
             @SuppressLint("InflateParams")
             View view = getLayoutInflater().inflate(R.layout.setting, null);
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setView(view)
+                    .setPositiveButton("确定", null)
+                    .show();
 
-            view.setBackgroundColor(Color.BLACK);
-            WindowDialog wd = new WindowDialog(this);
-            final EditText se = view.findViewById(R.id.setting_windowsize);
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorAccent));
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorAccent));
+            alertDialog.setCanceledOnTouchOutside(false);
 
-            se.setTextColor(Color.WHITE);
-            se.setText(String.valueOf(sharedPreferences.getInt("width", 700)));
-            view.findViewById(R.id.preview).setOnClickListener(p1 -> {
-                int i = Integer.parseInt(se.getText().toString());
+            CheckBox chb_sysapp, chb_thread, chb_float;
+            chb_sysapp = view.findViewById(R.id.setting_sysapp);
+            chb_thread = view.findViewById(R.id.setting_thread);
+            chb_float = view.findViewById(R.id.setting_float);
+            boolean sysapp, thread, floatt;
 
-                WindowDialog wd1 = new WindowDialog(MainActivity.this);
-                ReflectView2 re = new ReflectView2(MainActivity.this, sharedPreferences.getBoolean("rotate", true));
+            sysapp = sharedPreferences.getBoolean("sysapp", false);
+            thread = sharedPreferences.getBoolean("newthread", false);
+            floatt = sharedPreferences.getBoolean("float", false);
 
-                wd1.setTitle("预览");
-                wd1.setView(re);
-                wd1.show(i, i);
+            chb_sysapp.setChecked(sysapp);
+            chb_thread.setChecked(thread);
+            chb_float.setChecked(floatt);
 
 
+            chb_sysapp.setOnClickListener((v) -> {
+                sharedPreferences.edit().putBoolean("sysapp",chb_sysapp.isChecked()).apply();
             });
 
-            view.findViewById(R.id.ok).setOnClickListener(p1 -> {
-                int i = Integer.parseInt(se.getText().toString());
-                sharedPreferences.edit().putInt("width", i).apply();
-                Toast.makeText(MainActivity.this, "ojbk", Toast.LENGTH_SHORT).show();
+
+            chb_thread.setOnClickListener((v) -> {
+                sharedPreferences.edit().putBoolean("newthread",chb_thread.isChecked()).apply();
             });
 
-            CheckBox box = view.findViewById(R.id.setting_windowsearch);
-            box.setChecked(sharedPreferences.getBoolean("windowsearch", false));
-            box.setOnCheckedChangeListener((compoundButton, b) -> {
-                sharedPreferences.edit().putBoolean("windowsearch", b).apply();
-                MasterUtils.isUseWindowSearch = b;
 
+            chb_float.setOnClickListener((v) -> {
+                sharedPreferences.edit().putBoolean("float",chb_float.isChecked()).apply();
             });
 
-            CheckBox showfloat = view.findViewById(R.id.setting_float);
-            showfloat.setChecked(sharedPreferences.getBoolean("float", true));
-            showfloat.setOnCheckedChangeListener((compoundButton, b) -> sharedPreferences.edit().putBoolean("float", b).apply());
-
-            CheckBox rotate = view.findViewById(R.id.setting_rotate);
-            rotate.setChecked(sharedPreferences.getBoolean("rotate", true));
-            rotate.setOnCheckedChangeListener((compoundButton, b) -> sharedPreferences.edit().putBoolean("rotate", b).apply());
-
-            CheckBox sysapp = view.findViewById(R.id.setting_sysapp);
-            sysapp.setChecked(sharedPreferences.getBoolean("sysapp", false));
-            sysapp.setOnCheckedChangeListener((compoundButton, b) -> sharedPreferences.edit().putBoolean("sysapp", b).apply());
-            CheckBox newThread = view.findViewById(R.id.setting_thread);
-            newThread.setChecked(sharedPreferences.getBoolean("newthread", false));
-            newThread.setOnCheckedChangeListener((compoundButton, b) -> {
-                MasterUtils.newThread = b;
-                sharedPreferences.edit().putBoolean("newthread", b).apply();
-            });
-
-            wd.setTitle("确认配置");
-            wd.setView(view);
-            wd.show(800, 800);
         }
 //        else if (item.getItemId() == R.id.update) {
 //            //更新

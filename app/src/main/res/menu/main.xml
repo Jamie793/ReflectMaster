@@ -1,50 +1,40 @@
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 
     <item
         android:id="@+id/register"
-        android:title="注册" />
-
-    <!--<item-->
-        <!--android:title="脚本" >-->
-        <!--<menu>-->
-        <!--<item-->
-        <!--android:id="@+id/fake_script"-->
-        <!--android:title="Fake脚本" />-->
-        <item
+        android:title="@string/menu_main_register" />
+    <item
         android:id="@+id/lua_script"
-        android:title="Lua脚本" />
-        <!--</menu>-->
-    <!--</item>-->
+        android:title="@string/menu_main_lua_script" />
 
-    <item android:title="QQ群">
+    <item android:title="@string/menu_main_qq_group">
         <menu>
             <item
                 android:id="@+id/jgroup"
-                android:title="群1" />
+                android:title="@string/menu_main_qq_group_1" />
 
             <item
                 android:id="@+id/group"
-                android:title="群2"/>
+                android:title="@string/menu_main_qq_group_2" />
         </menu>
     </item>
 
     <item
         android:id="@+id/setting"
-        android:title="设置" />
+        android:title="@string/menu_main_setting" />
 
     <item
         android:id="@+id/update"
-        android:title="更新" />
+        android:title="@string/menu_main_update" />
 
     <item
         android:id="@+id/about"
-        android:title="关于" />
+        android:title="@string/menu_main_about" />
 
     <item
         android:id="@+id/exit"
-        android:title="退出" />
+        android:title="@string/menu_main_exit" />
 
 </menu>
 

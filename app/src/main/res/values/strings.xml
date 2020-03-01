@@ -6,6 +6,15 @@
     <string name="edit_filter_hint">请输入搜索的程序</string>
     <string name="apk_list_title">这里是软件的名字</string>
     <string name="todo">TODO</string>
+    <string name="menu_main_register">注册</string>
+    <string name="menu_main_lua_script">Lua脚本</string>
+    <string name="menu_main_qq_group">QQ群</string>
+    <string name="menu_main_qq_group_1">群1</string>
+    <string name="menu_main_qq_group_2">群2</string>
+    <string name="menu_main_setting">设置</string>
+    <string name="menu_main_update">更新</string>
+    <string name="menu_main_about">关于</string>
+    <string name="menu_main_exit">退出</string>
 
 
 </resources>
