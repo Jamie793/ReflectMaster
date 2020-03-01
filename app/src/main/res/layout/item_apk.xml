@@ -14,7 +14,7 @@
         card_view:cardBackgroundColor="#fff"
         android:paddingStart="20dp"
         android:paddingEnd="10dp"
-        card_view:cardCornerRadius="20dp">
+        card_view:cardCornerRadius="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"

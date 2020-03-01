@@ -7,13 +7,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="设置："
+        android:text="@string/layout_setting_setting"
         android:textSize="16sp"
         android:textColor="@color/colorAccent"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"/>
-
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:text="是否显示系统应用"
+            android:text="@string/layout_setting_system_app"
             android:textColor="@color/colorAccent" />
 
         <CheckBox
@@ -35,14 +33,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:text="使用新线程执行我的脚本"
+            android:text="@string/layout_setting_new_thread"
             android:textColor="@color/colorAccent" />
 
         <CheckBox
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:ems="10"
-        android:text="是否显示悬浮窗(只执行脚本不显示悬浮窗)"
+        android:text="@string/layout_setting_float"
         android:textColor="@color/colorAccent"
         android:id="@+id/setting_float" />
 

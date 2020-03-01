@@ -1,32 +1,27 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <item
-        android:id="@+id/register"
-        android:title="@string/menu_main_register" />
+        android:id="@+id/search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:orderInCategory="100"
+        android:title="@string/menu_main_search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+
     <item
         android:id="@+id/lua_script"
         android:title="@string/menu_main_lua_script" />
 
-    <item android:title="@string/menu_main_qq_group">
-        <menu>
-            <item
-                android:id="@+id/jgroup"
-                android:title="@string/menu_main_qq_group_1" />
 
-            <item
-                android:id="@+id/group"
-                android:title="@string/menu_main_qq_group_2" />
-        </menu>
-    </item>
+    <item
+        android:id="@+id/group"
+        android:title="@string/menu_main_qq_group_1" />
 
     <item
         android:id="@+id/setting"
         android:title="@string/menu_main_setting" />
-
-    <item
-        android:id="@+id/update"
-        android:title="@string/menu_main_update" />
 
     <item
         android:id="@+id/about"

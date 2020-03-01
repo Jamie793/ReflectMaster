@@ -1,4 +1,4 @@
-package android.support.v4.app.reflectmaster.Adapter;
+package formatfa.reflectmaster.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import formatfa.reflectmaster.ApkInfo;
 import formatfa.reflectmaster.MainActivity;
@@ -23,11 +24,13 @@ import formatfa.reflectmaster.R;
 public class ApkAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
-    private ArrayList<ApkInfo> apkInfos;
+    private ArrayList<ApkInfo> apkInfos,bak_apkInfos;
+    private static Filter filter;
 
     public ApkAdapter(Context context, ArrayList<ApkInfo> apkInfos) {
         this.context = context;
         this.apkInfos = apkInfos;
+        this.bak_apkInfos = apkInfos;
     }
 
     @Override
@@ -43,6 +46,13 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
     @Override
     public long getItemId(int position) {
         return 0;
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (filter == null)
+            filter = new ListFilter();
+        return filter;
     }
 
     @SuppressLint("SetTextI18n")
@@ -88,7 +98,7 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
             Intent intent = new Intent();
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
-            intent.setData(Uri.fromParts("package",apkInfo.getPackageName(),null));
+            intent.setData(Uri.fromParts("package", apkInfo.getPackageName(), null));
             this.context.startActivity(intent);
         });
 
@@ -96,14 +106,39 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
         return view;
     }
 
-    @Override
-    public Filter getFilter() {
-        return null;
-    }
-
     class ViewHolder {
         ImageView img_icon;
         TextView tv_title;
         Button btn_selection, btn_open, btn_info;
+    }
+
+    class ListFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults filterResults = new FilterResults();
+            List<ApkInfo> apkInfos = new ArrayList<>();
+            if(constraint.length() == 0){
+                apkInfos = ApkAdapter.this.bak_apkInfos;
+            }else{
+                for(ApkInfo apkInfo : ApkAdapter.this.apkInfos){
+                    if(apkInfo.getTitle().contains(constraint.toString()) || apkInfo.getPackageName().contains(constraint.toString())){
+                        apkInfos.add(apkInfo);
+                    }
+                }
+            }
+            filterResults.values = apkInfos;
+            filterResults.count = apkInfos.size();
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            ApkAdapter.this.apkInfos = (ArrayList<ApkInfo>) results.values;
+            if (results.count > 0)
+                notifyDataSetChanged();
+            else
+                notifyDataSetInvalidated();
+        }
     }
 }

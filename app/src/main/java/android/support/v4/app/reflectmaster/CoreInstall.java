@@ -23,7 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.support.v4.app.reflectmaster.Adapter.CoreAdapter;
+import formatfa.reflectmaster.Adapter.CoreAdapter;
 import android.support.v4.app.reflectmaster.Widget.OnEditTextListener;
 import formatfa.reflectmaster.R;
 

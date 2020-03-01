@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,23 +21,26 @@ import android.support.v4.app.MasterUtils;
 import android.support.v4.app.Utils.FileUtils;
 import android.support.v4.app.reflectmaster.CoreInstall;
 import android.support.v4.app.reflectmaster.Utils.Utils;
-import android.support.v4.app.widget.WindowDialog;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.widget.SearchView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.CheckBox;
-import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.luajava.LuaException;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -55,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
     public static SharedPreferences sharedPreferences;
     private final String PACKAGE_NAME = "packages";
     private ListView list;
-    private EditText edit_search;
     private SwipeRefreshLayout swipeRefreshLayout;
     private final String[] permission = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -72,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 //        FWindow(this, null);
         initData();
         firstOpen();
-        setContentView(R.layout.apklist);
         initView();
         requestPermission();
         refreshApkList();
@@ -95,32 +97,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        setContentView(R.layout.apklist);
         this.list = findViewById(R.id.listview);
         this.list.setTextFilterEnabled(true);
-        this.edit_search = findViewById(R.id.edite_filter);
         this.swipeRefreshLayout = findViewById(R.id.swipeLayout);
         this.swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         this.swipeRefreshLayout.setOnRefreshListener(() -> {
             refreshApkList();
             this.swipeRefreshLayout.setRefreshing(false);
-        });
-        this.edit_search.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.toString().isEmpty()) {
-                    list.clearTextFilter();
-                } else {
-                    list.setFilterText(s.toString());
-                }
-            }
         });
     }
 
@@ -142,6 +126,29 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater in = getMenuInflater();
         in.inflate(R.menu.main, menu);
+        MenuItem menuItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                if (s.isEmpty()) {
+                    MainActivity.this.list.clearTextFilter();
+                } else {
+                    MainActivity.this.list.setFilterText(s);
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if (s.isEmpty()) {
+                    MainActivity.this.list.clearTextFilter();
+                } else {
+                    MainActivity.this.list.setFilterText(s);
+                }
+                return false;
+            }
+        });
         return true;
     }
 
@@ -216,13 +223,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("ResourceType")
     private void about() {
-        WindowDialog wd = new WindowDialog(this);
-        WebView web = new WebView(this);
-        web.loadUrl("file:///android_asset/about.html");
-        web.getSettings().setSupportZoom(true);
-        wd.setView(web);
-        wd.show(500, 600);
+        ImageView imageView = new ImageView(this);
+        imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.pay));
+        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(LayoutInflater.from(this).inflate(R.layout.main_about,null,false))
+                .setNegativeButton("打赏作者", (v,e)->{
+                    new AlertDialog.Builder(this).setView(imageView).show();
+                })
+                .setPositiveButton("了解", null)
+                .show();
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorAccent));
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorAccent));
+
     }
 
 
@@ -230,25 +245,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.exit) {
-
             finish();
-        }
-        if (item.getItemId() == R.id.about) {
-
+        } else if (item.getItemId() == R.id.about) {
             about();
 
-        } else if (item.getItemId() == R.id.register) {
-            Intent i = new Intent();
-            i.setClass(this, Register.class);
-            startActivity(i);
-        }
-        if (item.getItemId() == R.id.group) {
+        } else if (item.getItemId() == R.id.group) {
 
-            joinQQGroup("jKcW_juMAQbVCtIXsZwTf7DsFBSbri9b");
-
-        } else if (item.getItemId() == R.id.jgroup) {
-
-            joinQQGroup("q33iBRmq-koN9JiTbMKM7AS4W0B49oEi");
+            joinQQGroup("SBkakwduo86-IUNuyD3URdiinFc7fwTc");
 
         } else if (item.getItemId() == R.id.core) {
 
@@ -293,24 +296,20 @@ public class MainActivity extends AppCompatActivity {
 
 
             chb_sysapp.setOnClickListener((v) -> {
-                sharedPreferences.edit().putBoolean("sysapp",chb_sysapp.isChecked()).apply();
+                sharedPreferences.edit().putBoolean("sysapp", chb_sysapp.isChecked()).apply();
             });
 
 
             chb_thread.setOnClickListener((v) -> {
-                sharedPreferences.edit().putBoolean("newthread",chb_thread.isChecked()).apply();
+                sharedPreferences.edit().putBoolean("newthread", chb_thread.isChecked()).apply();
             });
 
 
             chb_float.setOnClickListener((v) -> {
-                sharedPreferences.edit().putBoolean("float",chb_float.isChecked()).apply();
+                sharedPreferences.edit().putBoolean("float", chb_float.isChecked()).apply();
             });
 
         }
-//        else if (item.getItemId() == R.id.update) {
-//            //更新
-//        }
-
         return true;
     }
 
