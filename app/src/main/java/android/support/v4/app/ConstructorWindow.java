@@ -114,8 +114,6 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
 
         final LinearLayout l = new LinearLayout(act);
         l.setBackgroundColor(Color.BLACK);
-        lp.width = MasterUtils.windowSize;
-        lp.height = MasterUtils.windowSize;
         ActionWindow ac = new ActionWindow(act, wm, lp, l);
 
 
@@ -289,13 +287,8 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         else {
-            if (MasterUtils.isUseWindowSearch)
-                lp.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-            else
-                lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
+            lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         }
-        lp.width = MasterUtils.windowSize;
-        lp.height = MasterUtils.windowSize;
 
         final LinearLayout root = new LinearLayout(act);
 
@@ -305,9 +298,9 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         root.addView(title);
 
 
-        acw = new ActionWindow(act, manager, lp, root, !MasterUtils.isUseWindowSearch);
+        acw = new ActionWindow(act, manager, lp, root, false);
 
-        if (!MasterUtils.isUseWindowSearch)
+//        if (!MasterUtils.isUseWindowSearch)
             acw.setSearchCallback(new ActionSearchCallback() {
                 @Override
                 public void onTextChange(EditText edit, String text) {
@@ -368,27 +361,27 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
 
         Button fa = null;
 
-        if (MasterUtils.isUseWindowSearch) {
-            fa = new Button(act);
-            fa.setText("搜索");
-            fa.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View p1) {
-                    EditWindow window = new EditWindow(lpparam, param, act, "搜索函数", "");
-                    window.setListener(new EditWindow.EditWindowListener() {
-                        @Override
-                        public void onEdited(String str) {
-                            list.setFilterText(str);
-                        }
-                    });
-                    window.show(manager, lp);
-                }
-            });
-            buttonLayout.addView(fa);
-
-
-        }
+//        if (MasterUtils.isUseWindowSearch) {
+//            fa = new Button(act);
+//            fa.setText("搜索");
+//            fa.setOnClickListener(new View.OnClickListener() {
+//
+//                @Override
+//                public void onClick(View p1) {
+//                    EditWindow window = new EditWindow(lpparam, param, act, "搜索函数", "");
+//                    window.setListener(new EditWindow.EditWindowListener() {
+//                        @Override
+//                        public void onEdited(String str) {
+//                            list.setFilterText(str);
+//                        }
+//                    });
+//                    window.show(manager, lp);
+//                }
+//            });
+//            buttonLayout.addView(fa);
+//
+//
+//        }
         HorizontalScrollView ho = new HorizontalScrollView(act);
         ho.addView(buttonLayout);
         root.addView(ho);

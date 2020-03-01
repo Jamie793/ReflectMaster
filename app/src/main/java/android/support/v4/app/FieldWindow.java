@@ -80,50 +80,36 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         WindowList wlist = new WindowList(act, am);
         wlist.setTitle("变量操作");
         wlist.setItems(new String[]{"编辑", "收藏", "复制变量名称", "复制类名和变量名称", "复制变量名称和类型"/*,"持久化修改(构造函数后使用while(true)不断修改}"*/});
-        wlist.setListener(new OnItemClickListener() {
+        wlist.setListener((adap, view, posi, l) -> {
 
-            @Override
-            public void onItemClick(AdapterView<?> adap, View view, int posi, long l) {
+            Field m = (Field) p1.getItemAtPosition(p3);
+            if (posi == 0) {
+                if (m.isAccessible() == false) m.setAccessible(true);
+                EditFieldWindow ew = new EditFieldWindow(lpparam, param, act, object, fields[p3], EditFieldWindow.TYPE_EDIT);
+                ew.show(wm, lp);
 
-                Field m = (Field) p1.getItemAtPosition(p3);
-                if (posi == 0) {
-                    if (m.isAccessible() == false) m.setAccessible(true);
-                    EditFieldWindow ew = new EditFieldWindow(lpparam, param, act, object, fields[p3], EditFieldWindow.TYPE_EDIT);
-                    ew.show(wm, lp);
+            } else if (posi == 1) {
+                favorite(p3, m);
+            } else if (posi == 2) {
+                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("test", m.toGenericString()));
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
 
-//						tr
-//						{
-//					Object		re=m.invoke(object, new Class[]{});
-//					Toast.makeText(act,"result;"+re,Toast.LENGTH_LONG).show();
-//						}
-//						catch (Exception e)
-//						{Toast.makeText(act,e.toString(),Toast.LENGTH_LONG).show();}
-//						
+            } else if (posi == 3) {
+                String s = m.getName() + " " + m.getType().getName();
+                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("test", s));
+                Toast.makeText(act, "复制成功:" + s, Toast.LENGTH_SHORT).show();
 
+            } else {
 
-                } else if (posi == 1) {
-                    favorite(p3, m);
-                } else if (posi == 2) {
-                    ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                    cm.setPrimaryClip(ClipData.newPlainText("test", m.toGenericString()));
-                    Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
+                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("test", "'" + m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'"));
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
 
-                } else if (posi == 3) {
-                    String s = m.getName() + " " + m.getType().getName();
-                    ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                    cm.setPrimaryClip(ClipData.newPlainText("test", s));
-                    Toast.makeText(act, "复制成功:" + s, Toast.LENGTH_SHORT).show();
-
-                } else {
-
-                    ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                    cm.setPrimaryClip(ClipData.newPlainText("test", "'" + m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'"));
-                    Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
-
-
-                }
 
             }
+
         });
         wlist.show();
 
@@ -222,14 +208,8 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         else {
-            if (MasterUtils.isUseWindowSearch)
-                lp.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-            else
-                lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
+            lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         }
-
-        lp.width = MasterUtils.windowSize;
-        lp.height = MasterUtils.windowSize;
 
 
         if (object == null) {
@@ -241,9 +221,8 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         //lp.height=-2;
         final LinearLayout layout = new LinearLayout(act);
         layout.setBackgroundColor(0xFF303030);
-        final ActionWindow ac = new ActionWindow(act, wm, lp, layout, !MasterUtils.isUseWindowSearch);
+        final ActionWindow ac = new ActionWindow(act, wm, lp, layout);
 
-        if (!MasterUtils.isUseWindowSearch)
             ac.setSearchCallback((edit, text) -> {
 
                 if (TextUtils.isEmpty(text))
@@ -383,18 +362,18 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         //buttonLayout.addView(fa);
 
 
-        if (MasterUtils.isUseWindowSearch) {
-            fa = new Button(act);
-            fa.setText("搜索");
-            fa.setOnClickListener(p1 -> {
-                EditWindow window = new EditWindow(lpparam, param, act, "搜索变量", "");
-                window.setListener(str -> list.setFilterText(str));
-                window.show(amanager, lp);
-            });
-            buttonLayout.addView(fa);
-
-
-        }
+//        if (MasterUtils.isUseWindowSearch) {
+//            fa = new Button(act);
+//            fa.setText("搜索");
+//            fa.setOnClickListener(p1 -> {
+//                EditWindow window = new EditWindow(lpparam, param, act, "搜索变量", "");
+//                window.setListener(str -> list.setFilterText(str));
+//                window.show(amanager, lp);
+//            });
+//            buttonLayout.addView(fa);
+//
+//
+//        }
 
 
         Button add = new Button(act);

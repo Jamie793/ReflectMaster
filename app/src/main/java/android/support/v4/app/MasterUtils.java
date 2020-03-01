@@ -13,11 +13,7 @@ import java.util.List;
 public class MasterUtils {
     public static Activity nowAct;
 
-    //旋转
-    public static boolean rotate;
-
-    public static int windowSize;
-    public static boolean isUseWindowSearch, isFloating = true, newThread = false;
+    public static boolean isFloating = true, newThread = false;
     public static List<Object> objects = new ArrayList<Object>();
     public static List<Object> serviceobjects = new ArrayList<Object>();
 

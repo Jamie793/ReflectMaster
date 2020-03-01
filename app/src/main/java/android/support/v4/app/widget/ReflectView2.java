@@ -23,7 +23,7 @@ public class ReflectView2 extends View {
         this.rotate = ro;
     }
 
-    public ReflectView2(Context context, boolean rotate) {
+    public ReflectView2(Context context) {
         super(context);
         this.context = context;
         this.rotate = rotate;

@@ -1,16 +1,29 @@
 package android.support.v4.app;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.media.Image;
+import android.os.Environment;
+import android.support.v4.app.Adapter.ObjectAdapter;
+import android.support.v4.app.reflectmaster.Utils.Utils;
+import android.support.v4.app.widget.ReflectView2;
+import android.support.v4.app.widget.ViewLineClickListener;
+import android.support.v4.app.widget.ViewLineView;
+import android.support.v4.app.widget.WindowList;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,107 +34,69 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
-
-import android.support.v4.app.widget.ReflectView2;
-import android.support.v4.app.widget.ViewLineClickListener;
-import android.support.v4.app.widget.ViewLineView;
-import android.support.v4.app.widget.WindowList;
-
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import android.support.v4.app.Adapter.ObjectAdapter;
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class FWindow {
 
     private XC_LoadPackage.LoadPackageParam lpparam;
-
     private XC_MethodHook.MethodHookParam param;
     private Context act;
     private Object obj;
-
-
+    private int startX = 0, startY = 0, nowX = 0, nowY = 0;
+    private LinearLayout layout;
+    private WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams();
+    private View floating;
     private WindowManager wm;
     private boolean isMenu = true;
 
-    //对话框模式
-    private Dialog dialog;
-
-    public Dialog getDialog() {
-        return dialog;
-    }
-
-    public void setDialog(Dialog dialog) {
-        this.dialog = dialog;
-
-    }
 
     public FWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam method) {
         if (!MasterUtils.isFloating) return;
         this.lpparam = lpparam;
         this.param = method;
-
-
         act = (Context) method.thisObject;
         obj = act;
-        Toast.makeText(act, "创建新窗口", Toast.LENGTH_SHORT).show();
-
         init();
-
     }
 
-    public FWindow(Context activity, Dialog dialog) {
-
-        if (!MasterUtils.isFloating) return;
-        act = activity;
-        obj = act;
-        this.dialog = dialog;
-        if (dialog != null)
-            Toast.makeText(act, "创建Dialog窗口", Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(act, "创建测试窗口", Toast.LENGTH_SHORT).show();
-
-        init();
-
-    }
+//    public FWindow(Context activity, Dialog dialog) {
+//        if (!MasterUtils.isFloating) return;
+//        act = activity;
+//        obj = act;
+//        this.dialog = dialog;
+//        if (dialog != null)
+//            Toast.makeText(act, "创建Dialog窗口", Toast.LENGTH_SHORT).show();
+//        else
+//            Toast.makeText(act, "创建测试窗口", Toast.LENGTH_SHORT).show();
+//
+//        init();
+//    }
 
     public FWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam method, Object object) {
         if (!MasterUtils.isFloating) return;
         this.lpparam = lpparam;
         this.param = method;
-
-
         try {
             Method getActivity = (object.getClass().getDeclaredMethod("getActivity", new Class[]{}));
-
-
             this.act = (Activity) getActivity.invoke(object, new Object[]{});
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         this.obj = object;
-
         init();
-
     }
 
-    private int startX = 0, startY = 0, nowX = 0, nowY = 0;
-    private LinearLayout layout;
-
-    private WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams();
-
-
-    private ReflectView2 floating;
 
     private Button newButton(Context context) {
         Button button = new Button(context);
@@ -137,120 +112,62 @@ public class FWindow {
         lp.height = (displayMetrics.heightPixels / 4) * 3;
     }
 
-    private void init() {
-        //	Toast.makeText(act,"Test",Toast.LENGTH_LONG).show();
-        wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
 
-        //	layoutParam.width=400;
-        //	layoutParam.height=800;
-        getscreensize(layoutParam);
+
+
+    @SuppressLint("SetTextI18n")
+    private void init() {
+        wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+        layoutParam.width = 500;
+        layoutParam.height = 500;
         layoutParam.x = 0;
         layoutParam.y = 0;
-        layoutParam.flags = layoutParam.FLAG_NOT_FOCUSABLE;
-        layoutParam.type = layoutParam.TYPE_APPLICATION;
+        layoutParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        layoutParam.type = WindowManager.LayoutParams.TYPE_APPLICATION;
         layoutParam.format = PixelFormat.RGBA_8888;
-
+//
+//
         layout = new LinearLayout(act);
         layout.setOrientation(LinearLayout.VERTICAL);
-
-
         layout.setBackgroundColor(Color.rgb(255, 250, 250));
 
         TextView text = new TextView(act);
         layout.addView(text);
         text.setText(act.getClass().getName());
+        text.setOnClickListener((v) -> Utils.writeClipboard(act, text.getText().toString()));
         text.setTextColor(Color.BLACK);
-        text.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                showActivity();
-//					XSharedPreferences sp= new XSharedPreferences("formatfa.android.f","ss");
-//					sp.reload();
-//					String s = sp.getString("cls","android.support.v4.app.FragmentActivity");
-//					Toast.makeText(act,"q"+s,Toast.LENGTH_LONG).show();
-//
-            }
+        text.setOnClickListener(p1 -> {
+            showActivity();
         });
-
-
-        Button move = newButton(act);
-
-
-        move.setOnTouchListener(new OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View p1, MotionEvent p2) {
-
-
-                int actipn = p2.getAction();
-
-                switch (actipn) {
-                    case MotionEvent.ACTION_DOWN:
-                        startX = (int) p2.getRawX();
-                        startY = (int) p2.getRawY();
-                        swicthWindow(false);
-                        break;
-//						case MotionEvent.ACTION_MOVE:
-//
-//							nowX = (int)p2.getRawX();
-//							nowY= (int)p2.getRawY();
-//							layoutParam.x+= nowX-startX;
-//							layoutParam.y +=nowY-startY;
-//							layoutParam.width=400;
-//							layoutParam.height=-2;
-//							wm.updateViewLayout(layout,layoutParam);
-//							startX = nowX;
-//							startY=nowY;
-//							break;
-                    case MotionEvent.ACTION_UP:
-
-                        break;
-
-
-                }
-                return true;
-            }
-        });
-
-
-        move.setText("缩小" + String.format(Locale.CHINA, "%d x %d", layoutParam.width, layoutParam.height));
-        layout.addView(move);
-
 
         Button field = newButton(act);
 
         field.setText("当前Activity");
 
         layout.addView(field);
-        field.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-
-                FieldWindow fw = new FieldWindow(lpparam, param, act, obj);
-                fw.show(wm, layoutParam);
-            }
+        field.setOnClickListener(p1 -> {
+            FieldWindow fw = new FieldWindow(lpparam, param, act, obj);
+            fw.show(wm, layoutParam);
         });
 
 
-        Button dialogbutton = null;
-        if (dialog != null) {
-            dialogbutton = newButton(act);
-
-            dialogbutton.setText("当前Dialog");
-
-            layout.addView(dialogbutton);
-            dialogbutton.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View p1) {
-
-                    FieldWindow fw = new FieldWindow(lpparam, param, act, dialog);
-                    fw.show(wm, layoutParam);
-                }
-            });
-        }
+//        Button dialogbutton = null;
+//        if (dialog != null) {
+//            dialogbutton = newButton(act);
+//
+//            dialogbutton.setText("当前Dialog");
+//
+//            layout.addView(dialogbutton);
+//            dialogbutton.setOnClickListener(new OnClickListener() {
+//
+//                @Override
+//                public void onClick(View p1) {
+//
+//                    FieldWindow fw = new FieldWindow(lpparam, param, act, dialog);
+//                    fw.show(wm, layoutParam);
+//                }
+//            });
+//        }
         Button res = newButton(act);
 
         res.setText("View获取(子)");
@@ -261,7 +178,7 @@ public class FWindow {
             @Override
             public void onClick(View p1) {
                 wm.removeView(layout);
-                loadViews(false);
+//                loadViews(false);
 
             }
 
@@ -279,12 +196,12 @@ public class FWindow {
 //				{
 //					wm.removeView(layout);
 //					loadViews(true);
-//					
+//
 //				}
 //
 //
 //			});
-//		
+//
         Button myfield = newButton(act);
 
         myfield.setText("我的变量");
@@ -323,20 +240,6 @@ public class FWindow {
                 swicthWindow(false);
             }
         });
-
-        Button rotate = newButton(act);
-        rotate.setText("旋转");
-        layout.addView(rotate);
-        rotate.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                if (floating != null)
-                    floating.setRotate(
-                            !floating.getRotate());
-            }
-        });
-
 
         Button exit = newButton(act);
 
@@ -458,25 +361,49 @@ public class FWindow {
 
     }
 
+    private View getFLoat(Context context) {
+        String resourcePath = Environment.getExternalStorageDirectory().toString() + "/reflectmaster/a.apk";
+        AssetManager mAsset = null;
+        try {
+            mAsset = AssetManager.class.newInstance();
+            @SuppressLint("PrivateApi")
+            Method method = mAsset.getClass().getDeclaredMethod("addAssetPath", String.class);
+            method.setAccessible(true);
+            method.invoke(mAsset, resourcePath);
+            Resources pluginResources = new Resources(mAsset, this.act.getResources().getDisplayMetrics(), this.act.getResources().getConfiguration());
+            PackageInfo packageInfo = this.act.getPackageManager().getPackageArchiveInfo(resourcePath, PackageManager.GET_ACTIVITIES);
+            int float_0 = pluginResources.getIdentifier("float_0", "layout", packageInfo.packageName);
+            XmlResourceParser xmlResourceParser = pluginResources.getXml(float_0);
+            return LayoutInflater.from(context).inflate(xmlResourceParser, null);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     private void swicthWindow(boolean isExit) {
         if (isMenu) {
-
             if (floating != null)
                 wm.removeView(layout);
-            layoutParam.width = 170;
-            layoutParam.height = 170;
+            layoutParam.width = 100;
+            layoutParam.height = 100;
             if (!isExit) {
                 if (floating == null) {
-                    floating = new ReflectView2(act, MasterUtils.rotate);
+                    ImageView imageView = new ImageView(act);
+                    imageView.setImageBitmap(BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().toString()+"/ReflectMaster/icon.png"));
+                    floating = imageView;
                     floating.setOnTouchListener(new OnTouchListener() {
-
                         int x;
                         int y;
-
                         @Override
                         public boolean onTouch(View p1, MotionEvent p2) {
-
-
                             int actipn = p2.getAction();
 
                             switch (actipn) {
@@ -507,19 +434,17 @@ public class FWindow {
                                         swicthWindow(false);
                                     else {
                                     }
-
                                     break;
-
-
                             }
                             return true;
                         }
                     });
-                }
 
+                }
                 wm.addView(floating, layoutParam);
             }
             isMenu = false;
+
         } else {
             if (floating != null)
                 wm.removeView(floating);
@@ -591,12 +516,12 @@ public class FWindow {
         return allchildren;
     }
 
-    private void loadViews(boolean p0) {
-        if (dialog != null)
-            showViewsLine(dialog.getWindow(), p0);
-        else
-            showViewsLine(MasterUtils.nowAct.getWindow(), p0);
-    }
+//    private void loadViews(boolean p0) {
+//        if (dialog != null)
+//            showViewsLine(dialog.getWindow(), p0);
+//        else
+//            showViewsLine(MasterUtils.nowAct.getWindow(), p0);
+//    }
 
 
 }

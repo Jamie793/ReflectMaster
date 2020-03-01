@@ -36,23 +36,11 @@ public class Entry implements IXposedHookLoadPackage {
             return;
         }
 
-        MasterUtils.isUseWindowSearch = sharedPreferences.getBoolean("windowsearch", false);
         MasterUtils.isFloating = sharedPreferences.getBoolean("float", true);
         MasterUtils.newThread = sharedPreferences.getBoolean("newthread", false);
 
-
-        id = sharedPreferences.getString("fid", "");
-        int statu = sharedPreferences.getInt("statu", 0);
-        String register = sharedPreferences.getString("register", "");
-
         XposedBridge.log("aim hooked");
-        MasterUtils.windowSize = sharedPreferences.getInt("width", 700);
-        MasterUtils.rotate = sharedPreferences.getBoolean("rotate", true);
-        XposedBridge.log("set Window size:" + MasterUtils.windowSize);
 
-
-        LogUtils.loge("the aim app had hook");
-//        XposedHelpers.findAndHookMethod("android.app.Application",lpparam.classLoader, "attach", Context.class,new HOnApp());
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onCreate", Bundle.class, new HOnCreate(lpparam));
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onResume", new HOnResume());
         XposedHelpers.findAndHookMethod("android.app.Dialog", lpparam.classLoader, "onKeyDown", int.class, KeyEvent.class, new XC_MethodHook() {
@@ -61,12 +49,8 @@ public class Entry implements IXposedHookLoadPackage {
                 super.beforeHookedMethod(param);
                 int keyCode = (int) param.args[0];
                 Dialog dialog = (Dialog) param.thisObject;
-
-
                 if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                    FWindow win = new FWindow(MasterUtils.nowAct, dialog);
-                    //win.setDialog(dialog);
-
+//                    new FWindow(MasterUtils.nowAct, dialog);
                 }
             }
         });
@@ -77,12 +61,9 @@ public class Entry implements IXposedHookLoadPackage {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
                 int keyCode = (int) param.args[0];
-
-
                 if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
                     MasterUtils.nowAct = (Activity) param.thisObject;
-                    FWindow win = new FWindow(lpparam, param);
-
+                    new FWindow(lpparam, param);
                 }
             }
         });

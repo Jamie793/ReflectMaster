@@ -145,8 +145,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
 
         final LinearLayout l = new LinearLayout(act);
         l.setBackgroundColor(Color.BLACK);
-        lp.width = MasterUtils.windowSize;
-        lp.height = MasterUtils.windowSize;
         ActionWindow ac = new ActionWindow(act, wm, lp, l);
 
 
@@ -417,14 +415,8 @@ public class MethodWindow extends Window implements OnItemClickListener {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         else {
-            if (MasterUtils.isUseWindowSearch)
-                lp.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-            else
                 lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         }
-        lp.width = MasterUtils.windowSize;
-        lp.height = MasterUtils.windowSize;
-
         final LinearLayout root = new LinearLayout(act);
 
         TextView title = new TextView(act);
@@ -433,18 +425,8 @@ public class MethodWindow extends Window implements OnItemClickListener {
         root.addView(title);
 
 
-        acw = new ActionWindow(act, manager, lp, root, !MasterUtils.isUseWindowSearch);
+        acw = new ActionWindow(act, manager, lp, root, false);
 
-        if (!MasterUtils.isUseWindowSearch)
-            acw.setSearchCallback(new ActionSearchCallback() {
-                @Override
-                public void onTextChange(EditText edit, String text) {
-                    if (TextUtils.isEmpty(text))
-                        list.clearTextFilter();
-                    else
-                        list.setFilterText(text);
-                }
-            });
 
         root.addView(acw.getActionBar());
         root.setOrientation(LinearLayout.VERTICAL);
@@ -504,7 +486,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
             }
         });
         buttonLayout.addView(fa);
-        if (MasterUtils.isUseWindowSearch) {
             fa = new Button(act);
             fa.setText("搜索");
             fa.setOnClickListener(new OnClickListener() {
@@ -524,7 +505,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
             buttonLayout.addView(fa);
 
 
-        }
         HorizontalScrollView ho = new HorizontalScrollView(act);
         ho.addView(buttonLayout);
         root.addView(ho);

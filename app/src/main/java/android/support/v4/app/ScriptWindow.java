@@ -240,8 +240,6 @@ public class ScriptWindow extends Window {
         layoutParams = new WindowManager.LayoutParams();
         layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        layoutParams.width = MasterUtils.windowSize;
-        layoutParams.height = MasterUtils.windowSize;
         layout = new LinearLayout(act);
         layout.setBackgroundColor(Color.WHITE);
         layout.setOrientation(LinearLayout.VERTICAL);

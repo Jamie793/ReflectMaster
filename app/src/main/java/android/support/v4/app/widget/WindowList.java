@@ -35,8 +35,6 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         this.context = context;
         this.manager = manager;
         layoutParam = new WindowManager.LayoutParams();
-        layoutParam.width = MasterUtils.windowSize;
-        layoutParam.height = MasterUtils.windowSize;
         layoutParam.x = 0;
         layoutParam.y = 0;
         layoutParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;

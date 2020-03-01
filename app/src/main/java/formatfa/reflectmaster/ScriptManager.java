@@ -50,7 +50,6 @@ public class ScriptManager extends Activity {
         super.onCreate(savedInstanceState);
 //        Version.isTestMode = true;
         setTitle("Feak脚本");
-        FWindow window = new FWindow(this, null);
 
 
         mode = getIntent().getIntExtra("mode", 0);

@@ -82,9 +82,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         sharedPreferences = getSharedPreferences("package", MODE_WORLD_READABLE);
-        MasterUtils.windowSize = sharedPreferences.getInt("width", 700);
-        MasterUtils.rotate = sharedPreferences.getBoolean("rotate", true);
-
         String[] packages = sharedPreferences.getString("packages", "").split(";");
         SELECTED_APK_LIST.addAll(Arrays.asList(packages));
     }

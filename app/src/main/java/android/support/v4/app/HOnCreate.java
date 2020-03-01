@@ -50,16 +50,12 @@ public class HOnCreate extends XC_MethodHook {
             FileUtils.copyFile(f.getAbsolutePath(), luajavaPath + "/" + f.getName(), false, true);
         }
 
-
         Utils.setLuaJavaSoPath(luajavaPath + "/libluajava.so");
-
 
         MasterUtils.nowAct = (Activity) param.thisObject;
         new FWindow(lpparam, param);
         super.afterHookedMethod(param);
     }
-
-
 
 
 }
