@@ -37,8 +37,6 @@
 
         <activity android:name=".SplashActivity"/>
         <activity android:name=".ScriptManager" />
-        <activity android:name=".LuaScriptManager" />
-        <activity android:name=".LuaScriptEditor"/>
         <activity android:name=".Register" />
         <activity android:name=".ScriptEditActivity" />
     </application>

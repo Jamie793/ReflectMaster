@@ -1,6 +1,9 @@
 package android.support.v4.app.reflectmaster.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +45,7 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
         return 0;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ApkInfo apkInfo = getItem(position);
@@ -62,15 +66,30 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
         }
         viewHolder.img_icon.setImageDrawable(apkInfo.getIcon());
         viewHolder.tv_title.setText(apkInfo.getTitle());
-        viewHolder.btn_selection.setOnClickListener((v)->{
-            String packages = MainActivity.sharedPreferences.getString("packages","");
-            MainActivity.sharedPreferences.edit().putString("packages",packages+";"+apkInfo.getPackageName()).apply();
+
+        if (MainActivity.SELECTED_APK_LIST.contains(apkInfo.getPackageName()))
+            viewHolder.btn_selection.setText("UNSELECT");
+        viewHolder.btn_selection.setOnClickListener((v) -> {
+            if (MainActivity.SELECTED_APK_LIST.contains(apkInfo.getPackageName())) {
+                MainActivity.SELECTED_APK_LIST.remove(apkInfo.getPackageName());
+                viewHolder.btn_selection.setText("SELECT");
+            } else {
+                MainActivity.SELECTED_APK_LIST.add(apkInfo.getPackageName());
+                viewHolder.btn_selection.setText("UNSELECT");
+            }
+            MainActivity.saveSelectedApk();
         });
-        viewHolder.btn_open.setOnClickListener((v)->{
-            System.out.println(123);
+
+        viewHolder.btn_open.setOnClickListener((v) -> {
+            this.context.startActivity(this.context.getPackageManager().getLaunchIntentForPackage(apkInfo.getPackageName()));
         });
-        viewHolder.btn_info.setOnClickListener((v)->{
-            System.out.println(123);
+
+        viewHolder.btn_info.setOnClickListener((v) -> {
+            Intent intent = new Intent();
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+            intent.setData(Uri.fromParts("package",apkInfo.getPackageName(),null));
+            this.context.startActivity(intent);
         });
 
 

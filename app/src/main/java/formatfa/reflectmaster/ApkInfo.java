@@ -36,4 +36,5 @@ public class ApkInfo {
     public void setIcon(Drawable icon) {
         this.icon = icon;
     }
+
 }

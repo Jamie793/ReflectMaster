@@ -11,7 +11,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ApkLoadAsync extends AsyncTask {
+public class ApkLoadAsync extends AsyncTask<String, String, String> {
     private Context context;
     private ListView listView;
     private ArrayList<ApkInfo> apkInfos;
@@ -29,10 +29,9 @@ public class ApkLoadAsync extends AsyncTask {
 
 
     @Override
-    protected Object doInBackground(Object[] p1) {
+    protected String doInBackground(String[] p1) {
         PackageManager packageManager = this.context.getPackageManager();
         boolean isSys = MainActivity.sharedPreferences.getBoolean("sysapp", false);
-        // Return a List of all packages that are installed on the device.
         List<PackageInfo> packages = packageManager.getInstalledPackages(0);
         for (PackageInfo packageInfo : packages) {
             // 判断系统/非系统应用
@@ -56,8 +55,8 @@ public class ApkLoadAsync extends AsyncTask {
     }
 
     @Override
-    protected void onPostExecute(Object result) {
-        ApkAdapter apkAdapter = new ApkAdapter(this.context,this.apkInfos);
+    protected void onPostExecute(String result) {
+        ApkAdapter apkAdapter = new ApkAdapter(this.context, this.apkInfos);
         this.listView.setAdapter(apkAdapter);
         super.onPostExecute(result);
     }

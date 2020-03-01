@@ -44,7 +44,9 @@ import com.luajava.LuaException;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import dalvik.system.DexClassLoader;
 
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
     private LuaDexLoaders luaDexLoader;
     public static final String BASE_PATH = Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/";
     //    public static final String APP_INFO = "反射大师1.1\nauthor:FormatFa and JamieXu";
+    public static final HashSet<String> SELECTED_APK_LIST = new HashSet<>();
     public static SharedPreferences sharedPreferences;
     private final String PACKAGE_NAME = "packages";
     private ListView list;
@@ -83,6 +86,16 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         sharedPreferences = getSharedPreferences("package", MODE_WORLD_WRITEABLE);
         MasterUtils.windowSize = sharedPreferences.getInt("width", 700);
         MasterUtils.rotate = sharedPreferences.getBoolean("rotate", true);
+
+        String[] packages = sharedPreferences.getString("packages", "").split(";");
+        SELECTED_APK_LIST.addAll(Arrays.asList(packages));
+    }
+
+    public static void saveSelectedApk() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String p : SELECTED_APK_LIST)
+            stringBuilder.append(p).append(";");
+        sharedPreferences.edit().putString("packages", stringBuilder.toString()).apply();
     }
 
     private void initView() {
@@ -91,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         this.list.setOnItemClickListener(this);
         this.edit_search = findViewById(R.id.edite_filter);
         this.swipeRefreshLayout = findViewById(R.id.swipeLayout);
+        this.swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         this.swipeRefreshLayout.setOnRefreshListener(() -> {
             refreshApkList();
             this.swipeRefreshLayout.setRefreshing(false);

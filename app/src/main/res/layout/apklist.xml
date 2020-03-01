@@ -11,10 +11,9 @@
         android:id="@+id/edite_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/edit_filter_hint"
-        />
+        android:hint="@string/edit_filter_hint" />
 
-    <android.support.v4.app.widget.SwipeRefreshLayout
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/swipeLayout">
@@ -26,7 +25,7 @@
             android:layout_below="@id/edite_filter"
             android:dividerHeight="0dp"/>
 
-    </android.support.v4.app.widget.SwipeRefreshLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 
 </RelativeLayout>

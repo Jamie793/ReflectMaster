@@ -16,24 +16,30 @@ public class Entry implements IXposedHookLoadPackage {
     public static String id;
 
     @Override
-    public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+    public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
         XSharedPreferences sharedPreferences = new XSharedPreferences("formatfa.reflectmaster", "package");
         sharedPreferences.reload();
 
-        String[] s = sharedPreferences.getString("packages", "").split(";");
-        boolean is = false;
-        for (String g : s) {
-            if (g.equals(lpparam.packageName)) {
-                XposedBridge.log("Hook packagename is:" + g);
-                is = true;
-                break;
-            }
-        }
+//
+//        String[] s = sharedPreferences.getString("packages", "").split(";");
+////        XposedBridge.log("Hook packagenames is:" + Arrays.toString(s));
+//
+//
+//        boolean is = false;
+//        for (String g : s) {
+//            if (g.equals(lpparam.packageName)) {
+//                XposedBridge.log("Hook packagename is:" + g);
+//                is = true;
+//                break;
+//            }
+//        }
+//
+//        if (!is) {
+//            return;
+//        }
 
-        if (!is) {
+        if (!lpparam.packageName.equals("com.iapp.app"))
             return;
-        }
-
 
         MasterUtils.isUseWindowSearch = sharedPreferences.getBoolean("windowsearch", false);
         MasterUtils.isFloating = sharedPreferences.getBoolean("float", true);
