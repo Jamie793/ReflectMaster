@@ -181,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         //创建文件夹复制文件等
         final File file = new File(BASE_PATH + "lua");
         final File file2 = new File(BASE_PATH + "lib");
+        final File file3 = new File(BASE_PATH+"icon.png");
 
         @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
             @Override
@@ -189,6 +190,11 @@ public class MainActivity extends AppCompatActivity {
                 super.handleMessage(msg);
             }
         };
+
+        if(!file3.exists())
+            FileUtils.deZip(getApplicationInfo().sourceDir,file3.getAbsolutePath(),"drawable/ic_launcher.png");
+
+
 
 
         if (!file.isDirectory()) {

@@ -9,4 +9,16 @@
         android:src="@drawable/ic_launcher"
         android:id="@+id/float_button"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test a"
+        android:textColor="#000"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/todo"
+        android:textColor="#000"/>
+
 </LinearLayout>

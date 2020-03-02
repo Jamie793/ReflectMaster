@@ -1,1 +1,1 @@
-include ':app', ':Test', ':ScriptParser', ':fake-script'
+include ':app'

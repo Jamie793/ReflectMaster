@@ -117,6 +117,7 @@ public class FWindow {
 
     @SuppressLint("SetTextI18n")
     private void init() {
+//        ResourceLoader loader
         wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         layoutParam.width = 500;
         layoutParam.height = 500;
