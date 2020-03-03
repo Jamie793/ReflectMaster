@@ -139,8 +139,8 @@ public class ActionWindow {
                         searchCallback.onTextChange(ActionWindow.this.search, editable.toString());
                 }
             });
+            rootLayout.addView(this.search);
         }
-        rootLayout.addView(this.search);
     }
 
 
