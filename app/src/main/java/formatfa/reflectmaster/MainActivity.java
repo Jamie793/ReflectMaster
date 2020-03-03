@@ -5,6 +5,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -17,15 +18,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.MasterUtils;
+import formatfa.reflectmaster.j.MasterUtils;
 import com.jamiexu.utils.FileUtils;
-import android.support.v4.app.reflectmaster.CoreInstall;
-import android.support.v4.app.reflectmaster.Utils.Utils;
+import formatfa.reflectmaster.j.reflectmaster.CoreInstall;
+import formatfa.reflectmaster.j.reflectmaster.Utils.Utils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.AttributeSet;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,7 +36,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.luajava.LuaException;
@@ -77,7 +82,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        sharedPreferences = getSharedPreferences("package", MODE_WORLD_READABLE);
+        try {
+            sharedPreferences = getSharedPreferences("package", MODE_WORLD_READABLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sharedPreferences = getSharedPreferences("package", MODE_PRIVATE);
+        }
         String[] packages = sharedPreferences.getString("packages", "").split(";");
         SELECTED_APK_LIST.addAll(Arrays.asList(packages));
     }
@@ -158,12 +168,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showHelp() {
-        AlertDialog.Builder ab = new AlertDialog.Builder(this);
-        ab.setTitle("协议");
-        ab.setMessage(R.string.about);
-        ab.setPositiveButton("同意", (p1, p2) -> sharedPreferences.edit().putBoolean("first", false).apply());
-        ab.setNegativeButton("不同意", (p1, p2) -> finish());
-        ab.show().setCancelable(false);
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setPadding(20,20,20,20);
+
+        TextView title = new TextView(this);
+        title.setText("用户协议：");
+        title.setTextSize(18);
+        title.setTextColor(getResources().getColor(R.color.colorAccent));
+
+        TextView textView = new TextView(this);
+        textView.setText(getResources().getText(R.string.about));
+        textView.setTextColor(getResources().getColor(R.color.colorAccent));
+        textView.setPadding(30,20,0,0);
+
+        linearLayout.addView(title);
+        linearLayout.addView(textView);
+
+        AlertDialog ab = new AlertDialog.Builder(this)
+        .setView(linearLayout)
+        .setPositiveButton("同意", (p1, p2) -> sharedPreferences.edit().putBoolean("first", false).apply())
+        .setNegativeButton("不同意", (p1, p2) -> finish())
+        .show();
+        ab.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(0xFFFF4081);
+        ab.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(0xFFFF4081);
     }
 
 

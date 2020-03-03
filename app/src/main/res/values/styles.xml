@@ -6,16 +6,22 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">@color/textColor</item>
-        <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
+        <item name="android:textColor">#FFF</item>
+        <item name="android:textColorPrimary">#FFF</item>
+        <item name="android:actionBarStyle">@style/my_actionbar_style</item>
         <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
-        <item name="actionMenuTextColor">@color/textColorPrimary</item>
     </style>
 
+    <style name="my_actionbar_style" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">#FFF</item>
+        <!--<item name="android:titleTextStyle">@style/AcBar_titleStyle</item>-->
+    </style>
 
     <style name="OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
         <item name="overlapAnchor">false</item>  <!--设置不覆盖锚点-->
         <item name="android:popupBackground">@color/colorPrimary</item> <!--更改背景颜色-->
+        <item name="android:actionMenuTextColor">#FFF</item> <!--颜色-->
     </style>
 
 </resources>

@@ -25,8 +25,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.support.v4.app.FWindow;
-
 /**
  * Created by formatfa on 18-4-28.
  */
