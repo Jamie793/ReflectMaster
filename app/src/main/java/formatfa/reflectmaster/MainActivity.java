@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
         if(!file3.exists())
-            FileUtils.deZip(getApplicationInfo().sourceDir,file3.getAbsolutePath(),"drawable/ic_launcher.png");
+            FileUtils.deZip(getApplicationInfo().sourceDir,file3.getAbsolutePath(),"res/drawable/ic_launcher.png");
 
 
 
