@@ -1,4 +1,6 @@
-package android.support.v4.app.Utils;
+package com.jamiexu.utils;
+
+import com.jamiexu.utils.Base64Utils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

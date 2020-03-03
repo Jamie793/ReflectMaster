@@ -18,7 +18,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.MasterUtils;
-import android.support.v4.app.Utils.FileUtils;
+import com.jamiexu.utils.FileUtils;
 import android.support.v4.app.reflectmaster.CoreInstall;
 import android.support.v4.app.reflectmaster.Utils.Utils;
 import android.support.v4.content.ContextCompat;
@@ -33,14 +33,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.luajava.LuaException;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.ArrayList;

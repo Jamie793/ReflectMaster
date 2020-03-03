@@ -24,27 +24,4 @@ public class ResourceFactory {
         return abstractResourceLoader;
     }
 
-
-    public int getResourceID(String packageName, String name, String sourceType) {
-        int id = -1;
-        ResourceInfo resourceInfo = this.resourceInfoHashMap.get(packageName);
-        if (resourceInfo == null)
-            return id;
-        try {
-            Class<?> clas = resourceInfo.getClassLoader().loadClass(packageName + ".R$" + sourceType);
-            id = (int) clas.getField(name).get(null);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        return id;
-    }
-
-
-
-
-
 }

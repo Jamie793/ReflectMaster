@@ -1,12 +1,6 @@
 package com.androlua;
 
 import android.content.Context;
-import android.support.v4.app.Utils.FileUtils;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import formatfa.reflectmaster.MainActivity;
 
 public class LuaEditorFactory {
     private static LuaEditor luaEditor;

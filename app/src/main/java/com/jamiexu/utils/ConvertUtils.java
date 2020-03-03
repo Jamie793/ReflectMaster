@@ -1,4 +1,4 @@
-package android.support.v4.app.Utils;
+package com.jamiexu.utils;
 
 public class ConvertUtils {
 

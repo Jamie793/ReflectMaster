@@ -8,22 +8,16 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.content.res.XmlResourceParser;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.media.Image;
 import android.os.Environment;
 import android.support.v4.app.Adapter.ObjectAdapter;
 import android.support.v4.app.reflectmaster.Utils.Utils;
-import android.support.v4.app.widget.ReflectView2;
 import android.support.v4.app.widget.ViewLineClickListener;
 import android.support.v4.app.widget.ViewLineView;
 import android.support.v4.app.widget.WindowList;
 import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,7 +33,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,8 +106,6 @@ public class FWindow {
     }
 
 
-
-
     @SuppressLint("SetTextI18n")
     private void init() {
 //        ResourceLoader loader
@@ -179,43 +170,18 @@ public class FWindow {
             @Override
             public void onClick(View p1) {
                 wm.removeView(layout);
-//                loadViews(false);
+                loadViews(false);
 
             }
 
 
         });
-//		Button res2 =new Button(act);
-//
-//		res2.setText("View获取2");
-//		res2.setTextColor(Color.RED);
-//		layout.addView(res2);
-//		res2.setOnClickListener(new OnClickListener(){
-//
-//				@Override
-//				public void onClick(View p1)
-//				{
-//					wm.removeView(layout);
-//					loadViews(true);
-//
-//				}
-//
-//
-//			});
-//
         Button myfield = newButton(act);
 
         myfield.setText("我的变量");
 
         layout.addView(myfield);
-        myfield.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                showObjects("我的变量", MasterUtils.objects);
-
-            }
-        });
+        myfield.setOnClickListener(p1 -> showObjects("我的变量", MasterUtils.objects));
 //		Button service =new Button(act);
 //
 //		service.setText("Service");
@@ -257,17 +223,6 @@ public class FWindow {
 
         swicthWindow(false);
 
-
-//		floating.setOnClickListener(new OnClickListener(){
-//
-//				@Override
-//				public void onClick(View p1)
-//				{
-//					
-//				}
-//			});
-
-
     }
 
     private void showActivity() {
@@ -287,7 +242,6 @@ public class FWindow {
                 if (a.name.startsWith(".")) {
                     actname = a.packageName + a.name;
                 } else {
-
                     actname = a.name;
                 }
                 aname.add(actname);
@@ -303,18 +257,13 @@ public class FWindow {
             WindowList wlist = new WindowList(act, wm);
             wlist.setItems(name);
             wlist.setTitle("Activity启动");
-
-            wlist.setListener(new OnItemClickListener() {
-
-                @Override
-                public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-                    sp.edit().putInt("select", p3).commit();
-                    try {
-                        Intent i = new Intent(act, act.getClassLoader().loadClass(aname.get(p3)));
-                        act.startActivity(i);
-                    } catch (ClassNotFoundException e) {
-                        Toast.makeText(act, e.toString(), Toast.LENGTH_LONG).show();
-                    }
+            wlist.setListener((p1, p2, p3, p4) -> {
+                sp.edit().putInt("select", p3).apply();
+                try {
+                    Intent i = new Intent(act, act.getClassLoader().loadClass(aname.get(p3)));
+                    act.startActivity(i);
+                } catch (ClassNotFoundException e) {
+                    Toast.makeText(act, e.toString(), Toast.LENGTH_LONG).show();
                 }
             });
             wlist.show();
@@ -336,58 +285,15 @@ public class FWindow {
             return;
         }
         WindowList wlist = new WindowList(act, wm);
-//		String[] names = new String[obs.size()];
-//		for(int i = 0;i<obs.size();i+=1)
-//		{
-//			if(obs.get(i)==null)
-//				names[i]="null";
-//			else
-//				names[i]="v"+i+"  "+obs.get(i).getClass().getCanonicalName();
-//		}
-//
         ObjectAdapter oba = new ObjectAdapter(act, obs);
 
         //wlist.setItems(names);
         wlist.setAdaptet(oba);
         wlist.setTitle(title);
-        wlist.setListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-                FieldWindow.newWindow(lpparam, param, act, obs.get(p3), wm);
-
-            }
-        });
+        wlist.setListener((p1, p2, p3, p4) -> FieldWindow.newWindow(lpparam, param, act, obs.get(p3), wm));
         wlist.show(-2, -2);
 
     }
-
-    private View getFLoat(Context context) {
-        String resourcePath = Environment.getExternalStorageDirectory().toString() + "/reflectmaster/a.apk";
-        AssetManager mAsset = null;
-        try {
-            mAsset = AssetManager.class.newInstance();
-            @SuppressLint("PrivateApi")
-            Method method = mAsset.getClass().getDeclaredMethod("addAssetPath", String.class);
-            method.setAccessible(true);
-            method.invoke(mAsset, resourcePath);
-            Resources pluginResources = new Resources(mAsset, this.act.getResources().getDisplayMetrics(), this.act.getResources().getConfiguration());
-            PackageInfo packageInfo = this.act.getPackageManager().getPackageArchiveInfo(resourcePath, PackageManager.GET_ACTIVITIES);
-            int float_0 = pluginResources.getIdentifier("float_0", "layout", packageInfo.packageName);
-            XmlResourceParser xmlResourceParser = pluginResources.getXml(float_0);
-            return LayoutInflater.from(context).inflate(xmlResourceParser, null);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
     private void swicthWindow(boolean isExit) {
         if (isMenu) {
@@ -398,15 +304,15 @@ public class FWindow {
             if (!isExit) {
                 if (floating == null) {
                     ImageView imageView = new ImageView(act);
-                    imageView.setImageBitmap(BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().toString()+"/ReflectMaster/icon.png"));
+                    imageView.setImageBitmap(BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/icon.png"));
                     floating = imageView;
                     floating.setOnTouchListener(new OnTouchListener() {
                         int x;
                         int y;
+
                         @Override
                         public boolean onTouch(View p1, MotionEvent p2) {
                             int actipn = p2.getAction();
-
                             switch (actipn) {
                                 case MotionEvent.ACTION_DOWN:
                                     startX = (int) p2.getRawX();
@@ -415,22 +321,17 @@ public class FWindow {
                                     y = startY;
                                     break;
                                 case MotionEvent.ACTION_MOVE:
-
                                     nowX = (int) p2.getRawX();
                                     nowY = (int) p2.getRawY();
                                     layoutParam.x += nowX - startX;
                                     layoutParam.y += nowY - startY;
-
                                     wm.updateViewLayout(floating, layoutParam);
                                     startX = nowX;
                                     startY = nowY;
                                     break;
                                 case MotionEvent.ACTION_UP:
-
                                     nowX = (int) p2.getRawX();
                                     nowY = (int) p2.getRawY();
-                                    //floating.setRotate(false);
-                                    //Log.d("ReflectView2",""+Math.pow( Math.abs( nowX-x) ,2)+Math.pow( Math.abs( nowY-y),2));
                                     if (Math.sqrt(Math.pow(Math.abs(nowX - x), 2) + Math.pow(Math.abs(nowY - y), 2)) < 170)
                                         swicthWindow(false);
                                     else {
@@ -445,7 +346,6 @@ public class FWindow {
                 wm.addView(floating, layoutParam);
             }
             isMenu = false;
-
         } else {
             if (floating != null)
                 wm.removeView(floating);
@@ -483,11 +383,6 @@ public class FWindow {
             public void onClick(ViewLineView obj, List<View> views) {
                 List<Object> r = new ArrayList<>();
                 for (View view : views) r.add(view);
-                //if(r.size()>0)
-                //	{
-                //if(!(views.get(0) instanceof  ViewGroup))
-                //views.get(0).setBackgroundColor(Color.RED);
-                // }
                 showObjects("点击范围内的views", r);
             }
 
@@ -517,12 +412,9 @@ public class FWindow {
         return allchildren;
     }
 
-//    private void loadViews(boolean p0) {
-//        if (dialog != null)
-//            showViewsLine(dialog.getWindow(), p0);
-//        else
-//            showViewsLine(MasterUtils.nowAct.getWindow(), p0);
-//    }
+    private void loadViews(boolean p0) {
+        showViewsLine(MasterUtils.nowAct.getWindow(), p0);
+    }
 
 
 }

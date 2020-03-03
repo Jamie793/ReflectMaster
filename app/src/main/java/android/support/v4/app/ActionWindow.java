@@ -1,11 +1,11 @@
 package android.support.v4.app;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -17,10 +17,15 @@ public class ActionWindow {
     private WindowManager manager;
     private WindowManager.LayoutParams lp;
     private View view;
-
     private int startX, startY, nowX, nowY;
-
     private ActionSearchCallback searchCallback;
+    private LinearLayout rootLayout;
+    private LinearLayout contain;
+    private Button test;
+    private Button close;
+    private Button move;
+    private Button resize;
+    private EditText search;
 
     public ActionSearchCallback getSearchCallback() {
         return searchCallback;
@@ -40,7 +45,6 @@ public class ActionWindow {
     }
 
     public ActionWindow(Context context, WindowManager manager, WindowManager.LayoutParams lp, View view, boolean search) {
-
         this.context = context;
         this.manager = manager;
         this.lp = lp;
@@ -48,84 +52,73 @@ public class ActionWindow {
         init(search);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void init(boolean search) {
-        //Toast.makeText(context,lp.width+" view:"+lp.height,Toast.LENGTH_LONG).show();
         if (lp.width == 0) lp.width = context.getResources().getDisplayMetrics().widthPixels;
         if (lp.height == 0) lp.height = context.getResources().getDisplayMetrics().heightPixels;
-        //Toast.makeText(context,lp.width+"dd",Toast.LENGTH_SHORT).show();
         rootLayout = new LinearLayout(context);
         rootLayout.setOrientation(LinearLayout.VERTICAL);
-
+        rootLayout.setBackgroundColor(0xFFDDDADA);
         contain = new LinearLayout(context);
+
         test = new Button(context);
-        test.setText("++");
+        test.setText("Zoom");
+        test.setTextColor(0xFFFFFFFF);
         test.setOnTouchListener(new ResizsListener(false));
+        test.setBackground(null);
 
         close = new Button(context);
-        close.setText("关闭");
-        close.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                manager.removeView(view);
-            }
-        });
+        close.setText("close");
+        close.setTextColor(0xFFFFFFFF);
+        close.setOnClickListener(p1 -> manager.removeView(view));
+        close.setBackground(null);
 
 
         move = new Button(context);
-        move.setText("移动");
-
-        move.setOnTouchListener(new OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View p1, MotionEvent p2) {
-
-                switch (p2.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        startX = (int) p2.getRawX();
-                        startY = (int) p2.getRawY();
-                        break;
+        move.setText("Drag");
+        move.setTextColor(0xFFFFFFFF);
+        move.setBackground(null);
 
 
-                    case MotionEvent.ACTION_MOVE:
-                        nowX = (int) p2.getRawX();
-                        nowY = (int) p2.getRawY();
+        move.setOnTouchListener((p1, p2) -> {
 
-                        lp.x += nowX - startX;
-                        lp.y += nowY - startY;
+            switch (p2.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    startX = (int) p2.getRawX();
+                    startY = (int) p2.getRawY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    nowX = (int) p2.getRawX();
+                    nowY = (int) p2.getRawY();
 
-                        startX = nowX;
-                        startY = nowY;
-                        manager.updateViewLayout(view, lp);
+                    lp.x += nowX - startX;
+                    lp.y += nowY - startY;
 
-                        break;
-
-
-                    case MotionEvent.ACTION_UP:
-                        break;
-
-
-                }
-                return false;
+                    startX = nowX;
+                    startY = nowY;
+                    manager.updateViewLayout(view, lp);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    break;
             }
+            return false;
         });
 
         resize = new Button(context);
         resize.setText("++");
         resize.setOnTouchListener(new ResizsListener(true));
-
-        //ViewGroup.LayoutParams vg = new ViewGroup.LayoutParams(-2,-2);
-
-
         contain.addView(test);
-        contain.addView(close);
         contain.addView(move);
-        contain.addView(resize);
-        contain.setBackgroundColor(0xFF3F51B5);
+        contain.addView(close);
+        contain.setBackgroundColor(0xFF2196F3);
         rootLayout.addView(contain);
         if (search) {
             this.search = new EditText(context);
-            this.search.setHint("输入要查询的关键字");
+            this.search.setTextColor(0xFFFF4081);
+            this.search.setHint("Input filter...");
+            this.search.setHintTextColor(0xFFFF4081);
+            this.search.setBackgroundColor(0xFFFFFFFF);
+
 
             this.search.addTextChangedListener(new TextWatcher() {
 
@@ -146,18 +139,10 @@ public class ActionWindow {
                         searchCallback.onTextChange(ActionWindow.this.search, editable.toString());
                 }
             });
-            rootLayout.addView(this.search);
         }
-
+        rootLayout.addView(this.search);
     }
 
-    private LinearLayout rootLayout;
-    private LinearLayout contain;
-    private Button test;
-    private Button close;
-    private Button move;
-    private Button resize;
-    private EditText search;
 
     public LinearLayout getActionBar() {
 

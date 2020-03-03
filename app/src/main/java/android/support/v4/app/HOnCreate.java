@@ -3,9 +3,8 @@ package android.support.v4.app;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Environment;
-import android.support.v4.app.Utils.FileUtils;
+import com.jamiexu.utils.FileUtils;
 import android.view.WindowManager;
 
 import java.io.File;

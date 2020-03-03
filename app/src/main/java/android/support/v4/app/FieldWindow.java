@@ -77,7 +77,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
 
         WindowManager am = (WindowManager) act.getSystemService(act.WINDOW_SERVICE);
-        WindowList wlist = new WindowList(act, am);
+        WindowList wlist = new WindowList(act, am,false);
         wlist.setTitle("变量操作");
         wlist.setItems(new String[]{"编辑", "收藏", "复制变量名称", "复制类名和变量名称", "复制变量名称和类型"/*,"持久化修改(构造函数后使用while(true)不断修改}"*/});
         wlist.setListener((adap, view, posi, l) -> {
@@ -235,7 +235,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         layout.addView(ac.getActionBar());
         final TextView
                 clsname = new TextView(act);
-//		Toast.makeText(act,"获取类名:"+object.getClass())
         clsname.setText("当前：" + object.getClass().getCanonicalName());
         clsname.setOnClickListener(view -> {
             if (superCls == null) {
@@ -308,14 +307,10 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 //		
         Button metbod = new Button(act);
         metbod.setText("方法");
-        metbod.setOnClickListener(new OnClickListener() {
+        metbod.setOnClickListener(p1 -> {
+            MethodWindow mw = new MethodWindow(lpparam, param, act, object);
 
-            @Override
-            public void onClick(View p1) {
-                MethodWindow mw = new MethodWindow(lpparam, param, act, object);
-
-                mw.show(wm, lp);
-            }
+            mw.show(wm, lp);
         });
         buttonLayout.addView(metbod);
 
@@ -352,13 +347,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         buttonLayout.addView(undeclared);
         Button fa = new Button(act);
         fa.setText("收藏");
-        fa.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                showFavrite();
-            }
-        });
+        fa.setOnClickListener(p1 -> showFavrite());
         //buttonLayout.addView(fa);
 
 
@@ -422,12 +411,12 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 @Override
                 public void onClick(View p1) {
                     try {
-                        OutputStream os = new FileOutputStream("/sdcard/Reflect.data");
+                        OutputStream os = new FileOutputStream("/sdcard/ReflectUtils.data");
                         os.write((byte[]) object);
                     } catch (Exception e) {
                         Toast.makeText(act, "错误", Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(act, "写出成功:" + "/sdcard/Reflect.data", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(act, "写出成功:" + "/sdcard/ReflectUtils.data", Toast.LENGTH_SHORT).show();
                 }
             });
             buttonLayout.addView(operation);
@@ -539,7 +528,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             }
 
         }
-        WindowList listView = new WindowList(act, wm);
+        WindowList listView = new WindowList(act, wm,false);
         listView.setItems(names);
         listView.setTitle("Lua脚本");
         listView.setListener((adapterView, view, i, l) -> {

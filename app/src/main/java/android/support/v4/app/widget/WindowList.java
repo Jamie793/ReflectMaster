@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.app.ActionWindow;
 import android.support.v4.app.Adapter.TextAdapter;
-import android.support.v4.app.MasterUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -29,11 +28,13 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
     private String title;
     private ListAdapter adapter;
     private AdapterView.OnItemLongClickListener onLongClickListener;
+    private boolean isearch;
 
 
-    public WindowList(Context context, WindowManager manager) {
+    public WindowList(Context context, WindowManager manager, boolean isearch) {
         this.context = context;
         this.manager = manager;
+        this.isearch = isearch;
         layoutParam = new WindowManager.LayoutParams();
         layoutParam.x = 0;
         layoutParam.y = 0;
@@ -45,7 +46,41 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         layout.setOrientation(LinearLayout.VERTICAL);
 
 
-        ActionWindow ar = new ActionWindow(context, manager, layoutParam, layout);
+        ActionWindow ar = new ActionWindow(context, manager, layoutParam, layout,this.isearch);
+        layout.addView(ar.getActionBar());
+        titleview = new TextView(context);
+        titleview.setTextColor(Color.WHITE);
+        layout.addView(titleview);
+
+        buttonLayout = new LinearLayout(context);
+        buttonLayout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(buttonLayout);
+
+        lv = new ListView(context);
+        lv.setFastScrollEnabled(true);
+        lv.setOnItemClickListener(this);
+        lv.setOnItemLongClickListener(this);
+        layout.addView(lv);
+
+    }
+
+
+    public WindowList(Context context, WindowManager manager) {
+        this.context = context;
+        this.manager = manager;
+        this.isearch = isearch;
+        layoutParam = new WindowManager.LayoutParams();
+        layoutParam.x = 0;
+        layoutParam.y = 0;
+        layoutParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        layoutParam.type = WindowManager.LayoutParams.TYPE_APPLICATION;
+
+        layout = new LinearLayout(context);
+        layout.setBackgroundColor(Color.DKGRAY);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+
+        ActionWindow ar = new ActionWindow(context, manager, layoutParam, layout,this.isearch);
         layout.addView(ar.getActionBar());
         titleview = new TextView(context);
         titleview.setTextColor(Color.WHITE);

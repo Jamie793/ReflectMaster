@@ -39,18 +39,15 @@ public class MethodWindow extends Window implements OnItemClickListener {
     @Override
     public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
         WindowManager am = (WindowManager) act.getSystemService(act.WINDOW_SERVICE);
-        WindowList wlist = new WindowList(act, am);
+        WindowList wlist = new WindowList(act, am,false);
         wlist.setTitle("调用方法");
         wlist.setItems(new String[]{"运行", "收藏", "复制函数名称", "复制类名和函数名", "复制类和函数名(hook脚本使用)"});
-        wlist.setListener(new OnItemClickListener() {
+        wlist.setListener((adap, view, posi, l) -> {
 
-            @Override
-            public void onItemClick(AdapterView<?> adap, View view, int posi, long l) {
-
-                Method m = (Method) p1.getItemAtPosition(p3);
-                if (posi == 0) {
-                    if (m.isAccessible() == false) m.setAccessible(true);
-                    runMethod(m);
+            Method m = (Method) p1.getItemAtPosition(p3);
+            if (posi == 0) {
+                if (m.isAccessible() == false) m.setAccessible(true);
+                runMethod(m);
 
 //						try
 //						{
@@ -59,38 +56,37 @@ public class MethodWindow extends Window implements OnItemClickListener {
 //						}
 //						catch (Exception e)
 //						{Toast.makeText(act,e.toString(),Toast.LENGTH_LONG).show();}
-//						
+//
 
 
-                } else if (posi == 1) {
-                    favorite(p3, m);
-                } else if (posi == 2) {
-                    ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                    cm.setPrimaryClip(ClipData.newPlainText("test", m.toGenericString()));
-                    Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
+            } else if (posi == 1) {
+                favorite(p3, m);
+            } else if (posi == 2) {
+                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("test", m.toGenericString()));
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
 
-                } else if (posi == 3) {
-                    ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                    cm.setPrimaryClip(ClipData.newPlainText("test", "'" + m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'"));
-                    Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
+            } else if (posi == 3) {
+                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("test", "'" + m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'"));
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
 
-                } else {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(m.getDeclaringClass().getCanonicalName());
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append(m.getDeclaringClass().getCanonicalName());
+                sb.append(" ");
+                sb.append(m.getName());
+                ;
+                for (Class clz : m.getParameterTypes()) {
                     sb.append(" ");
-                    sb.append(m.getName());
-                    ;
-                    for (Class clz : m.getParameterTypes()) {
-                        sb.append(" ");
-                        sb.append(clz.getCanonicalName());
-
-                    }
-                    ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                    cm.setPrimaryClip(ClipData.newPlainText("test", sb.toString()));
-                    Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
-
+                    sb.append(clz.getCanonicalName());
 
                 }
+                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("test", sb.toString()));
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
+
+
             }
         });
         wlist.show();
