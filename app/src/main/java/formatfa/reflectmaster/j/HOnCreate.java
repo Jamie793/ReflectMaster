@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
+
 import com.jamiexu.utils.FileUtils;
+
 import android.view.WindowManager;
 
 import java.io.File;
@@ -44,9 +46,11 @@ public class HOnCreate extends XC_MethodHook {
         String cpu = formatfa.reflectmaster.j.reflectmaster.Utils.Utils.getCpu();
         XposedBridge.log("CPU=>" + cpu);
 
-        File[] files = new File(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lib/" + cpu).listFiles();
-        for (File f : files) {
-            FileUtils.copyFile(f.getAbsolutePath(), luajavaPath + "/" + f.getName(), false, true);
+        if (!new File(luajavaPath).exists()) {
+            File[] files = new File(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lib/" + cpu).listFiles();
+            for (File f : files) {
+                FileUtils.copyFile(f.getAbsolutePath(), luajavaPath + "/" + f.getName(), false, true);
+            }
         }
 
         Utils.setLuaJavaSoPath(luajavaPath + "/libluajava.so");
