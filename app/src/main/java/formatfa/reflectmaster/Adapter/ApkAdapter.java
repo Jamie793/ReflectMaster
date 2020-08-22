@@ -3,9 +3,7 @@ package formatfa.reflectmaster.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +14,10 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.jamiexu.Main;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.robv.android.xposed.XposedBridge;
 import formatfa.reflectmaster.ApkInfo;
 import formatfa.reflectmaster.MainActivity;
 import formatfa.reflectmaster.R;
@@ -93,9 +88,12 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
                 String cpu = formatfa.reflectmaster.j.reflectmaster.Utils.Utils.getCpu();
                 if (MainActivity.isRoot()) {
                     String luajavaPath = apkInfo.getDataPath() + "/app_lib/" + "/libluajava.so";
-                    if (!new File(luajavaPath).exists())
-                        MainActivity.copyFile("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so", luajavaPath);
-                    MainActivity.chmod(luajavaPath);
+                    if (!new File(luajavaPath).exists()) {
+//                        MainActivity.mkdir(apkInfo.getDataPath() + "/app_lib");
+                        MainActivity.copyFile("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so",
+                                luajavaPath);
+//                        MainActivity.chmod(luajavaPath);
+                    }
                 }
                 MainActivity.SELECTED_APK_LIST.add(apkInfo.getPackageName());
                 viewHolder.btn_selection.setText("UNSELECT");

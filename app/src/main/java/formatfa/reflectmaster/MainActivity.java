@@ -425,22 +425,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             Process process = Runtime.getRuntime().exec("su");
             OutputStream outputStream = process.getOutputStream();
-            outputStream.write(("cp " + from + " " + to).getBytes());
-            outputStream.flush();
-            outputStream.write(("chmod 777 " + to).getBytes());
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static void chmod(String f) {
-        try {
-            Process process = Runtime.getRuntime().exec("su");
-            OutputStream outputStream = process.getOutputStream();
-            outputStream.write(("chmod 777 " + f).getBytes());
+            String p = new File(to).getParent();
+            outputStream.write(("mkdir -p " + p + " && cp " + from + " " + to + " && chmod 777 " + to).getBytes());
             outputStream.flush();
             outputStream.close();
         } catch (IOException e) {
@@ -448,5 +434,31 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+//    public static void chmod(String f) {
+//        try {
+//            Process process = Runtime.getRuntime().exec("su");
+//            OutputStream outputStream = process.getOutputStream();
+//            outputStream.write(("chmod 777 " + f).getBytes());
+//            outputStream.flush();
+//            outputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
+
+//    public static void mkdir(String dir) {
+//        try {
+//            Process process = Runtime.getRuntime().exec("su");
+//            OutputStream outputStream = process.getOutputStream();
+//            outputStream.write(("mkdir -p " + dir).getBytes());
+//            outputStream.flush();
+//            outputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
 }
