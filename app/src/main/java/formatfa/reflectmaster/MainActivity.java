@@ -18,16 +18,21 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+
 import formatfa.reflectmaster.j.MasterUtils;
+
 import com.jamiexu.utils.FileUtils;
+
 import formatfa.reflectmaster.j.reflectmaster.CoreInstall;
 import formatfa.reflectmaster.j.reflectmaster.Utils.Utils;
+
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,9 +46,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jamiexu.utils.file.ZipUtils;
 import com.luajava.LuaException;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -158,7 +166,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void joinQQGroup(String key) {
         Intent intent = new Intent();
-        intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D" + key));
+        intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2" +
+                "Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D" + key));
         // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try {
             startActivity(intent);
@@ -170,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     private void showHelp() {
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-        linearLayout.setPadding(20,20,20,20);
+        linearLayout.setPadding(20, 20, 20, 20);
 
         TextView title = new TextView(this);
         title.setText("用户协议：");
@@ -180,16 +189,17 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = new TextView(this);
         textView.setText(getResources().getText(R.string.about));
         textView.setTextColor(getResources().getColor(R.color.colorAccent));
-        textView.setPadding(30,20,0,0);
+        textView.setPadding(30, 20, 0, 0);
 
         linearLayout.addView(title);
         linearLayout.addView(textView);
 
         AlertDialog ab = new AlertDialog.Builder(this)
-        .setView(linearLayout)
-        .setPositiveButton("同意", (p1, p2) -> sharedPreferences.edit().putBoolean("first", false).apply())
-        .setNegativeButton("不同意", (p1, p2) -> finish())
-        .show();
+                .setView(linearLayout)
+                .setPositiveButton("同意", (p1, p2) -> sharedPreferences.edit().putBoolean(
+                        "first", false).apply())
+                .setNegativeButton("不同意", (p1, p2) -> finish())
+                .show();
         ab.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(0xFFFF4081);
         ab.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(0xFFFF4081);
     }
@@ -202,10 +212,12 @@ public class MainActivity extends AppCompatActivity {
             showHelp();
         }
 
+        Log.i(getClass().getCanonicalName(), getApplicationInfo().sourceDir);
+
         //创建文件夹复制文件等
         final File file = new File(BASE_PATH + "lua");
         final File file2 = new File(BASE_PATH + "lib");
-        final File file3 = new File(BASE_PATH+"icon.png");
+        final File file3 = new File(BASE_PATH + "icon.png");
 
         @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
             @Override
@@ -215,10 +227,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if(!file3.exists())
-            FileUtils.deZip(getApplicationInfo().sourceDir,file3.getAbsolutePath(),"res/drawable/ic_launcher.png");
-
-
+        if (!file3.exists())
+            ZipUtils.extraceFile(getApplicationInfo().sourceDir, file3.getAbsolutePath(),
+                    "res/drawable/ic_launcher.png");
 
 
         if (!file.isDirectory()) {
@@ -226,11 +237,12 @@ public class MainActivity extends AppCompatActivity {
             Utils.showToast(this, "解压Lua资源中...", 0);
 
             new Thread(() -> {
-                boolean status = FileUtils.deZip(getApplicationInfo().sourceDir, file.toString(), "assets/lua/");
+                boolean status = com.jamiexu.utils.file.ZipUtils.extraceDir(
+                        getApplicationInfo().sourceDir, file.toString(), "assets/lua/");
                 if (status) {
-                    handler.obtainMessage(22, "解压Lua完成").sendToTarget();
+                    handler.obtainMessage(0, "解压Lua资源完成");
                 } else {
-                    handler.obtainMessage(22, "解压Lua出现错误").sendToTarget();
+                    handler.obtainMessage(0, "解压Lua资源失败");
                 }
             }).start();
 
@@ -239,11 +251,12 @@ public class MainActivity extends AppCompatActivity {
         if (!file2.exists()) {
             Utils.showToast(this, "解压So资源中...", 0);
             new Thread(() -> {
-                boolean status = FileUtils.deZip(getApplicationInfo().sourceDir, file2.toString(), "lib");
+                boolean status = ZipUtils.extraceDirs(getApplicationInfo().sourceDir,
+                        file2.getParent(), "lib");
                 if (status) {
-                    handler.obtainMessage(22, "解压So完成").sendToTarget();
+                    handler.obtainMessage(0, "解压So资源完成");
                 } else {
-                    handler.obtainMessage(22, "解压So出现错误").sendToTarget();
+                    handler.obtainMessage(0, "解压So资源失败");
                 }
             }).start();
         }
@@ -253,17 +266,20 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ResourceType")
     private void about() {
         ImageView imageView = new ImageView(this);
-        imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.pay));
+        imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.pay));
         imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setView(LayoutInflater.from(this).inflate(R.layout.main_about,null,false))
-                .setNegativeButton("打赏作者", (v,e)->{
+                .setView(LayoutInflater.from(this).inflate(R.layout.main_about, null,
+                        false))
+                .setNegativeButton("打赏作者", (v, e) -> {
                     new AlertDialog.Builder(this).setView(imageView).show();
                 })
                 .setPositiveButton("了解", null)
                 .show();
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorAccent));
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorAccent));
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().
+                getColor(R.color.colorAccent));
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().
+                getColor(R.color.colorAccent));
 
     }
 
@@ -287,7 +303,8 @@ public class MainActivity extends AppCompatActivity {
 
         } else if (item.getItemId() == R.id.lua_script) {
             if (checkAppInstalled(this)) {
-                Intent intent = this.getPackageManager().getLaunchIntentForPackage("com.androlua");
+                Intent intent = this.getPackageManager()
+                        .getLaunchIntentForPackage("com.androlua");
                 startActivity(intent);
             } else {
                 Utils.showToast(this, "请先安装Androlua", 0);
@@ -391,6 +408,45 @@ public class MainActivity extends AppCompatActivity {
 
     public DexClassLoader loadDex(String path) throws LuaException {
         return luaDexLoader.loadDex(path);
+    }
+
+
+    public static boolean isRoot() {
+        try {
+            Runtime.getRuntime().exec("su");
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void copyFile(String from, String to) {
+        try {
+            Process process = Runtime.getRuntime().exec("su");
+            OutputStream outputStream = process.getOutputStream();
+            outputStream.write(("cp " + from + " " + to).getBytes());
+            outputStream.flush();
+            outputStream.write(("chmod 777 " + to).getBytes());
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void chmod(String f) {
+        try {
+            Process process = Runtime.getRuntime().exec("su");
+            OutputStream outputStream = process.getOutputStream();
+            outputStream.write(("chmod 777 " + f).getBytes());
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

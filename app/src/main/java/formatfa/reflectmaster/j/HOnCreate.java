@@ -5,11 +5,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
 
-import com.jamiexu.utils.FileUtils;
-
+import android.util.Log;
 import android.view.WindowManager;
 
+import com.jamiexu.utils.file.FileUtils;
+
 import java.io.File;
+import java.io.IOException;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -46,19 +48,15 @@ public class HOnCreate extends XC_MethodHook {
         String cpu = formatfa.reflectmaster.j.reflectmaster.Utils.Utils.getCpu();
         XposedBridge.log("CPU=>" + cpu);
 
-        if (!new File(luajavaPath).exists()) {
-            File[] files = new File(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lib/" + cpu).listFiles();
-            for (File f : files) {
-                FileUtils.copyFile(f.getAbsolutePath(), luajavaPath + "/" + f.getName(), false, true);
-            }
-        }
-
         Utils.setLuaJavaSoPath(luajavaPath + "/libluajava.so");
+
 
         MasterUtils.nowAct = (Activity) param.thisObject;
         new FWindow(lpparam, param);
         super.afterHookedMethod(param);
     }
+
+
 
 
 }

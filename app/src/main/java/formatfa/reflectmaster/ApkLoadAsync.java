@@ -40,6 +40,8 @@ public class ApkLoadAsync extends AsyncTask<String, String, String> {
                 this.apkInfos.add(new ApkInfo(
                         packageInfo.applicationInfo.loadLabel(packageManager).toString(),
                         packageInfo.packageName,
+                        packageInfo.applicationInfo.sourceDir,
+                        packageInfo.applicationInfo.dataDir,
                         packageInfo.applicationInfo.loadIcon(packageManager)));
             } else {
                 // 系统应用
@@ -47,6 +49,8 @@ public class ApkLoadAsync extends AsyncTask<String, String, String> {
                     this.apkInfos.add(new ApkInfo(
                             packageInfo.applicationInfo.loadLabel(packageManager).toString(),
                             packageInfo.packageName,
+                            packageInfo.applicationInfo.sourceDir,
+                            packageInfo.applicationInfo.dataDir,
                             packageInfo.applicationInfo.loadIcon(packageManager)));
                 }
             }

@@ -3,7 +3,9 @@ package formatfa.reflectmaster.Adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +16,13 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jamiexu.Main;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.robv.android.xposed.XposedBridge;
 import formatfa.reflectmaster.ApkInfo;
 import formatfa.reflectmaster.MainActivity;
 import formatfa.reflectmaster.R;
@@ -24,7 +30,7 @@ import formatfa.reflectmaster.R;
 public class ApkAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
-    private ArrayList<ApkInfo> apkInfos,bak_apkInfos;
+    private ArrayList<ApkInfo> apkInfos, bak_apkInfos;
     private static Filter filter;
 
     public ApkAdapter(Context context, ArrayList<ApkInfo> apkInfos) {
@@ -55,7 +61,7 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
         return filter;
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "SdCardPath"})
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ApkInfo apkInfo = getItem(position);
@@ -84,6 +90,13 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
                 MainActivity.SELECTED_APK_LIST.remove(apkInfo.getPackageName());
                 viewHolder.btn_selection.setText("SELECT");
             } else {
+                String cpu = formatfa.reflectmaster.j.reflectmaster.Utils.Utils.getCpu();
+                if (MainActivity.isRoot()) {
+                    String luajavaPath = apkInfo.getDataPath() + "/app_lib/" + "/libluajava.so";
+                    if (!new File(luajavaPath).exists())
+                        MainActivity.copyFile("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so", luajavaPath);
+                    MainActivity.chmod(luajavaPath);
+                }
                 MainActivity.SELECTED_APK_LIST.add(apkInfo.getPackageName());
                 viewHolder.btn_selection.setText("UNSELECT");
             }
@@ -118,11 +131,11 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults filterResults = new FilterResults();
             List<ApkInfo> apkInfos = new ArrayList<>();
-            if(constraint.length() == 0){
+            if (constraint.length() == 0) {
                 apkInfos = ApkAdapter.this.bak_apkInfos;
-            }else{
-                for(ApkInfo apkInfo : ApkAdapter.this.apkInfos){
-                    if(apkInfo.getTitle().contains(constraint.toString()) || apkInfo.getPackageName().contains(constraint.toString())){
+            } else {
+                for (ApkInfo apkInfo : ApkAdapter.this.apkInfos) {
+                    if (apkInfo.getTitle().contains(constraint.toString()) || apkInfo.getPackageName().contains(constraint.toString())) {
                         apkInfos.add(apkInfo);
                     }
                 }

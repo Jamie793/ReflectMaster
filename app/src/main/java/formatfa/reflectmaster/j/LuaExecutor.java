@@ -31,7 +31,7 @@ public class LuaExecutor {
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public LuaExecutor(Context activity, Window jf) {
-        XposedBridge.log("Path=>" + formatfa.reflectmaster.Utils.Utils.getLuaJavaSoPath());
+        XposedBridge.log("LuaJavaSOPath=>" + formatfa.reflectmaster.Utils.Utils.getLuaJavaSoPath());
         this.context = activity;
         L = LuaStateFactory.newLuaState(formatfa.reflectmaster.Utils.Utils.getLuaJavaSoPath());
         L.openLibs();
