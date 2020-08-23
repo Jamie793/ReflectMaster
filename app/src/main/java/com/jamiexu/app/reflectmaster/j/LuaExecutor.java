@@ -21,7 +21,9 @@ import java.io.File;
 import java.util.HashMap;
 
 import dalvik.system.DexClassLoader;
+import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 
 public class LuaExecutor {
 
@@ -31,7 +33,7 @@ public class LuaExecutor {
     private final HashMap<String, LuaDexClassLoader> dexCache = new HashMap<>();
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
-    public LuaExecutor(Context activity, Window jf) {
+    public LuaExecutor(Context activity, Object jf) {
         XposedBridge.log("LuaJavaSOPath=>" + com.jamiexu.app.reflectmaster.Utils.Utils.getLuaJavaSoPath());
         this.context = activity;
         this.output = new StringBuilder();
@@ -41,20 +43,21 @@ public class LuaExecutor {
         L.setGlobal("this");
         L.pushJavaObject(activity);
         L.setGlobal("activity");
-        if (jf != null) {
-            L.pushJavaObject(jf);
-            L.setGlobal("jf");
-        }
+        L.pushJavaObject(jf);
+        L.setGlobal("jf");
         L.pushJavaObject(this);
         L.setGlobal("jl");
         L.pushJavaObject(com.jamiexu.utils.reflect.ReflectUtils.class);
         L.setGlobal("jr");
         try {
             L.pushJavaObject(ReflectUtils.getStaticField(Class.forName("com.jamiexu.app.reflectmaster.j.MasterUtils"), "objects"));
-            L.setGlobal("jr");
+            L.setGlobal("ju");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+
+
         L.getGlobal("package");
         L.pushString(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lua/?.lua");
         L.setField(-2, "path");
@@ -63,9 +66,7 @@ public class LuaExecutor {
         //        XposedBridge.log("LuaJava=>Init successfult");
     }
 
-    public LuaExecutor(Context context) {
-        this(context, null);
-    }
+
 
 
     private void initLuaFunction() {

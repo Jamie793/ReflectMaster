@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.jamiexu.app.reflectmaster",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "properties": [],
+      "versionCode": 11,
+      "versionName": "3.1.4(夏暑版)",
+      "enabled": true,
+      "outputFile": "app-release.apk"
+    }
+  ]
+}

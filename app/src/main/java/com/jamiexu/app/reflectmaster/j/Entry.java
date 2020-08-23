@@ -1,11 +1,8 @@
 package com.jamiexu.app.reflectmaster.j;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.view.KeyEvent;
-
-import com.jamiexu.utils.FileUtils;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;

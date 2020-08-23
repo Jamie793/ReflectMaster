@@ -20,8 +20,16 @@
     <string name="layout_setting_new_thread">使用新线程执行我的脚本</string>
     <string name="layout_setting_float">是否显示悬浮窗(只执行脚本不显示悬浮窗)</string>
     <string name="menu_main_search">搜索</string>
-    <string name="main_about">作者：JamieXu\ndoxm@foxmail\n本人中职生一枚热爱于编程。\n这是我在2020年暑假根据FormatFa的原版增加了很多功能并美化了UI\n 使用本软件可以配合xposed或者virtualxposed，无需root手机或者修改安装包达到修改应用的效果。本软件适合给玩机的朋友或者开发的朋友使用让大家在分析的过程中和开发中更容易达到自己想要的效果、调试应用和测试bug等等。本软件支持lua脚本支持使用javaapi无需编译直接一键运行Lua脚本。
-    \n本软件完全免费，如果你是通过交易获得本软件的恭喜你被骗了。\n\n
+    <string name="main_about">
+        作者：JamieXu/Jamie793\n
+        email:doxm@foxmail\n
+        blog:https://blog.jamiexu.cn\n
+        本人中职生一枚热爱于编程。\n
+        这是我在2020年暑假根据FormatFa的原版增加了很多功能并美化了UI\n
+        使用本软件可以配合xposed或者virtualxposed，无需root手机或者修改安装包达到修改应用的效果。
+        本软件适合给玩机的朋友或者开发的朋友使用让大家在分析的过程中和开发中更容易达到自己想要的效果、调试应用和测试bug等等。
+        本软件支持lua脚本支持使用javaapi无需编译直接一键运行Lua脚本。\n本软件完全免费，如果你是通过交易获得本软件的恭喜你被骗了。\n\n
+
         鸣谢（排名不分顺序）：\n
         FormatFa提供了原版源代码\n
         Nirenr提供了LuaJava的支持\n

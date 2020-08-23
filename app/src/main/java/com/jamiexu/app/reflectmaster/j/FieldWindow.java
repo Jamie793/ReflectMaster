@@ -40,6 +40,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jamiexu.utils.ReflectUtils;
 import com.luajava.LuaException;
 
 import java.io.File;
@@ -73,7 +74,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         classLoader = act.getClassLoader();
         this.wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         sp = act.getSharedPreferences(object.getClass().getCanonicalName(), act.MODE_PRIVATE);
-        this.luaExecutor = LuaExecutorFactory.newInstance(act, this);
+        this.luaExecutor = LuaExecutorFactory.newInstance(act, HOnCreate.hOnCreate);
         this.luaDexLoader = new LuaDexLoaders(act);
         myShared = new MyShared(sp, "fieldfaviroylte2");
     }

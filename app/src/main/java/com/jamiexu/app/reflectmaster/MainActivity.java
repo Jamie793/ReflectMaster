@@ -41,6 +41,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jamiexu.utils.file.FileUtils;
 import com.jamiexu.utils.file.ZipUtils;
 import com.luajava.LuaException;
 
@@ -224,9 +225,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if (!file3.exists())
-            ZipUtils.extraceFile(getApplicationInfo().sourceDir, file3.getAbsolutePath(),
+        if (!file3.exists()) {
+            ZipUtils.extraceDir(getApplicationInfo().sourceDir, file3.getParentFile().getAbsolutePath(),
                     "res/drawable/ic_launcher.png");
+            FileUtils.renameFile(file3.getParent() + "/ic_launcher.png", "icon.png");
+        }
 
 
         if (!file.isDirectory()) {
