@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import com.jamiexu.utils.FileUtils;
+
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
@@ -15,6 +17,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class Entry implements IXposedHookLoadPackage {
     public static String id;
     public static XSharedPreferences sharedPreferences;
+    public static boolean isFirst = false;
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {

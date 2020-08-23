@@ -1,5 +1,6 @@
 package com.jamiexu.app.reflectmaster.j;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -203,6 +204,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     //获取父类类名
     private Class superCls;
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void show(final WindowManager amanager, final WindowManager.LayoutParams lpp) {
 
@@ -246,6 +248,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             } else
                 superCls = superCls.getClass();
             if (superCls == null) superCls = object.getClass();
+
             //if(superCls.getCanonicalName().equals("java.lang.Class"))return;
             clsname.setText("当前：" + superCls.getCanonicalName());
             try {
