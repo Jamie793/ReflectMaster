@@ -48,7 +48,12 @@ public class LuaExecutor {
         L.pushJavaObject(this);
         L.setGlobal("jl");
         L.pushJavaObject(com.jamiexu.utils.reflect.ReflectUtils.class);
-        L.setGlobal("jr");
+        L.setGlobal("ReflectUtils");
+        L.pushJavaObject(com.jamiexu.utils.file.FileUtils.class);
+        L.setGlobal("FileUtils");
+        L.pushJavaObject(com.jamiexu.utils.file.ZipUtils.class);
+        L.setGlobal("ZipUtils");
+        L.pushJavaObject(com.jamiexu.utils.file.ZipUtils.class);
         try {
             L.pushJavaObject(ReflectUtils.getStaticField(Class.forName("com.jamiexu.app.reflectmaster.j.MasterUtils"), "objects"));
             L.setGlobal("ju");
