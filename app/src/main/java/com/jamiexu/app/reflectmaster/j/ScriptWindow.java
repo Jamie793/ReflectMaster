@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.androlua.LuaEditor;
 import com.androlua.LuaEditorFactory;
+import com.jamiexu.app.reflectmaster.factory.LuaExecutorFactory;
 import com.luajava.LuaException;
 
 import java.io.File;
@@ -32,6 +33,7 @@ import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+
 import com.jamiexu.app.reflectmaster.LuaDexLoaders;
 
 
@@ -62,7 +64,7 @@ public class ScriptWindow extends Window {
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
         screenW = displayMetrics.widthPixels;
         screenH = displayMetrics.heightPixels;
-        this.luaExecutor = new LuaExecutor(getAct(), this);
+        this.luaExecutor = LuaExecutorFactory.newInstance(getAct(), this);
         luaDexLoader = new LuaDexLoaders(getAct());
         this.luaEditor = LuaEditorFactory.getInstance(act);
     }
@@ -253,12 +255,12 @@ public class ScriptWindow extends Window {
         execute.setWidth(screenW);
         execute.setOnClickListener(p1 -> {
             log.setText("");
-//            if (MasterUtils.newThread) {
-//                new Thread(()->{
-//                    luaExecutor.executeLua(getAct(),this.script.toString());
-//                }).start();
-//            }
-            luaExecutor.executeLua(getAct(), this.luaEditor.getText().toString());
+            if (MasterUtils.newThread) {
+                new Thread(()->{
+                    luaExecutor.executeLua(getAct(), this.luaEditor.getText().toString());
+                }).start();
+            }else
+                luaExecutor.executeLua(getAct(), this.luaEditor.getText().toString());
         });
 
 //        Button copy = new Button(act);

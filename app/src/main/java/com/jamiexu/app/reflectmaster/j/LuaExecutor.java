@@ -6,11 +6,12 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
-import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import android.widget.Toast;
 
 import com.androlua.LuaDexClassLoader;
 import com.androlua.LuaThread;
+import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
+import com.jamiexu.utils.ReflectUtils;
 import com.luajava.JavaFunction;
 import com.luajava.LuaException;
 import com.luajava.LuaState;
@@ -26,27 +27,32 @@ public class LuaExecutor {
 
     private LuaState L;
     private Context context;
-    private final StringBuilder output = new StringBuilder();
+    private final StringBuilder output;
     private final HashMap<String, LuaDexClassLoader> dexCache = new HashMap<>();
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public LuaExecutor(Context activity, Window jf) {
         XposedBridge.log("LuaJavaSOPath=>" + com.jamiexu.app.reflectmaster.Utils.Utils.getLuaJavaSoPath());
         this.context = activity;
+        this.output = new StringBuilder();
         L = LuaStateFactory.newLuaState(com.jamiexu.app.reflectmaster.Utils.Utils.getLuaJavaSoPath());
         L.openLibs();
         L.pushJavaObject(activity);
         L.setGlobal("this");
         L.pushJavaObject(activity);
         L.setGlobal("activity");
-        L.pushJavaObject(jf);
-        L.setGlobal("jf");
+        if (jf != null) {
+            L.pushJavaObject(jf);
+            L.setGlobal("jf");
+        }
         L.pushJavaObject(this);
         L.setGlobal("jl");
+        L.pushJavaObject(com.jamiexu.utils.reflect.ReflectUtils.class);
+        L.setGlobal("jr");
         try {
-            L.pushJavaObject(Class.forName("com.jamiexu.app.reflectmaster.j.MasterUtils").getDeclaredField("objects").get(null));
+            L.pushJavaObject(ReflectUtils.getStaticField(Class.forName("com.jamiexu.app.reflectmaster.j.MasterUtils"), "objects"));
             L.setGlobal("jr");
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         L.getGlobal("package");
@@ -54,7 +60,11 @@ public class LuaExecutor {
         L.setField(-2, "path");
         L.pop(1);
         initLuaFunction();
+        //        XposedBridge.log("LuaJava=>Init successfult");
+    }
 
+    public LuaExecutor(Context context) {
+        this(context, null);
     }
 
 
@@ -188,9 +198,17 @@ public class LuaExecutor {
 
 
     public void executeLua(Context activity, String code) {
-
         try {
-            exeLua(code);
+            if (MasterUtils.newThread) {
+                new Thread(() -> {
+                    try {
+                        exeLua(code);
+                    } catch (LuaException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            } else
+                exeLua(code);
         } catch (LuaException e) {
             output.insert(0, e.toString());
         }

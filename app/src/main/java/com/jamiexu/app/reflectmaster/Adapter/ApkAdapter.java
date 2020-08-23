@@ -88,7 +88,7 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
             } else {
                 String cpu = com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils.getCpu();
                 if (MainActivity.isRoot()) {
-                    String luajavaPath = apkInfo.getDataPath() + "/app_lib/" + "/libluajava.so";
+                    String luajavaPath = apkInfo.getDataPath() + "/app_lib/" + "/libJamieReflectMasterluajava.so";
                     if (!new File(luajavaPath).exists()) {
                         MainActivity.copyFile("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so",
                                 luajavaPath);

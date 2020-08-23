@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+
+import com.jamiexu.app.reflectmaster.factory.LuaExecutorFactory;
 import com.jamiexu.app.reflectmaster.j.Adapter.FieldAdapter;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ArrayList;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ImageView;
@@ -18,6 +20,7 @@ import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ViewGroup;
 import com.jamiexu.app.reflectmaster.j.Data.MyShared;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,6 +53,7 @@ import java.util.Set;
 import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+
 import com.jamiexu.app.reflectmaster.LuaDexLoaders;
 
 public class FieldWindow extends Window implements OnItemClickListener, OnItemLongClickListener {
@@ -68,7 +72,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         classLoader = act.getClassLoader();
         this.wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         sp = act.getSharedPreferences(object.getClass().getCanonicalName(), act.MODE_PRIVATE);
-        this.luaExecutor = new LuaExecutor(act, this);
+        this.luaExecutor = LuaExecutorFactory.newInstance(act, this);
         this.luaDexLoader = new LuaDexLoaders(act);
         myShared = new MyShared(sp, "fieldfaviroylte2");
     }
@@ -77,7 +81,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
 
         WindowManager am = (WindowManager) act.getSystemService(act.WINDOW_SERVICE);
-        WindowList wlist = new WindowList(act, am,false);
+        WindowList wlist = new WindowList(act, am, false);
         wlist.setTitle("变量操作");
         wlist.setItems(new String[]{"编辑", "收藏", "复制变量名称", "复制类名和变量名称", "复制变量名称和类型"/*,"持久化修改(构造函数后使用while(true)不断修改}"*/});
         wlist.setListener((adap, view, posi, l) -> {
@@ -223,13 +227,13 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         layout.setBackgroundColor(0xFF303030);
         final ActionWindow ac = new ActionWindow(act, wm, lp, layout);
 
-            ac.setSearchCallback((edit, text) -> {
+        ac.setSearchCallback((edit, text) -> {
 
-                if (TextUtils.isEmpty(text))
-                    list.clearTextFilter();
-                else
-                    list.setFilterText(text);
-            });
+            if (TextUtils.isEmpty(text))
+                list.clearTextFilter();
+            else
+                list.setFilterText(text);
+        });
         //layout.setBackgroundColor(Color.BLACK);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.addView(ac.getActionBar());
@@ -528,7 +532,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             }
 
         }
-        WindowList listView = new WindowList(act, wm,false);
+        WindowList listView = new WindowList(act, wm, false);
         listView.setItems(names);
         listView.setTitle("Lua脚本");
         listView.setListener((adapterView, view, i, l) -> {

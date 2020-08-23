@@ -25,6 +25,8 @@
 package com.luajava;
 
 
+import android.annotation.SuppressLint;
+
 /**
  * LuaState if the main class of LuaJava for the Java developer.
  * LuaState is a mapping of most of Lua's C API functions.
@@ -105,6 +107,7 @@ public class LuaState {
     final public static int LUA_OPEQ = 0;
     final public static int LUA_OPLT = 1;
     final public static int LUA_OPLE = 2;
+    private static boolean isLoad = false;
 
 
     /**
@@ -118,8 +121,12 @@ public class LuaState {
 
     //private long stateId;
 
+    @SuppressLint("UnsafeDynamicallyLoadedCode")
     protected LuaState(String path) {
-        System.load(path);
+        if (!isLoad) {
+            System.load(path);
+            isLoad = true;
+        }
         luaState = _newstate();
         //openLuajava(stateId);
         //this.stateId = luaState.getPeer();
@@ -1265,6 +1272,7 @@ public class LuaState {
             return obj.getFunction();
         return null;
     }
+
     public LuaFunction getFunction(int idx) {
         LuaObject obj = getLuaObject(idx);
         if (obj.isFunction())

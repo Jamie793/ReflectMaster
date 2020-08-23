@@ -14,10 +14,11 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class Entry implements IXposedHookLoadPackage {
     public static String id;
+    public static XSharedPreferences sharedPreferences;
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
-        XSharedPreferences sharedPreferences = new XSharedPreferences("com.jamiexu.app.reflectmaster", "package");
+        sharedPreferences = new XSharedPreferences("com.jamiexu.app.reflectmaster", "package");
         sharedPreferences.makeWorldReadable();
         sharedPreferences.reload();
 
@@ -43,17 +44,6 @@ public class Entry implements IXposedHookLoadPackage {
 
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onCreate", Bundle.class, new HOnCreate(lpparam));
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onResume", new HOnResume());
-        XposedHelpers.findAndHookMethod("android.app.Dialog", lpparam.classLoader, "onKeyDown", int.class, KeyEvent.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-                int keyCode = (int) param.args[0];
-                Dialog dialog = (Dialog) param.thisObject;
-                if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-//                    new FWindow(MasterUtils.nowAct, dialog);
-                }
-            }
-        });
 
 
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onKeyDown", int.class, KeyEvent.class, new XC_MethodHook() {
