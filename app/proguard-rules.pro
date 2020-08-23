@@ -41,6 +41,7 @@
 -keep	class	com.baidu.mobstat.**	{	*;	}
 -keep	class	com.baidu.bottom.**	{	*;	}
 -keep class com.github.esrrhs.fakescript.** {*;}
+-keep class com.jamiexu.utils.** {*;}
 #-keep class formatfa.android.f.ScriptWindow$rf {*;}
 #-keep class formatfa.android.f.ScriptWindow$io {*;}
 #-keepclassmembers class formatfa.android.f.ScriptWindow {

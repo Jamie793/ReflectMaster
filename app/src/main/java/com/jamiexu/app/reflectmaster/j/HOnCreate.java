@@ -25,6 +25,7 @@ public class HOnCreate extends XC_MethodHook {
     public static HOnCreate hOnCreate;
     public static MethodHookParam beforeHookedMethod;
     public static MethodHookParam afterHookedMethod;
+    public static LuaExecutor luaExecutor;
 
 
     public HOnCreate(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -63,40 +64,44 @@ public class HOnCreate extends XC_MethodHook {
 
     public void initLua(Context context, String packageName, FWindow jf) {
         XposedBridge.log("ReflectMater=>init script");
+        if (luaExecutor == null)
+            luaExecutor = LuaExecutorFactory.newInstance(context, this);
         File file = new File(com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils.BASEPATH + "/script");
         if (file.exists()) {
-            File[] files = file.listFiles();
-            for (File fi : files) {
-                if (!fi.getName().endsWith(".lua"))
-                    continue;
-                String line = FileUtils.getLineString(fi.toString(), 1);
+            new Thread(() -> {
+                File[] files = file.listFiles();
+                for (File fi : files) {
+                    if (!fi.getName().endsWith(".lua"))
+                        continue;
+                    String line = FileUtils.getLineString(fi.toString(), 1);
 
-                if (line.contains("--PackageName:")) {
-                    line = line.substring(14);
-                    line = line.trim();
+                    if (line.contains("--PackageName:")) {
+                        line = line.substring(14);
+                        line = line.trim();
 
-                    if (line.equals(packageName) || line.equals("*")) {
-                        String line2 = FileUtils.getLineString(fi.toString(), 2);
+                        if (line.equals(packageName) || line.equals("*")) {
+                            String line2 = FileUtils.getLineString(fi.toString(), 2);
 
-                        if (line2.contains("--Main:")) {
-                            line2 = line2.substring(7);
-                            if (line2.trim().equals((context.getClass().getCanonicalName()))) {
+                            if (line2.contains("--Main:")) {
+                                line2 = line2.substring(7);
+                                if (line2.trim().equals((context.getClass().getCanonicalName()))) {
+                                    Entry.isFirst = true;
+                                    XposedBridge.log("ReflectMater=>start run script");
+                                    String code = FileUtils.getString(fi.toString());
+                                    luaExecutor.executeLua(context, code);
+                                }
+                            } else {
                                 Entry.isFirst = true;
                                 XposedBridge.log("ReflectMater=>start run script");
                                 String code = FileUtils.getString(fi.toString());
-                                LuaExecutor luaExecutor = LuaExecutorFactory.newInstance(context, this);
                                 luaExecutor.executeLua(context, code);
                             }
-                        } else {
-                            Entry.isFirst = true;
-                            XposedBridge.log("ReflectMater=>start run script");
-                            String code = FileUtils.getString(fi.toString());
-                            LuaExecutor luaExecutor = LuaExecutorFactory.newInstance(context, this);
-                            luaExecutor.executeLua(context, code);
+                            XposedBridge.log("ReflectMater=>runing script: " + fi.toString());
+
                         }
                     }
                 }
-            }
+            }).start();
         }
     }
 

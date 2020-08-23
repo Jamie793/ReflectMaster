@@ -1,11 +1,14 @@
 package com.jamiexu.app.reflectmaster.j;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.widget.Toast;
 
 import com.androlua.LuaDexClassLoader;
@@ -21,9 +24,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import dalvik.system.DexClassLoader;
-import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
 
 public class LuaExecutor {
 
@@ -31,6 +32,23 @@ public class LuaExecutor {
     private Context context;
     private final StringBuilder output;
     private final HashMap<String, LuaDexClassLoader> dexCache = new HashMap<>();
+    private final Handler exeHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Activity activity = (Activity) msg.obj;
+            if (output.length() > 0) {
+                new AlertDialog.Builder(activity)
+                        .setTitle("运行结果：")
+                        .setMessage(output.toString())
+                        .setPositiveButton("确定", null)
+                        .setNegativeButton("复制", (dialog, which) -> {
+                            Utils.writeClipboard(activity, output.toString());
+                            Toast.makeText(activity, "已复制到剪切板", Toast.LENGTH_SHORT).show();
+                        }).setNeutralButton("清空", (dialog, which) -> output.setLength(0)).show().setCancelable(false);
+            }
+        }
+    };
 
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public LuaExecutor(Context activity, Object jf) {
@@ -62,7 +80,6 @@ public class LuaExecutor {
         }
 
 
-
         L.getGlobal("package");
         L.pushString(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/lua/?.lua");
         L.setField(-2, "path");
@@ -70,8 +87,6 @@ public class LuaExecutor {
         initLuaFunction();
         //        XposedBridge.log("LuaJava=>Init successfult");
     }
-
-
 
 
     private void initLuaFunction() {
@@ -219,18 +234,10 @@ public class LuaExecutor {
             output.insert(0, e.toString());
         }
 
-        if (output.length() > 0) {
-            new AlertDialog.Builder(activity)
-                    .setTitle("运行结果：")
-                    .setMessage(output.toString())
-                    .setPositiveButton("确定", null)
-                    .setNegativeButton("复制", (dialog, which) -> {
-                        Utils.writeClipboard(activity, output.toString());
-                        Toast.makeText(activity, "已复制到剪切板", Toast.LENGTH_SHORT).show();
-                    }).setNeutralButton("清空", (dialog, which) -> output.setLength(0)).show().setCancelable(false);
-        }
+        exeHandler.obtainMessage(0,activity).sendToTarget();
 
     }
+
 
 
     private String exeLua(String src) throws LuaException {
