@@ -2,7 +2,7 @@
     <string name="app_name">ReflectMaster</string>
 
 
-    <string name="about">作者：FormatFa and JamieXu\n当前版本:J10p_2020-2-22更新\n1.使用新的Lua脚本方式代替Fake-script脚本简单使用功能强大，支持植入运行java代码\n2.替换五角星为六芒星\n3.显示系统应用\n4.新增若干未知bug\n反射大师是一款软件，本软件造成的问题由使用者负责，如果你同意以上要求，请点击同意，否则请点击不同意退出软件</string>
+    <string name="about">作者：JamieXu\n当前版本:J10p_2020-08-23更新\n1.使用新的Lua脚本方式代替Fake-script脚本简单使用功能强大，支持植入运行java代码\n2.替换五角星为六芒星\n3.显示系统应用\n4.新增若干未知bug\n反射大师是一款软件，本软件造成的问题由使用者负责，如果你同意以上要求，请点击同意，否则请点击不同意退出软件</string>
     <string name="edit_filter_hint">请输入搜索的程序</string>
     <string name="apk_list_title">这里是软件的名字</string>
     <string name="todo">TODO</string>
@@ -20,12 +20,11 @@
     <string name="layout_setting_new_thread">使用新线程执行我的脚本</string>
     <string name="layout_setting_float">是否显示悬浮窗(只执行脚本不显示悬浮窗)</string>
     <string name="menu_main_search">搜索</string>
-    <string name="main_about">作者：JamieXu\ndoxm@foxmail\n本人中职生一枚热爱于编程。\n这是我在2019年寒假根据FormatFa的原版增加了很多功能并美化了UI\n 使用本软件可以配合xposed或者virtualxposed，无需root手机或者修改安装包达到修改应用的效果。本软件适合给玩机的朋友或者开发的朋友使用让大家在分析的过程中和开发中更容易达到自己想要的效果、调试应用和测试bug等等。本软件支持lua脚本支持使用javaapi无需编译直接一键运行Lua脚本。
+    <string name="main_about">作者：JamieXu\ndoxm@foxmail\n本人中职生一枚热爱于编程。\n这是我在2020年暑假根据FormatFa的原版增加了很多功能并美化了UI\n 使用本软件可以配合xposed或者virtualxposed，无需root手机或者修改安装包达到修改应用的效果。本软件适合给玩机的朋友或者开发的朋友使用让大家在分析的过程中和开发中更容易达到自己想要的效果、调试应用和测试bug等等。本软件支持lua脚本支持使用javaapi无需编译直接一键运行Lua脚本。
     \n本软件完全免费，如果你是通过交易获得本软件的恭喜你被骗了。\n\n
         鸣谢（排名不分顺序）：\n
         FormatFa提供了原版源代码\n
         Nirenr提供了LuaJava的支持\n
-        柯南开发过程中提供了帮助\n
         \n\n
         最后感谢我自己设计Logo，图标，UI等
     </string>

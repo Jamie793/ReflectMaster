@@ -20,11 +20,11 @@ android {
     //noinspection GradleCompatible
     compileSdkVersion 28
     defaultConfig {
-        applicationId "formatfa.reflectmaster"
+        applicationId "com.jamiexu.app.reflectmaster"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 10
-        versionName "2.1.4"
+        versionCode 11
+        versionName "3.1.4(夏暑版)"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

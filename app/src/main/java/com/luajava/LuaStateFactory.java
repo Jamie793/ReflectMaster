@@ -37,44 +37,43 @@ import java.util.*;
  *
  * @author Thiago Ponte
  */
-public final class LuaStateFactory
-{
+public final class LuaStateFactory {
+    private static LuaState luaState;
     /**
      * Array with all luaState's instances
      */
-    private static final Map<Long,LuaState> states = new HashMap<Long,LuaState>();
+    private static final Map<Long, LuaState> states = new HashMap<Long, LuaState>();
 
     /**
      * Non-public constructor.
      */
-    private LuaStateFactory()
-    {}
+    private LuaStateFactory() {
+    }
 
     /**
      * Method that creates a new instance of LuaState
+     *
      * @return LuaState
      */
-    public synchronized static LuaState newLuaState(String path)
-    {
-        LuaState L = new LuaState(path);
-
-        states.put(L.getPointer(), L);
-
-        return L;
+    public synchronized static LuaState newLuaState(String path) {
+        if (luaState != null) {
+            luaState = new LuaState(path);
+            states.put(luaState.getPointer(), luaState);
+        }
+        return luaState;
     }
 
     /**
      * Returns a existing instance of LuaState
+     *
      * @param index
      * @return LuaState
      */
-    public synchronized static LuaState getExistingState(long index)
-    {
-        LuaState l= states.get(index);
-        if(l==null)
-        {
-            l=new LuaState(index);
-            states.put(index,l);
+    public synchronized static LuaState getExistingState(long index) {
+        LuaState l = states.get(index);
+        if (l == null) {
+            l = new LuaState(index);
+            states.put(index, l);
         }
         return l;
     }
@@ -82,11 +81,11 @@ public final class LuaStateFactory
     /**
      * Receives a existing LuaState and checks if it exists in the states list.
      * If it doesn't exist adds it to the list.
+     *
      * @param L
      * @return int
      */
-    public synchronized static long insertLuaState(LuaState L)
-    {
+    public synchronized static long insertLuaState(LuaState L) {
         states.put(L.getPointer(), L);
 
         return L.getPointer();
@@ -94,10 +93,10 @@ public final class LuaStateFactory
 
     /**
      * removes the luaState from the states list
+     *
      * @param idx
      */
-    public synchronized static void removeLuaState(long idx)
-    {
+    public synchronized static void removeLuaState(long idx) {
         states.put(idx, null);
     }
 
