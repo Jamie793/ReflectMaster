@@ -1,27 +1,16 @@
 package com.jamiexu.app.reflectmaster.j;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jamiexu.app.reflectmaster.MainActivity;
-import com.jamiexu.utils.file.FileUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import de.robv.android.xposed.XposedBridge;
 
 public class MasterUtils {
     public static Activity nowAct;
@@ -62,6 +51,10 @@ public class MasterUtils {
 //        if (!file.getParentFile().exists())
 //            file.getParentFile().mkdir();
 //        try {
+//            Gson gson = new Gson();
+//            gson.toJson(hashMap);
+//            gson.toString();
+//            FileUtils.putString(file.toString(),gson.toString());
 //            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file));
 //            objectOutputStream.writeObject(hashMap);
 //            objectOutputStream.flush();
@@ -76,20 +69,42 @@ public class MasterUtils {
 //        File file = new File(MainActivity.BASE_PATH + "objs/" + packageName + ".obj");
 //        if (!file.exists())
 //            return;
-//        try {
-//            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
-//            Object o = objectInputStream.readObject();
-//            hashMap = (HashMap<String, Object>) o;
-//            XposedBridge.log("反序列化" + hashMap);
-//            objectInputStream.close();
-//        } catch (IOException | ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
+//
+//        Gson gson = new Gson();
+//        hashMap = gson.fromJson(FileUtils.getString(file.toString()),HashMap.class);
+//
+////        try {
+////            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
+////            Object o = objectInputStream.readObject();
+////            hashMap = (HashMap<String, Object>) o;
+////            XposedBridge.log("反序列化" + hashMap);
+////            objectInputStream.close();
+////        } catch (IOException | ClassNotFoundException e) {
+////            e.printStackTrace();
+////        }
 //    }
 
     public static Object get(int i) {
         return objects.get(i);
     }
+
+
+    public static void addHashMap(Context context,Object o) {
+        EditText editText = new EditText(context);
+        editText.setHint("保存的名称");
+        new AlertDialog.Builder(context)
+                .setTitle("添加寄存器")
+                .setView(editText)
+                .setPositiveButton("添加", (dialog, which) -> {
+                    String name = editText.getText().toString().trim();
+                    if (name.length() == 0) {
+                        Toast.makeText(context, "请输入寄存器名称", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    MasterUtils.add(context, name, o);
+                }).show();
+    }
+
 
     public static void addService(Context context, Object obj) {
 

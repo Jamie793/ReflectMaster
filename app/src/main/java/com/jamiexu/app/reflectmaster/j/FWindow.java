@@ -141,23 +141,6 @@ public class FWindow {
         });
 
 
-//        Button dialogbutton = null;
-//        if (dialog != null) {
-//            dialogbutton = newButton(act);
-//
-//            dialogbutton.setText("当前Dialog");
-//
-//            layout.addView(dialogbutton);
-//            dialogbutton.setOnClickListener(new OnClickListener() {
-//
-//                @Override
-//                public void onClick(View p1) {
-//
-//                    FieldWindow fw = new FieldWindow(lpparam, param, act, dialog);
-//                    fw.show(wm, layoutParam);
-//                }
-//            });
-//        }
         Button res = newButton(act);
 
         res.setText("View获取(子)");

@@ -2,7 +2,9 @@ package com.jamiexu.app.reflectmaster.j.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+
 import com.jamiexu.app.reflectmaster.j.MasterUtils;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -72,16 +74,12 @@ public class FieldAdapter extends BaseAdapter implements Filterable {
         name.setText(fields[p1].getName());
 
         type.setText(fields[p1].getType().getCanonicalName());
-        if (fields[p1].isAccessible() == false) fields[p1].setAccessible(true);
-
-
-
-            try {
-                value.setText(MasterUtils.getObjectString(fields[p1].get(obj)));
-            } catch (IllegalAccessException e) {
-            } catch (IllegalArgumentException e) {
+        if (!fields[p1].isAccessible()) fields[p1].setAccessible(true);
+        try {
+            value.setText(MasterUtils.getObjectString(fields[p1].get(obj)));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
-
         name.setTextColor(Color.WHITE);
         type.setTextColor(Color.GREEN);
         value.setTextColor(Color.WHITE);

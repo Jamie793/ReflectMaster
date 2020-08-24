@@ -1,6 +1,8 @@
 package com.jamiexu.app.reflectmaster.j.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -35,14 +37,15 @@ public class TextAdapter extends BaseAdapter {
         return items[p1].hashCode();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int p1, View p2, ViewGroup p3) {
         TextView tv = new TextView(context);
-        tv.setTextSize(19);
-        //	tv.setTextAppearance(R.style.TextAppearance_Medium);
-        //tv.setTextSize(
-        tv.setText(items[p1]);
-        tv.setTextColor(Color.RED);
+        tv.setHeight(60);
+        tv.setTextSize(16);
+        tv.setGravity(Gravity.CENTER | Gravity.LEFT);
+        tv.setText("  " + items[p1]);
+        tv.setTextColor(Color.WHITE);
         // TODO: Implement this method
         return tv;
     }

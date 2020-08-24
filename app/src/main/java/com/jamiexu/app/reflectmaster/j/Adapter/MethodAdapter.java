@@ -71,12 +71,11 @@ public class MethodAdapter extends BaseAdapter implements Filterable {
             sb.append(p.toString() + ",");
         }
         params.setText(sb.toString());
-        //params.setText(fields[p1].gLl);
         if (!methods[p1].isAccessible()) methods[p1].setAccessible(true);
 
         name.setTextColor(Color.WHITE);
         params.setTextColor(Color.GREEN);
-        returntype.setTextColor(Color.RED);
+        returntype.setTextColor(Color.WHITE);
         layout.addView(name);
         layout.addView(params);
         layout.addView(returntype);

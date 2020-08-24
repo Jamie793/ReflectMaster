@@ -127,6 +127,7 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         layoutParam.height = h;
 
         titleview.setBackgroundColor(Color.BLUE);
+        titleview.setTextSize(14);
         if (title != null) titleview.setText(title);
         if (adapter != null) lv.setAdapter(adapter);
         manager.addView(layout, layoutParam);

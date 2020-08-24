@@ -1,15 +1,11 @@
 package com.jamiexu.app.reflectmaster.j;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,7 +16,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jamiexu.app.reflectmaster.LuaDexLoaders;
+import com.jamiexu.app.reflectmaster.MainActivity;
 import com.jamiexu.app.reflectmaster.factory.LuaExecutorFactory;
 import com.jamiexu.app.reflectmaster.j.Adapter.FieldAdapter;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ArrayList;
@@ -37,7 +33,6 @@ import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_Set;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_TextView;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_View;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ViewGroup;
-import com.jamiexu.app.reflectmaster.j.Data.MyShared;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
 import com.jamiexu.utils.file.FileUtils;
@@ -78,7 +73,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         super(lpparam, param, act, object);
         classLoader = act.getClassLoader();
         this.wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
-        sp = act.getSharedPreferences(object.getClass().getCanonicalName(), act.MODE_PRIVATE);
+        sp = act.getSharedPreferences(object.getClass().getCanonicalName(), Context.MODE_PRIVATE);
         this.luaExecutor = LuaExecutorFactory.newInstance(act, HOnCreate.hOnCreate);
         this.luaDexLoader = new LuaDexLoaders(act);
     }
@@ -102,9 +97,9 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 MasterUtils.add(act, m);
             } else if (posi == 2) {
                 m.setAccessible(true);
-                addHashMap(m);
+                MasterUtils.addHashMap(act, m);
             } else if (posi == 3) {
-                Utils.writeClipboard(act, m.toGenericString()));
+                Utils.writeClipboard(act, m.toGenericString());
                 Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
             } else if (posi == 4) {
                 String s = m.getName() + " " + m.getType().getName();
@@ -180,9 +175,10 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
     }
 
+    @SuppressLint("ShowToast")
     public static void newFieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object, WindowManager wm) {
         final WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.type = lp.TYPE_APPLICATION;
+        lp.type = WindowManager.LayoutParams.TYPE_APPLICATION;
 
         try {
 
@@ -191,23 +187,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         } catch (IllegalArgumentException e) {
             Toast.makeText(act, e.toString(), Toast.LENGTH_SHORT);
         }
-    }
-
-
-    public void addHashMap(Object o) {
-        EditText editText = new EditText(act);
-        editText.setHint("保存的名称");
-        new AlertDialog.Builder(act)
-                .setTitle("添加寄存器")
-                .setView(editText)
-                .setPositiveButton("添加", (dialog, which) -> {
-                    String name = editText.getText().toString().trim();
-                    if (name.length() == 0) {
-                        Toast.makeText(act, "请输入寄存器名称", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    MasterUtils.add(act, name, o);
-                }).show();
     }
 
 
@@ -281,7 +260,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         metbod.setText("方法");
         metbod.setOnClickListener(p1 -> {
             MethodWindow mw = new MethodWindow(lpparam, param, act, object);
-
             mw.show(wm, lp);
         });
         buttonLayout.addView(metbod);
@@ -326,7 +304,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         Button adds = new Button(act);
         adds.setText("添加寄存器");
         adds.setOnClickListener(p1 -> {
-            addHashMap(object);
+            MasterUtils.addHashMap(act, object);
         });
         buttonLayout.addView(adds);
 
@@ -352,6 +330,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             operation.setText("写出");
             operation.setOnClickListener(new OnClickListener() {
 
+                @SuppressLint("SdCardPath")
                 @Override
                 public void onClick(View p1) {
                     try {
@@ -360,7 +339,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                     } catch (Exception e) {
                         Toast.makeText(act, "错误", Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(act, "写出成功:" + "/sdcard/ReflectUtils.data", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(act, "写出成功:" + MainActivity.BASE_PATH + System.currentTimeMillis() + ".bin", Toast.LENGTH_SHORT).show();
                 }
             });
             buttonLayout.addView(operation);
@@ -394,7 +373,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         button = new Button(act);
         button.setText("我的脚本");
         button.setOnClickListener(p1 -> {
-            WindowManager am = (WindowManager) act.getSystemService(act.WINDOW_SERVICE);
+            WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
             loadLuaScriptButton();
         });
         buttonLayout.addView(button);
@@ -472,7 +451,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         }
         WindowList listView = new WindowList(act, wm, false);
         listView.setItems(names);
-        listView.setTitle("Lua脚本");
+        listView.setTitle("    Lua脚本");
         listView.setListener((adapterView, view, i, l) -> {
             this.luaExecutor.executeLua(act, FileUtils.getString(Utils.BASEPATH + "/script/" + names.get(i) + ".lua"));
         });
