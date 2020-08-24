@@ -1,8 +1,10 @@
 package com.jamiexu.app.reflectmaster.j;
 
 /**
- * Created by formatfa on 18-5-12.
+ * Created by Jamiexu on 2020
+ * -08-24.
  */
+
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -42,9 +44,10 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
     private ActionWindow acw;
     private ListView list;
     private ConstructorAdapter adapter;
-    private boolean isundeclear = false;
+    private boolean isDeclared;
 
-    public ConstructorWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
+    public ConstructorWindow(XC_LoadPackage.LoadPackageParam lpparam,
+                             XC_MethodHook.MethodHookParam param, Context act, Object object) {
         super(lpparam, param, act, object);
     }
 
@@ -200,6 +203,7 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
 
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void show(final WindowManager manager, WindowManager.LayoutParams lpq) {
         this.windowManager = manager;
@@ -214,14 +218,14 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         root.addView(acw.getActionBar());
 
         TextView title = new TextView(act);
-        title.setText("    构造函数");
+        title.setText("    All Constructors");
         title.setTextSize(16);
         title.setWidth(root.getWidth());
         title.setTextColor(Color.WHITE);
         root.addView(title);
 
         EditText editText = new EditText(act);
-        editText.setHint("过滤函数");
+        editText.setHint("Filter constructors...");
         editText.setTextSize(14);
         editText.setWidth(root.getWidth());
         editText.setHintTextColor(Color.WHITE);
@@ -256,18 +260,18 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         undeclare.setTextColor(Color.WHITE);
         undeclare.setBackground(null);
         undeclare.setOnClickListener(p1 -> {
-            if (isundeclear) {
+            if (this.isDeclared) {
                 methods = object.getClass().getDeclaredConstructors();
                 adapter.setMethods(methods);
                 adapter.notifyDataSetChanged();
-                isundeclear = false;
-                undeclare.setText("A");
+                this.isDeclared = false;
+                undeclare.setText("P");
             } else {
                 methods = object.getClass().getConstructors();
                 adapter.setMethods(methods);
                 adapter.notifyDataSetChanged();
-                isundeclear = true;
-                undeclare.setText("P");
+                this.isDeclared = true;
+                undeclare.setText("A");
             }
 
         });
@@ -279,7 +283,8 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         root.addView(ho);
 
 
-        methods = object.getClass().getDeclaredConstructors();
+        methods = object.getClass().getConstructors();
+        this.isDeclared = true;
         adapter = new ConstructorAdapter(act, methods);
         list.setAdapter(adapter);
         list.setOnItemClickListener(this);

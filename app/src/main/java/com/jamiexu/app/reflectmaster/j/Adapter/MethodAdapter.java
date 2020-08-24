@@ -20,38 +20,36 @@ public class MethodAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
     private Method[] methods;
-
     private Method[] rawMethod;
 
 
-    public void setMethods(Method[] ms) {
-        this.methods = ms;
-        rawMethod = ms;
+    public void setMethods(Method[] methods) {
+        this.methods = methods;
+        this.rawMethod = methods;
     }
 
-    public MethodAdapter(Context context, Method[] fields) {
+    public MethodAdapter(Context context, Method[] methods) {
         this.context = context;
-        this.methods = fields;
-
-        rawMethod = methods;
+        this.methods = methods;
+        this.rawMethod = methods;
     }
 
     @Override
     public int getCount() {
         // TODO: Implement this method
-        return methods.length;
+        return this.methods.length;
     }
 
     @Override
     public Object getItem(int p1) {
         // TODO: Implement this method
-        return methods[p1];
+        return this.methods[p1];
     }
 
     @Override
     public long getItemId(int p1) {
         // TODO: Implement this method
-        return methods[p1].hashCode();
+        return this.methods[p1].hashCode();
     }
 
     @SuppressLint("SetTextI18n")
@@ -65,17 +63,14 @@ public class MethodAdapter extends BaseAdapter implements Filterable {
         TextView params = new TextView(context);
         TextView returntype = new TextView(context);
 
-        returntype.setText("ReturnType：" + methods[p1].getGenericReturnType());
-        name.setText("Name:" + methods[p1].getName());
+        returntype.setText("ReturnType：" + this.methods[p1].getGenericReturnType());
+        name.setText("Name:" + this.methods[p1].getName());
 
         StringBuilder sb = new StringBuilder();
-        for (Type p : methods[p1].getGenericParameterTypes()) {
+        for (Type p : this.methods[p1].getGenericParameterTypes()) {
             sb.append(p.toString()).append(";");
         }
-
         params.setText("ParamterType：" + sb.toString());
-        if (!methods[p1].isAccessible()) methods[p1].setAccessible(true);
-
         name.setTextColor(Color.GREEN);
         params.setTextColor(Color.WHITE);
         returntype.setTextColor(Color.WHITE);
@@ -97,8 +92,6 @@ public class MethodAdapter extends BaseAdapter implements Filterable {
                 for (Method method : rawMethod) {
                     if (method.getName().toUpperCase().contains(charSequence.toString().toUpperCase()))
                         temp.add(method);
-
-
                 }
                 results.values = temp.toArray(new Method[0]);
                 results.count = temp.size();
@@ -107,7 +100,6 @@ public class MethodAdapter extends BaseAdapter implements Filterable {
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-
                 methods = (Method[]) filterResults.values;
                 if (filterResults.count > 0) {
                     notifyDataSetChanged();

@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,6 +22,7 @@ import android.widget.Toast;
 import com.jamiexu.app.reflectmaster.j.Adapter.MethodAdapter;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
+import com.jamiexu.utils.ReflectUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -38,10 +38,9 @@ public class MethodWindow extends Window implements OnItemClickListener {
     private WindowManager.LayoutParams lp;
     private ListView list;
     private MethodAdapter adapter;
-    private boolean isundeclear = false;
+    private boolean isDeclared;
     private Object[] values;
     private EditText[] valuesEdit = null;
-    private int p = 0;
 
     public MethodWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
         super(lpparam, param, act, object);
@@ -109,7 +108,7 @@ public class MethodWindow extends Window implements OnItemClickListener {
             values = new Object[m.getParameterTypes().length];
 
             valuesEdit = new EditText[m.getParameterTypes().length];
-            p = 0;
+            int p = 0;
             for (Class type : m.getParameterTypes()) {
                 valuesEdit[p] = new EditText(act);
                 valuesEdit[p].setTextColor(Color.RED);
@@ -232,14 +231,14 @@ public class MethodWindow extends Window implements OnItemClickListener {
         root.addView(acw.getActionBar());
 
         TextView title = new TextView(act);
-        title.setText("    所有方法");
+        title.setText("    All Methods");
         title.setTextSize(16);
         title.setWidth(root.getWidth());
         title.setTextColor(Color.WHITE);
         root.addView(title);
 
         EditText editText = new EditText(act);
-        editText.setHint("过滤方法");
+        editText.setHint("Filter methods...");
         editText.setTextSize(14);
         editText.setWidth(root.getWidth());
         editText.setHintTextColor(Color.WHITE);
@@ -269,18 +268,18 @@ public class MethodWindow extends Window implements OnItemClickListener {
         undeclare.setTextColor(Color.WHITE);
         undeclare.setBackground(null);
         undeclare.setOnClickListener(p1 -> {
-            if (isundeclear) {
-                methods = object.getClass().getDeclaredMethods();
-                adapter.setMethods(methods);
-                adapter.notifyDataSetChanged();
-                isundeclear = false;
+            if (this.isDeclared) {
                 undeclare.setText("A");
+                this.methods = this.object.getClass().getDeclaredMethods();
+                this.adapter.setMethods(this.methods);
+                this.adapter.notifyDataSetChanged();
+                this.isDeclared = false;
             } else {
-                methods = object.getClass().getMethods();
-                adapter.setMethods(methods);
-                adapter.notifyDataSetChanged();
-                isundeclear = true;
                 undeclare.setText("P");
+                this.methods = this.object.getClass().getMethods();
+                this.adapter.setMethods(this.methods);
+                this.adapter.notifyDataSetChanged();
+                this.isDeclared = true;
             }
         });
         acw.addView(undeclare);
@@ -290,9 +289,10 @@ public class MethodWindow extends Window implements OnItemClickListener {
         list.setTextFilterEnabled(true);
         list.setFastScrollEnabled(true);
         list.setOnItemClickListener(this);
-        methods = object.getClass().getDeclaredMethods();
-        adapter = new MethodAdapter(act, methods);
-        list.setAdapter(adapter);
+        this.methods = this.object.getClass().getMethods();
+        this.adapter = new MethodAdapter(this.act, this.methods);
+        this.isDeclared = true;
+        list.setAdapter(this.adapter);
         list.setDividerHeight(15);
         root.addView(list);
 

@@ -28,7 +28,6 @@ public class FieldAdapter extends BaseAdapter implements Filterable {
     private Object obj;
 
     public void setFields(Field[] fields) {
-
         this.fields = fields;
         rawFields = fields;
     }

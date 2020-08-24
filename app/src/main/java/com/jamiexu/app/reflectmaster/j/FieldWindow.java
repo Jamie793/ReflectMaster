@@ -1,21 +1,21 @@
 package com.jamiexu.app.reflectmaster.j;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.text.TextUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,6 +40,7 @@ import com.luajava.LuaException;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -59,23 +60,26 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     private List<String> names = new ArrayList<>();
     private LuaExecutor luaExecutor;
     private LuaDexLoaders luaDexLoader;
-    private ListView list;
+    private ListView listView;
     private Field[] fields;
-    private WindowManager wm;
-    private WindowManager.LayoutParams lp;
-    boolean isundeclear = false;
-    private FieldAdapter adapter;
-    private Class superCls;
-    private SharedPreferences sp;
+    private WindowManager windowManager;
+    private WindowManager.LayoutParams layoutParams;
+    private boolean isDdeclear;
+    private FieldAdapter fieldAdapter;
+    private Class<?> superCls;
 
 
     public FieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
         super(lpparam, param, act, object);
-        classLoader = act.getClassLoader();
-        this.wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
-        sp = act.getSharedPreferences(object.getClass().getCanonicalName(), Context.MODE_PRIVATE);
+        this.classLoader = act.getClassLoader();
+        this.windowManager = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+        this.layoutParams = new WindowManager.LayoutParams();
+        this.layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION;
+        this.layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+
         this.luaExecutor = LuaExecutorFactory.newInstance(act, HOnCreate.hOnCreate);
         this.luaDexLoader = new LuaDexLoaders(act);
+
     }
 
     @Override
@@ -91,7 +95,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             if (posi == 0) {
                 if (!m.isAccessible()) m.setAccessible(true);
                 EditFieldWindow ew = new EditFieldWindow(lpparam, param, act, object, fields[p3], EditFieldWindow.TYPE_EDIT);
-                ew.show(wm, lp);
+                ew.show(this.windowManager, this.layoutParams);
             } else if (posi == 1) {
                 m.setAccessible(true);
                 MasterUtils.add(act, m);
@@ -121,7 +125,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     @Override
     public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
         try {
-            newWindow(lpparam, param, act, ((Field) p1.getItemAtPosition(p3)).get(object), wm);
+            newWindow(lpparam, param, act, ((Field) p1.getItemAtPosition(p3)).get(object), this.windowManager);
 
 
         } catch (Exception e) {
@@ -193,119 +197,106 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     @SuppressLint("SetTextI18n")
     @Override
     public void show(final WindowManager amanager, final WindowManager.LayoutParams lpp) {
-
-
-        lp = new WindowManager.LayoutParams();
-        lp.type = WindowManager.LayoutParams.TYPE_APPLICATION;
-        lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        //初始化布局
         if (object == null) {
             Toast.makeText(act, "is null....", Toast.LENGTH_SHORT).show();
         }
 
-        //lp.height=-2;
         final LinearLayout layout = new LinearLayout(act);
         layout.setBackgroundColor(0xFF303030);
-        final ActionWindow ac = new ActionWindow(act, wm, lp, layout);
-
-        ac.setSearchCallback((edit, text) -> {
-
-            if (TextUtils.isEmpty(text))
-                list.clearTextFilter();
-            else
-                list.setFilterText(text);
-        });
+        final ActionWindow actionWindow = new ActionWindow(act, this.windowManager, this.layoutParams, layout);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.addView(ac.getActionBar());
-        final TextView
-                clsname = new TextView(act);
-        clsname.setText("当前：" + object.getClass().getCanonicalName());
+        layout.addView(actionWindow.getActionBar());
+
+
+        this.undeclared = new Button(act);
+        this.undeclared.setTextColor(Color.WHITE);
+        this.undeclared.setBackground(null);
+        this.undeclared.setOnClickListener(p1 -> {
+            Utils.showToast(this.act, this.isDdeclear + "", 0);
+            if (this.isDdeclear) {
+                this.fields = object.getClass().getDeclaredFields();
+                this.fieldAdapter.setFields(this.fields);
+                this.fieldAdapter.notifyDataSetInvalidated();
+                this.isDdeclear = false;
+                undeclared.setText("A");
+            } else {
+                this.fields = object.getClass().getFields();
+                this.fieldAdapter.setFields(this.fields);
+                this.fieldAdapter.notifyDataSetInvalidated();
+                this.isDdeclear = true;
+                this.undeclared.setText("P");
+            }
+
+
+        });
+        actionWindow.addView(undeclared);
+
+
+        final TextView clsname = new TextView(act);
+        clsname.setText("Current：" + object.getClass().getCanonicalName());
         clsname.setOnClickListener(view -> {
-            if (superCls == null) {
-                superCls = object.getClass().getSuperclass();
-            } else
-                superCls = superCls.getClass();
-            if (superCls == null) superCls = object.getClass();
-            clsname.setText("当前：" + superCls.getCanonicalName());
             try {
-                Class clas = act.getClass().getClassLoader().loadClass(superCls.getCanonicalName());
-                try {
-                    object = clas.newInstance();
-                    fields = object.getClass().getDeclaredFields();
-                    undeclared.setText("非私有变量");
-                    isundeclear = false;
-                    adapter = new FieldAdapter(act, fields, object);
-                    list.setAdapter(adapter);
-                } catch (Exception e) {
-                    Utils.showToast(act, e.toString(), 1);
+                if (this.superCls == null) {
+                    this.superCls = this.object.getClass().getSuperclass();
+                } else {
+                    if (!this.superCls.getCanonicalName().equals("java.lang.Object"))
+                        this.superCls = this.superCls.getSuperclass();
+                    else
+                        Utils.showToast(this.act, "Nothing...", Toast.LENGTH_SHORT);
                 }
-            } catch (ClassNotFoundException e) {
-                Utils.showToast(act, e.toString(), 1);
+                assert this.superCls != null;
+                this.fields = this.superCls.getDeclaredFields();
+                this.object = this.superCls.newInstance();
+                this.isDdeclear = true;
+                this.undeclared.setText("P");
+                this.fieldAdapter = new FieldAdapter(this.act, this.fields, object);
+                this.listView.setAdapter(this.fieldAdapter);
+                clsname.setText("Current：" + this.superCls.getCanonicalName());
+            } catch (IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
             }
         });
-        clsname.setOnLongClickListener(v -> {
-            Utils.writeClipboard(act, clsname.getText().toString().replace("当前：", ""));
-            Utils.showToast(act, "已复制类名", 0);
 
+
+        clsname.setOnLongClickListener(v -> {
+            Utils.writeClipboard(act, clsname.getText().toString().replace("Current：", ""));
+            Utils.showToast(act, "Copied", 0);
             return true;
         });
 
         clsname.setTextColor(0xFF909090);
-        //clsname.setBackgroundColor(Color.WHITE);
         layout.addView(clsname);
+
 
         LinearLayout buttonLayout = new LinearLayout(act);
         buttonLayout.setBackgroundColor(0xFF303030);
 
         Button metbod = new Button(act);
-        metbod.setText("方法");
+        metbod.setText("M");
         metbod.setOnClickListener(p1 -> {
             MethodWindow mw = new MethodWindow(lpparam, param, act, object);
-            mw.show(wm, lp);
+            mw.show(this.windowManager, this.layoutParams);
         });
         buttonLayout.addView(metbod);
 
 
         metbod = new Button(act);
-        metbod.setText("构造方法");
+        metbod.setText("F");
         metbod.setOnClickListener(p1 -> {
             ConstructorWindow mw = new ConstructorWindow(lpparam, param, act, object);
 
-            mw.show(wm, lp);
+            mw.show(this.windowManager, this.layoutParams);
         });
         buttonLayout.addView(metbod);
 
-
-        undeclared = new Button(act);
-        undeclared.setText("P");
-        undeclared.setTextColor(Color.WHITE);
-        undeclared.setBackground(null);
-        undeclared.setOnClickListener(p1 -> {
-            if (isundeclear) {
-                fields = object.getClass().getDeclaredFields();
-                adapter.setFields(fields);
-                adapter.notifyDataSetChanged();
-                isundeclear = false;
-                undeclared.setText("A");
-            } else {
-                fields = object.getClass().getFields();
-                adapter.setFields(fields);
-                adapter.notifyDataSetChanged();
-                isundeclear = true;
-                undeclared.setText("P");
-            }
-
-
-        });
-        ac.addView(undeclared);
-
-
         Button add = new Button(act);
-        add.setText("临时保存起来");
+        add.setText("ST");
         add.setOnClickListener(p1 -> MasterUtils.add(act, object));
         buttonLayout.addView(add);
 
         Button adds = new Button(act);
-        adds.setText("添加寄存器");
+        adds.setText("SR");
         adds.setOnClickListener(p1 -> {
             MasterUtils.addHashMap(act, object);
         });
@@ -313,49 +304,73 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
 
         if (object instanceof Drawable || object instanceof Bitmap) {
-
-            Toast.makeText(act, "这可能是一个Bitmap图片", Toast.LENGTH_SHORT).show();
             Button viewImage = new Button(act);
-            viewImage.setText("查看图片");
+            viewImage.setText("IMG");
             viewImage.setOnClickListener(p1 -> {
                 ImageWindow img = new ImageWindow(lpparam, param, act, object);
-                img.show(wm, lp);
+                img.show(this.windowManager, this.layoutParams);
             });
             buttonLayout.addView(viewImage);
-
-
         }
 
         if ("byte[]".equals(object.getClass().getCanonicalName())) {
 
-            Toast.makeText(act, "这是一个byte数组,可以将其写出到sd卡", Toast.LENGTH_SHORT).show();
             Button operation = new Button(act);
-            operation.setText("写出");
-            operation.setOnClickListener(new OnClickListener() {
-
-                @SuppressLint("SdCardPath")
-                @Override
-                public void onClick(View p1) {
-                    try {
-                        OutputStream os = new FileOutputStream("/sdcard/ReflectUtils.data");
-                        os.write((byte[]) object);
-                    } catch (Exception e) {
-                        Toast.makeText(act, "错误", Toast.LENGTH_SHORT).show();
-                    }
-                    Toast.makeText(act, "写出成功:" + MainActivity.BASE_PATH + System.currentTimeMillis() + ".bin", Toast.LENGTH_SHORT).show();
+            operation.setText("Write");
+            operation.setOnClickListener(p1 -> {
+                try {
+                    EditText editText = new EditText(this.act);
+                    editText.setHint("保存的路径");
+                    new AlertDialog.Builder(this.act)
+                            .setTitle("保存文件")
+                            .setView(editText)
+                            .setPositiveButton("保存", (dialog, which) -> {
+                                String path = editText.getText().toString().trim();
+                                if (path.length() == 0) {
+                                    Toast.makeText(this.act, "请输入路径", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                try {
+                                    FileOutputStream os = new FileOutputStream(path);
+                                    os.write((byte[]) object);
+                                    os.flush();
+                                    os.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }).show();
+                } catch (Exception e) {
+                    Toast.makeText(act, "错误", Toast.LENGTH_SHORT).show();
                 }
+                Toast.makeText(act, "写出成功:" + MainActivity.BASE_PATH + System.currentTimeMillis() + ".bin", Toast.LENGTH_SHORT).show();
             });
             buttonLayout.addView(operation);
 
 
         } else if (object instanceof ArrayList)
-            new Handle_ArrayList(act, object).handle(buttonLayout);
+            new
+
+                    Handle_ArrayList(act, object).
+
+                    handle(buttonLayout);
         else if (object instanceof ViewGroup)
-            new Handle_ViewGroup(act, object).handle(buttonLayout);
+            new
+
+                    Handle_ViewGroup(act, object).
+
+                    handle(buttonLayout);
         else if (object instanceof ImageView)
-            new Handle_ImageView(act, object).handle(buttonLayout);
+            new
+
+                    Handle_ImageView(act, object).
+
+                    handle(buttonLayout);
         else if (object instanceof TextView)
-            new Handle_TextView(act, object).handle(buttonLayout);
+            new
+
+                    Handle_TextView(act, object).
+
+                    handle(buttonLayout);
         else if (object instanceof Set) {
             new Handle_Set(act, object).handle(buttonLayout);
         }
@@ -365,25 +380,35 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
 
         Button button = new Button(act);
-        button.setText("Lua脚本测试");
-        button.setOnClickListener(p1 -> {
+        button.setText("LUAT");
+        button.setOnClickListener(p1 ->
+
+        {
             ScriptWindow sc = new ScriptWindow(lpparam, param, act, object, null);
-            sc.show(wm, null);
+            sc.show(this.windowManager, null);
         });
         buttonLayout.addView(button);
 
 
-        button = new Button(act);
-        button.setText("我的脚本");
-        button.setOnClickListener(p1 -> {
+        button = new
+
+                Button(act);
+        button.setText("MR");
+        button.setOnClickListener(p1 ->
+
+        {
             WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
             loadLuaScriptButton();
         });
         buttonLayout.addView(button);
 
-        button = new Button(act);
-        button.setText("查找类");
-        button.setOnClickListener(p1 -> findClass());
+        button = new
+
+                Button(act);
+        button.setText("FC");
+        button.setOnClickListener(p1 ->
+
+                findClass());
         buttonLayout.addView(button);
 
         HorizontalScrollView ho = new HorizontalScrollView(act);
@@ -391,21 +416,56 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         layout.addView(ho);
 
 
-        list = new ListView(act);
-        list.setTextFilterEnabled(true);
-        list.setFastScrollEnabled(true);
-        list.setOnItemClickListener(this);
-        list.setOnItemLongClickListener(this);
-        list.setBackgroundColor(0xFF303030);
-        list.setDividerHeight(15);
+        EditText editText = new EditText(act);
+        editText.setHint("Filter fields...");
+        editText.setTextSize(14);
+        editText.setWidth(layout.getWidth());
+        editText.setHintTextColor(Color.WHITE);
+        editText.addTextChangedListener(new
 
-        fields = object.getClass().getDeclaredFields();
+                                                TextWatcher() {
+                                                    @Override
+                                                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        adapter = new FieldAdapter(act, fields, object);
+                                                    }
 
-        list.setAdapter(adapter);
+                                                    @Override
+                                                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                                        if (s.length() == 0)
+                                                            listView.clearTextFilter();
+                                                        listView.setFilterText(s.toString());
+                                                    }
 
-        layout.addView(list);
+                                                    @Override
+                                                    public void afterTextChanged(Editable s) {
+
+                                                    }
+                                                });
+        layout.addView(editText);
+
+
+        this.listView = new
+
+                ListView(act);
+        this.listView.setTextFilterEnabled(true);
+        this.listView.setFastScrollEnabled(true);
+        this.listView.setOnItemClickListener(this);
+        this.listView.setOnItemLongClickListener(this);
+        this.listView.setBackgroundColor(0xFF303030);
+        this.listView.setDividerHeight(15);
+
+        this.fields = object.getClass().
+
+                getFields();
+        this.undeclared.setText("P");
+        this.isDdeclear = true;
+        this.fieldAdapter = new
+
+                FieldAdapter(act, this.fields, object);
+        this.listView.setAdapter(this.fieldAdapter);
+
+
+        layout.addView(this.listView);
 
 
         View line = new View(act);
@@ -413,7 +473,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         line.setBackgroundColor(Color.BLUE);
         line.setLayoutParams(he);
 
-        wm.addView(layout, lp);
+        this.windowManager.addView(layout, this.layoutParams);
     }
 
     private void findClass() {
@@ -426,7 +486,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 Toast.makeText(act, cls + "", Toast.LENGTH_SHORT).show();
                 if (cls == null && lpparam != null) cls = lpparam.classLoader.loadClass(str);
                 try {
-                    FieldWindow.newFieldWindow(lpparam, param, act, cls.newInstance(), wm);
+                    FieldWindow.newFieldWindow(lpparam, param, act, cls.newInstance(), this.windowManager);
                 } catch (Exception e) {
                     Toast.makeText(act, e.toString(), Toast.LENGTH_SHORT).show();
                 }
@@ -434,7 +494,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 Toast.makeText(act, e.toString(), Toast.LENGTH_SHORT).show();
             }
         });
-        editWindow.show(wm, lp);
+        editWindow.show(this.windowManager, this.layoutParams);
     }
 
 
@@ -453,7 +513,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             }
 
         }
-        WindowList listView = new WindowList(act, wm, false);
+        WindowList listView = new WindowList(act, this.windowManager, false);
         listView.setItems(names);
         listView.setTitle("    Lua脚本");
         listView.setListener((adapterView, view, i, l) -> {
@@ -462,7 +522,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
         listView.setOnItemLongClickListener((adapterView, view, i, l) -> {
             ScriptWindow sc = new ScriptWindow(lpparam, param, act, object, FileUtils.getString(Utils.BASEPATH + "/script/" + names.get(i) + ".lua"));
-            sc.show(wm, null);
+            sc.show(this.windowManager, null);
             return true;
         });
 
@@ -471,40 +531,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
     }
 
-
-    void fieldDialog() {
-
-        LinearLayout layout = new LinearLayout(act);
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-        CheckBox cnull = new CheckBox(act);
-        cnull.setText("not include null");
-
-        layout.addView(cnull);
-        CheckBox cundeclare = new CheckBox(act);
-        cnull.setText("undeclare");
-
-        layout.addView(cundeclare);
-
-
-    }
-
-    Field[] filter(boolean isnotull, boolean isundeclare) {
-        List<Field> result = new ArrayList<Field>();
-
-
-        for (Field field : fields) {
-
-            if (isnotull) {
-                try {
-                    if (field.get(object) == null) continue;
-                } catch (IllegalAccessException e) {
-                } catch (IllegalArgumentException e) {
-                }
-            }
-        }
-        return result.toArray(new Field[0]);
-    }
 
     public ArrayList<ClassLoader> getClassLoaders() {
         // TODO: Implement this method
