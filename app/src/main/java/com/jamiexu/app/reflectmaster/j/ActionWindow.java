@@ -2,8 +2,6 @@ package com.jamiexu.app.reflectmaster.j;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -24,7 +22,6 @@ public class ActionWindow {
     private Button test;
     private Button close;
     private Button move;
-    private Button resize;
     private EditText search;
 
     public ActionSearchCallback getSearchCallback() {
@@ -41,25 +38,18 @@ public class ActionWindow {
         this.manager = manager;
         this.lp = lp;
         this.view = view;
-        init(false);
+        init();
     }
 
-    public ActionWindow(Context context, WindowManager manager, WindowManager.LayoutParams lp, View view, boolean search) {
-        this.context = context;
-        this.manager = manager;
-        this.lp = lp;
-        this.view = view;
-        init(search);
-    }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void init(boolean search) {
+    @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
+    private void init() {
         if (lp.width == 0) lp.width = context.getResources().getDisplayMetrics().widthPixels;
         if (lp.height == 0) lp.height = context.getResources().getDisplayMetrics().heightPixels;
         rootLayout = new LinearLayout(context);
         rootLayout.setOrientation(LinearLayout.VERTICAL);
         rootLayout.setBackgroundColor(0xFFDDDADA);
-        contain = new LinearLayout(context);
+        this.contain = new LinearLayout(context);
 
         test = new Button(context);
         test.setText("Zoom");
@@ -104,53 +94,24 @@ public class ActionWindow {
             return false;
         });
 
-        resize = new Button(context);
-        resize.setText("++");
-        resize.setOnTouchListener(new ResizsListener(true));
+
         contain.addView(test);
         contain.addView(move);
         contain.addView(close);
         contain.setBackgroundColor(0xFF2196F3);
         rootLayout.addView(contain);
-        if (search) {
-            this.search = new EditText(context);
-            this.search.setTextColor(0xFFFF4081);
-            this.search.setHint("Input filter...");
-            this.search.setHintTextColor(0xFFFF4081);
-            this.search.setBackgroundColor(0xFFFFFFFF);
 
-
-            this.search.addTextChangedListener(new TextWatcher() {
-
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-
-                    if (searchCallback != null)
-                        searchCallback.onTextChange(ActionWindow.this.search, editable.toString());
-                }
-            });
-            rootLayout.addView(this.search);
-        }
     }
 
+    public void addView(View view) {
+        this.contain.addView(view);
+    }
 
     public LinearLayout getActionBar() {
-
         return rootLayout;
     }
 
     class ResizsListener implements OnTouchListener {
-
         boolean isJia;
 
         public ResizsListener(boolean isJia) {

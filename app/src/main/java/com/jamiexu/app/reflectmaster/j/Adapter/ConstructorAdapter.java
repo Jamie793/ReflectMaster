@@ -23,9 +23,9 @@ import java.util.List;
 public class ConstructorAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
-    private Constructor[] methods;
+    private Constructor<?>[] methods;
 
-    private Constructor[] rawMethod;
+    private Constructor<?>[] rawMethod;
 
 
     public void setMethods(Constructor[] ms) {
@@ -33,7 +33,7 @@ public class ConstructorAdapter extends BaseAdapter implements Filterable {
         rawMethod = ms;
     }
 
-    public ConstructorAdapter(Context context, Constructor[] fields) {
+    public ConstructorAdapter(Context context, Constructor<?>[] fields) {
         this.context = context;
         this.methods = fields;
 
@@ -68,7 +68,6 @@ public class ConstructorAdapter extends BaseAdapter implements Filterable {
         TextView params = new TextView(context);
         TextView returntype = new TextView(context);
 
-        //  returntype.setText(String.valueOf(methods[p1].ge()));
         name.setText(methods[p1].getName());
 
         StringBuilder sb = new StringBuilder();
@@ -76,7 +75,6 @@ public class ConstructorAdapter extends BaseAdapter implements Filterable {
             sb.append(p.toString() + ",");
         }
         params.setText(sb.toString());
-        //params.setText(fields[p1].gLl);
         if (!methods[p1].isAccessible()) methods[p1].setAccessible(true);
 
         name.setTextColor(Color.WHITE);
@@ -95,14 +93,14 @@ public class ConstructorAdapter extends BaseAdapter implements Filterable {
             protected FilterResults performFiltering(CharSequence charSequence) {
 
                 FilterResults results = new FilterResults();
-                List<Constructor> temp = new ArrayList<>();
-                for (Constructor method : rawMethod) {
+                List<Constructor<?>> temp = new ArrayList<>();
+                for (Constructor<?> method : rawMethod) {
                     if (method.getName().toUpperCase().contains(charSequence.toString().toUpperCase()))
                         temp.add(method);
 
 
                 }
-                results.values = temp.toArray(new Method[0]);
+                results.values = temp.toArray(new Constructor<?>[0]);
                 results.count = temp.size();
                 return results;
             }
@@ -110,7 +108,7 @@ public class ConstructorAdapter extends BaseAdapter implements Filterable {
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
 
-                methods = (Constructor[]) filterResults.values;
+                methods = (Constructor<?>[]) filterResults.values;
                 if (filterResults.count > 0) {
                     notifyDataSetChanged();
                 } else {

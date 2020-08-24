@@ -33,8 +33,6 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class MethodWindow extends Window implements OnItemClickListener {
-
-
     private Method[] methods;
     private WindowManager wm;
     private WindowManager.LayoutParams lp;
@@ -48,7 +46,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
     public MethodWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
         super(lpparam, param, act, object);
     }
-
 
     @Override
     public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
@@ -92,7 +89,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
         wlist.show();
 
     }
-
 
     //运行函数
     void runMethod(final Method m) {
@@ -202,7 +198,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
         wm.addView(l, lp);
     }
 
-
     //临时变量
     @SuppressLint("SetTextI18n")
     private void runMethod_showVar(final EditText edit) {
@@ -232,9 +227,8 @@ public class MethodWindow extends Window implements OnItemClickListener {
         final LinearLayout root = new LinearLayout(act);
         root.setBackgroundColor(0xFF303030);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.BLACK);
 
-        ActionWindow acw = new ActionWindow(act, manager, lp, root, false);
+        ActionWindow acw = new ActionWindow(act, manager, lp, root);
         root.addView(acw.getActionBar());
 
         TextView title = new TextView(act);
@@ -242,19 +236,12 @@ public class MethodWindow extends Window implements OnItemClickListener {
         title.setTextSize(16);
         title.setWidth(root.getWidth());
         title.setTextColor(Color.WHITE);
-        title.setBackgroundColor(0xFF303030);
         root.addView(title);
-
-
-        LinearLayout linearLayout = new LinearLayout(act);
-        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-
 
         EditText editText = new EditText(act);
         editText.setHint("过滤方法");
         editText.setTextSize(14);
-        editText.setBackgroundColor(0xFF303030);
-        editText.setWidth((int) (root.getWidth() * 0.8));
+        editText.setWidth(root.getWidth());
         editText.setHintTextColor(Color.WHITE);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -274,57 +261,43 @@ public class MethodWindow extends Window implements OnItemClickListener {
 
             }
         });
-        linearLayout.addView(editText);
-
-
-        list = new ListView(act);
-        list.setTextFilterEnabled(true);
-        list.setFastScrollEnabled(true);
-        list.setBackgroundColor(0xFF303030);
-
-        LinearLayout buttonLayout = new LinearLayout(act);
+        root.addView(editText);
 
 
         Button undeclare = new Button(act);
-        undeclare.setBackgroundColor(0xFF303030);
-        undeclare.setText("undeclare");
-        undeclare.setWidth((int) (root.getWidth() * 0.2));
+        undeclare.setText("P");
+        undeclare.setTextColor(Color.WHITE);
+        undeclare.setBackground(null);
         undeclare.setOnClickListener(p1 -> {
             if (isundeclear) {
                 methods = object.getClass().getDeclaredMethods();
                 adapter.setMethods(methods);
                 adapter.notifyDataSetChanged();
                 isundeclear = false;
-                undeclare.setText("undeclare");
+                undeclare.setText("P");
             } else {
                 methods = object.getClass().getMethods();
                 adapter.setMethods(methods);
                 adapter.notifyDataSetChanged();
                 isundeclear = true;
-                undeclare.setText("declare");
+                undeclare.setText("A");
             }
         });
-        linearLayout.addView(undeclare);
+        acw.addView(undeclare);
 
 
-        root.addView(linearLayout);
-
-
-        HorizontalScrollView ho = new HorizontalScrollView(act);
-        ho.addView(buttonLayout);
-        root.addView(ho);
-
-
+        list = new ListView(act);
+        list.setTextFilterEnabled(true);
+        list.setFastScrollEnabled(true);
+        list.setOnItemClickListener(this);
         methods = object.getClass().getDeclaredMethods();
         adapter = new MethodAdapter(act, methods);
         list.setAdapter(adapter);
-        list.setOnItemClickListener(this);
+        list.setDividerHeight(5);
         root.addView(list);
 
-        root.addView(WindowUtils.getLineView(act));
         manager.addView(root, lp);
     }
-
 
     class Listener implements OnLongClickListener {
         @Override
@@ -342,7 +315,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
         public void onClick(View p1) {
         }
     }
-
 
     //点击bool类型的
     static class ChooseableListener implements OnClickListener {

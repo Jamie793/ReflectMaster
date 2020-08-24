@@ -46,7 +46,7 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         layout.setOrientation(LinearLayout.VERTICAL);
 
 
-        ActionWindow ar = new ActionWindow(context, manager, layoutParam, layout,this.isearch);
+        ActionWindow ar = new ActionWindow(context, manager, layoutParam, layout);
         layout.addView(ar.getActionBar());
         titleview = new TextView(context);
         titleview.setTextColor(Color.WHITE);
@@ -80,7 +80,7 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         layout.setOrientation(LinearLayout.VERTICAL);
 
 
-        ActionWindow ar = new ActionWindow(context, manager, layoutParam, layout,this.isearch);
+        ActionWindow ar = new ActionWindow(context, manager, layoutParam, layout);
         layout.addView(ar.getActionBar());
         titleview = new TextView(context);
         titleview.setTextColor(Color.WHITE);

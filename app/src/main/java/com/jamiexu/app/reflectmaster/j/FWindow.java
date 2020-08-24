@@ -106,7 +106,6 @@ public class FWindow {
 
     @SuppressLint("SetTextI18n")
     private void init() {
-//        ResourceLoader loader
         wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         layoutParam.width = 500;
         layoutParam.height = 500;
@@ -146,61 +145,22 @@ public class FWindow {
         res.setText("View获取(子)");
 
         layout.addView(res);
-        res.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                wm.removeView(layout);
-                loadViews(false);
-
-            }
-
-
+        res.setOnClickListener(p1 -> {
+            wm.removeView(layout);
+            loadViews(false);
         });
-        Button myfield = newButton(act);
 
-        myfield.setText("我的变量");
-
-        layout.addView(myfield);
-        myfield.setOnClickListener(p1 -> showObjects("我的变量", MasterUtils.objects));
-//		Button service =new Button(act);
-//
-//		service.setText("Service");
-//		service.setTextColor(Color.RED);
-//		layout.addView(service);
-//		service.setOnClickListener(new OnClickListener(){
-//
-//				@Override
-//				public void onClick(View p1)
-//				{
-//					showObjects(",服务",MasterUtils.serviceobjects);
-//
-//				}
-//			});
-//
         Button hide = newButton(act);
         hide.setText("隐藏");
         layout.addView(hide);
-        hide.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                swicthWindow(false);
-            }
-        });
+        hide.setOnClickListener(p1 -> swicthWindow(false));
 
         Button exit = newButton(act);
 
         exit.setText("退出");
 
         layout.addView(exit);
-        exit.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                swicthWindow(true);
-            }
-        });
+        exit.setOnClickListener(p1 -> swicthWindow(true));
 
         swicthWindow(false);
 
