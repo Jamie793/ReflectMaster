@@ -1,5 +1,6 @@
 package com.jamiexu.app.reflectmaster.j.ClassHandle;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import com.jamiexu.app.reflectmaster.j.FieldWindow;
 import com.jamiexu.app.reflectmaster.j.MasterUtils;
@@ -21,7 +22,7 @@ import java.util.Set;
 
 public class Handle_Set extends ClassHandle {
 
-    Set set;
+    private Set set;
 
     public Handle_Set(Context context, Object obj) {
         super(context, obj);
@@ -31,25 +32,20 @@ public class Handle_Set extends ClassHandle {
 
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void handle(LinearLayout layout) {
 
 
         Button button = new Button(context);
-        button.setText("查看Set列表");
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                showList();
-            }
-        });
+        button.setText("View Set");
+        button.setOnClickListener(p1 -> showList());
         layout.addView(button);
 
     }
 
-    void showList() {
-        final WindowManager wm = (WindowManager) context.getSystemService(context.WINDOW_SERVICE);
+    private void showList() {
+        final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 
         WindowList wl = new WindowList(context, wm);
         List<String> st = new ArrayList<String>();
@@ -63,14 +59,7 @@ public class Handle_Set extends ClassHandle {
             objects.add(ob);
         }
         wl.setItems(st);
-        wl.setListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-
-                FieldWindow.newWindow(null, null, context, objects.get(p3), wm);
-            }
-        });
+        wl.setListener((p1, p2, p3, p4) -> FieldWindow.newWindow(null, null, context, objects.get(p3), wm));
         wl.setTitle("SetHandle,len:" + objects.size());
         wl.show();
 

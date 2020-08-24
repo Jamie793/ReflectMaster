@@ -1,39 +1,24 @@
 package com.jamiexu.app.reflectmaster.j.ClassHandle;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import com.jamiexu.app.reflectmaster.j.FieldWindow;
-import com.jamiexu.app.reflectmaster.j.widget.WindowList;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.jamiexu.app.reflectmaster.j.FieldWindow;
+import com.jamiexu.app.reflectmaster.j.widget.WindowList;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import android.view.ViewGroup;
-
 public class Handle_ViewGroup extends ClassHandle {
-
-    @Override
-    public void handle(LinearLayout layout) {
-        Button button = new Button(context);
-        button.setText("查看字View列表");
-        button.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                showList();
-            }
-        });
-        layout.addView(button);
-    }
-
-    Context context;
-    Object obj;
+    private Context context;
+    private Object obj;
 
     public Handle_ViewGroup(Context context, Object obj) {
         super(context, obj);
@@ -41,7 +26,16 @@ public class Handle_ViewGroup extends ClassHandle {
         this.obj = obj;
     }
 
-    void showList() {
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void handle(LinearLayout layout) {
+        Button button = new Button(context);
+        button.setText("View");
+        button.setOnClickListener(p1 -> showList());
+        layout.addView(button);
+    }
+
+    private void showList() {
         final WindowManager wm = (WindowManager) context.getSystemService(context.WINDOW_SERVICE);
 
         WindowList wl = new WindowList(context, wm);

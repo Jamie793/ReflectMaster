@@ -41,7 +41,6 @@ import com.luajava.LuaException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +93,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             Field m = (Field) p1.getItemAtPosition(p3);
             if (posi == 0) {
                 if (!m.isAccessible()) m.setAccessible(true);
-                EditFieldWindow ew = new EditFieldWindow(lpparam, param, act, object, fields[p3], EditFieldWindow.TYPE_EDIT);
+                EditFieldWindow ew = new EditFieldWindow(lpparam, param, act, object, fields[p3]);
                 ew.show(this.windowManager, this.layoutParams);
             } else if (posi == 1) {
                 m.setAccessible(true);
@@ -305,15 +304,13 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
         if (object instanceof Drawable || object instanceof Bitmap) {
             Button viewImage = new Button(act);
-            viewImage.setText("IMG");
+            viewImage.setText("View IMG");
             viewImage.setOnClickListener(p1 -> {
                 ImageWindow img = new ImageWindow(lpparam, param, act, object);
                 img.show(this.windowManager, this.layoutParams);
             });
             buttonLayout.addView(viewImage);
-        }
-
-        if ("byte[]".equals(object.getClass().getCanonicalName())) {
+        } else if ("byte[]".equals(object.getClass().getCanonicalName())) {
 
             Button operation = new Button(act);
             operation.setText("Write");
@@ -346,35 +343,17 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             });
             buttonLayout.addView(operation);
 
-
         } else if (object instanceof ArrayList)
-            new
-
-                    Handle_ArrayList(act, object).
-
-                    handle(buttonLayout);
+            new Handle_ArrayList(act, object).handle(buttonLayout);
         else if (object instanceof ViewGroup)
-            new
-
-                    Handle_ViewGroup(act, object).
-
-                    handle(buttonLayout);
+            new Handle_ViewGroup(act, object).handle(buttonLayout);
         else if (object instanceof ImageView)
-            new
-
-                    Handle_ImageView(act, object).
-
-                    handle(buttonLayout);
+            new Handle_ImageView(act, object).handle(buttonLayout);
         else if (object instanceof TextView)
-            new
-
-                    Handle_TextView(act, object).
-
-                    handle(buttonLayout);
+            new Handle_TextView(act, object).handle(buttonLayout);
         else if (object instanceof Set) {
             new Handle_Set(act, object).handle(buttonLayout);
-        }
-        if (object instanceof View) {
+        } else if (object instanceof View) {
             new Handle_View(act, object).handle(buttonLayout);
         }
 
@@ -407,7 +386,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 Button(act);
         button.setText("FC");
         button.setOnClickListener(p1 ->
-
                 findClass());
         buttonLayout.addView(button);
 

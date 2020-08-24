@@ -1,5 +1,6 @@
 package com.jamiexu.app.reflectmaster.j.ClassHandle;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import com.jamiexu.app.reflectmaster.j.FieldWindow;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
@@ -19,17 +20,12 @@ public class Handle_ArrayList extends ClassHandle {
 
     ArrayList list;
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void handle(LinearLayout layout) {
         Button button = new Button(context);
-        button.setText("查看List列表");
-        button.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                showList();
-            }
-        });
+        button.setText("View List");
+        button.setOnClickListener(p1 -> showList());
         layout.addView(button);
     }
 
@@ -45,20 +41,14 @@ public class Handle_ArrayList extends ClassHandle {
 
 
     void showList() {
-        final WindowManager wm = (WindowManager) context.getSystemService(context.WINDOW_SERVICE);
+        final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 
         WindowList wl = new WindowList(context, wm);
         List<String> st = new ArrayList<String>();
 
         for (Object o : list) st.add(o.toString());
         wl.setItems(st);
-        wl.setListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-                FieldWindow.newWindow(null, null, context, list.get(p3), wm);
-            }
-        });
+        wl.setListener((p1, p2, p3, p4) -> FieldWindow.newWindow(null, null, context, list.get(p3), wm));
         wl.setTitle("ArrayListHandle,len:" + list.size());
         wl.show();
 

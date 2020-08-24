@@ -17,87 +17,78 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class EditFieldWindow extends Window {
 
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void show(final WindowManager manager, WindowManager.LayoutParams lp) {
-        final EditText value = new EditText(act);
-        value.setTextColor(Color.RED);
-        final LinearLayout layout = new LinearLayout(act);
-        layout.setBackgroundColor(Color.BLACK);
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-        LinearLayout buttonLayout = new LinearLayout(act);
-
-        Button close = new Button(act);
-        close.setText("关闭");
-        close.setOnClickListener(p1 -> manager.removeView(layout));
-        buttonLayout.addView(close);
-
-
-        Button ok;
-
-        if (type == TYPE_EDIT) {
-            ok = new Button(act);
-            ok.setText("修改");
-            ok.setOnClickListener(p1 -> {
-                Object result = MasterUtils.baseTypeParse(field.getType().getCanonicalName(), value.getText().toString());
-                try {
-                    field.set(object, result);
-                } catch (IllegalAccessException e) {
-                    Toast.makeText(act, "set value err:" + e.toString(), Toast.LENGTH_SHORT).show();
-                } catch (IllegalArgumentException e) {
-                    Toast.makeText(act, "set value err:" + e.toString(), Toast.LENGTH_SHORT).show();
-                }
-
-                Toast.makeText(act, "修改完成", Toast.LENGTH_SHORT).show();
-                manager.removeView(layout);
-            });
-
-        } else {
-            ok = new Button(act);
-            ok.setText("持久修改");
-            ok.setOnClickListener(p1 -> {
-
-                Toast.makeText(act, "修改完成", Toast.LENGTH_SHORT).show();
-                manager.removeView(layout);
-            });
-
-        }
-
-        buttonLayout.addView(ok);
-
-        layout.addView(buttonLayout);
-
-
-        TextView msg = new TextView(act);
-        msg.setTextColor(Color.BLUE);
-        msg.setText("名字:" + field.getName());
-        try {
-            value.setText(String.valueOf(field.get(object)));
-        } catch (IllegalAccessException ignored) {
-        } catch (IllegalArgumentException ignored) {
-        }
-
-        value.setHint(field.getType().getCanonicalName());
-
-        lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        layout.addView(msg);
-        layout.addView(value);
-        manager.addView(layout, lp);
-
-    }
-
     private Field field;
+    private static int TYPE_EDIT = 0;
 
-
-    private int type;
-    static int TYPE_EDIT = 0;
-
-    EditFieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object, Field thiz, int type) {
+    EditFieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object, Field thiz) {
         super(lpparam, param, act, object);
         field = thiz;
-        this.type = type;
-//        XSharedPreferences sp = new XSharedPreferences(Entry.PACKAGENAME, "");
     }
 
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void show(final WindowManager windowManager, WindowManager.LayoutParams layoutParams) {
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        final LinearLayout layout = new LinearLayout(this.act);
+        layout.setBackgroundColor(0xFF303030);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        ActionWindow actionWindow = new ActionWindow(this.act, windowManager, layoutParams, layout);
+        layout.addView(actionWindow.getActionBar());
+
+        TextView name = new TextView(act);
+        name.setTextColor(Color.GREEN);
+        name.setText("Name:" + field.getName());
+        layout.addView(name);
+
+        final EditText value = new EditText(act);
+        value.setTextColor(Color.WHITE);
+        value.setHintTextColor(Color.WHITE);
+        value.setHint(field.getType().getCanonicalName());
+        try {
+            value.setText(String.valueOf(field.get(object)));
+        } catch (IllegalAccessException | IllegalArgumentException ignored) {
+        }
+
+        layout.addView(value);
+
+
+        Button button = new Button(this.act);
+        button.setBackgroundColor(0xFF303030);
+        button.setTextColor(Color.WHITE);
+        button.setText("修改");
+        button.setOnClickListener(p1 -> {
+            Object result = MasterUtils.baseTypeParse(field.getType().getCanonicalName(), value.getText().toString());
+            try {
+                field.set(object, result);
+            } catch (IllegalAccessException | IllegalArgumentException e) {
+                Toast.makeText(act, "set value err:" + e.toString(), Toast.LENGTH_SHORT).show();
+            }
+            Toast.makeText(act, "修改完成", Toast.LENGTH_SHORT).show();
+            windowManager.removeView(layout);
+        });
+        layout.addView(button);
+
+        Button button2 = new Button(this.act);
+        button2.setText("持久修改");
+        button2.setBackgroundColor(0xFF303030);
+        button2.setTextColor(Color.WHITE);
+        button2.setOnClickListener(p1 -> {
+            new Thread(() -> {
+                while (true) {
+                    try {
+                        Object result = MasterUtils.baseTypeParse(field.getType().getCanonicalName(), value.getText().toString());
+                        field.set(object, result);
+                    } catch (IllegalAccessException | IllegalArgumentException e) {
+                        Toast.makeText(act, "set value err:" + e.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }).start();
+            Toast.makeText(act, "持续化修改中", Toast.LENGTH_SHORT).show();
+            windowManager.removeView(layout);
+        });
+        layout.addView(button2);
+
+        windowManager.addView(layout, layoutParams);
+    }
 }

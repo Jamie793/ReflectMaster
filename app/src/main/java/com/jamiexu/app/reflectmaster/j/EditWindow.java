@@ -18,11 +18,14 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 
 public class EditWindow extends Window {
+    private String msg, text;
+    private EditWindowListener listener;
 
-    public interface EditWindowListener {
-        public void onEdited(String str);
 
-
+    public EditWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, String msg, String text) {
+        super(lpparam, param, act, null);
+        this.msg = msg;
+        this.text = text;
     }
 
     public EditWindowListener getListener() {
@@ -33,74 +36,51 @@ public class EditWindow extends Window {
         this.listener = listener;
     }
 
-    private EditWindowListener listener;
-
     @Override
-    public void show(final WindowManager manager, WindowManager.LayoutParams lp) {
-        final EditText value = new EditText(act);
-        value.setTextColor(Color.RED);
+    public void show(final WindowManager windowManager, WindowManager.LayoutParams layoutParams) {
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+
         final LinearLayout layout = new LinearLayout(act);
-        layout.setBackgroundColor(Color.BLACK);
+        layout.setBackgroundColor(0xFF303030);
         layout.setOrientation(LinearLayout.VERTICAL);
 
-        LinearLayout buttonLayout = new LinearLayout(act);
-
-        Button close = new Button(act);
-        close.setText("关闭");
-        close.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                manager.removeView(layout);
-            }
-        });
-        buttonLayout.addView(close);
-
-
-        Button ok = null;
-
-
-        ok = new Button(act);
-        ok.setText("确定");
-        ok.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                if (listener != null) {
-                    listener.onEdited(value.getText().toString());
-                }
-                manager.removeView(layout);
-            }
-        });
-
-
-        buttonLayout.addView(ok);
-
-        layout.addView(buttonLayout);
-
+        final ActionWindow actionWindow = new ActionWindow(this.act, windowManager, layoutParams, layout);
+        layout.addView(actionWindow.getActionBar());
 
         TextView msg = new TextView(act);
-        msg.setTextColor(Color.BLUE);
+        msg.setTextColor(Color.GREEN);
         msg.setText(this.msg);
-        if (text != null)
-            value.setText(String.valueOf(text));
-
-
-        lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
         layout.addView(msg);
+
+
+        final EditText value = new EditText(act);
+        value.setTextColor(Color.WHITE);
+        value.setHintTextColor(Color.WHITE);
+        value.setHint("输入类名");
+        if (text != null)
+            value.setText(text);
         layout.addView(value);
-        manager.addView(layout, lp);
+
+
+        Button button = new Button(act);
+        button.setText("确定");
+        button.setTextColor(Color.WHITE);
+        button.setOnClickListener(p1 -> {
+            if (listener != null) {
+                listener.onEdited(value.getText().toString());
+            }
+            windowManager.removeView(layout);
+        });
+        layout.addView(button);
+
+
+        windowManager.addView(layout, layoutParams);
 
     }
 
-    private String msg, text;
+    public interface EditWindowListener {
+        public void onEdited(String str);
 
-    public EditWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, String msg, String text) {
-        super(lpparam, param, act, null);
-
-        this.msg = msg;
-        this.text = text;
-        ;
     }
 
 }
