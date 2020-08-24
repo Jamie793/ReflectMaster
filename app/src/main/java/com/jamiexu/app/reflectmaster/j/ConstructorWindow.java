@@ -5,8 +5,6 @@ package com.jamiexu.app.reflectmaster.j;
  */
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
@@ -23,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jamiexu.app.reflectmaster.j.Adapter.ConstructorAdapter;
+import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
 
 import java.lang.reflect.Constructor;
@@ -51,10 +50,10 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
-        WindowManager am = (WindowManager) act.getSystemService(act.WINDOW_SERVICE);
+        WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         WindowList wlist = new WindowList(act, am);
         wlist.setTitle("函数操作");
-        wlist.setItems(new String[]{"运行", "收藏", "复制函数名称", "复制类名和函数名", "复制类和函数名(hook脚本使用)"});
+        wlist.setItems(new String[]{"运行", "临时保存起来", "添加到寄存器", "复制函数名称", "复制类名和函数名", "复制类和函数名(hook脚本使用)"});
         wlist.setListener((adap, view, posi, l) -> {
 
             Constructor<?> m = (Constructor<?>) p1.getItemAtPosition(p3);
@@ -62,30 +61,28 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
                 if (!m.isAccessible()) m.setAccessible(true);
                 runMethod(m);
             } else if (posi == 1) {
-
+                if (!m.isAccessible()) m.setAccessible(true);
+                MasterUtils.add(act, m);
             } else if (posi == 2) {
-                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                cm.setPrimaryClip(ClipData.newPlainText("test", m.toGenericString()));
-                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
-
+                if (!m.isAccessible()) m.setAccessible(true);
+                MasterUtils.addHashMap(act, m);
             } else if (posi == 3) {
-                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                cm.setPrimaryClip(ClipData.newPlainText("test", "'" + m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'"));
+                Utils.writeClipboard(act, m.toGenericString());
                 Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
-
+            } else if (posi == 4) {
+                Utils.writeClipboard(act, m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'");
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
             } else {
                 StringBuilder sb = new StringBuilder();
                 sb.append(m.getDeclaringClass().getCanonicalName());
                 sb.append(" ");
                 sb.append(m.getName());
-                ;
-                for (Class clz : m.getParameterTypes()) {
+                for (Class<?> clz : m.getParameterTypes()) {
                     sb.append(" ");
                     sb.append(clz.getCanonicalName());
 
                 }
-                ClipboardManager cm = (ClipboardManager) act.getSystemService(Context.CLIPBOARD_SERVICE);
-                cm.setPrimaryClip(ClipData.newPlainText("test", sb.toString()));
+                Utils.writeClipboard(act, sb.toString());
                 Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
 
             }

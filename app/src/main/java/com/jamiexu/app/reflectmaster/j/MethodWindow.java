@@ -52,7 +52,7 @@ public class MethodWindow extends Window implements OnItemClickListener {
         WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         WindowList wlist = new WindowList(act, am, false);
         wlist.setTitle("方法操作");
-        wlist.setItems(new String[]{"运行", "添加到临时寄存器", "添加到寄存器", "复制函数名称", "复制类名和函数名", "复制类和函数名(hook脚本使用)"});
+        wlist.setItems(new String[]{"运行", "临时保存起来", "添加到寄存器", "复制函数名称", "复制类名和函数名", "复制类和函数名(hook脚本使用)"});
         wlist.setListener((adap, view, posi, l) -> {
 
             Method m = (Method) p1.getItemAtPosition(p3);
