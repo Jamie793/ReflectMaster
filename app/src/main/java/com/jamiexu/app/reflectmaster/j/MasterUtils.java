@@ -7,15 +7,29 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jamiexu.app.reflectmaster.MainActivity;
+import com.jamiexu.utils.file.FileUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import de.robv.android.xposed.XposedBridge;
 
 public class MasterUtils {
     public static Activity nowAct;
 
     public static boolean isFloating = true, newThread = false;
-    public static List<Object> objects = new ArrayList<Object>();
-    public static List<Object> serviceobjects = new ArrayList<Object>();
+    public static List<Object> objects = new ArrayList<>();
+    public static HashMap<String, Object> hashMap = new HashMap<>();
+    public static List<Object> serviceobjects = new ArrayList<>();
 
 
     public static void add(Context context, Object obj) {
@@ -32,6 +46,46 @@ public class MasterUtils {
         if (context != null)
             Toast.makeText(context, "添加到临时存储器v" + p + "成功！", Toast.LENGTH_SHORT).show();
     }
+
+    public static void add(Context context, String name, Object obj) {
+        if (hashMap.containsKey(name))
+            if (context != null) {
+                Toast.makeText(context, "添加失败，寄存器名称已存在", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+        hashMap.put(name, obj);
+        if (context != null)
+            Toast.makeText(context, "添加到临时存储器：" + name + " 成功！", Toast.LENGTH_SHORT).show();
+
+//        File file = new File(MainActivity.BASE_PATH + "objs/" + HOnCreate.lpparam.packageName + ".obj");
+//        if (!file.getParentFile().exists())
+//            file.getParentFile().mkdir();
+//        try {
+//            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file));
+//            objectOutputStream.writeObject(hashMap);
+//            objectOutputStream.flush();
+//            objectOutputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+
+//    public static void loadObjects(String packageName) {
+//        File file = new File(MainActivity.BASE_PATH + "objs/" + packageName + ".obj");
+//        if (!file.exists())
+//            return;
+//        try {
+//            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
+//            Object o = objectInputStream.readObject();
+//            hashMap = (HashMap<String, Object>) o;
+//            XposedBridge.log("反序列化" + hashMap);
+//            objectInputStream.close();
+//        } catch (IOException | ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static Object get(int i) {
         return objects.get(i);

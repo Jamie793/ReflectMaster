@@ -1,6 +1,7 @@
 package com.jamiexu.app.reflectmaster.j;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -9,19 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-
-import com.jamiexu.app.reflectmaster.factory.LuaExecutorFactory;
-import com.jamiexu.app.reflectmaster.j.Adapter.FieldAdapter;
-import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ArrayList;
-import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ImageView;
-import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_Set;
-import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_TextView;
-import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_View;
-import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ViewGroup;
-import com.jamiexu.app.reflectmaster.j.Data.MyShared;
-import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
-import com.jamiexu.app.reflectmaster.j.widget.WindowList;
-
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,7 +28,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jamiexu.utils.ReflectUtils;
+import com.jamiexu.app.reflectmaster.LuaDexLoaders;
+import com.jamiexu.app.reflectmaster.factory.LuaExecutorFactory;
+import com.jamiexu.app.reflectmaster.j.Adapter.FieldAdapter;
+import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ArrayList;
+import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ImageView;
+import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_Set;
+import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_TextView;
+import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_View;
+import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ViewGroup;
+import com.jamiexu.app.reflectmaster.j.Data.MyShared;
+import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
+import com.jamiexu.app.reflectmaster.j.widget.WindowList;
+import com.jamiexu.utils.file.FileUtils;
 import com.luajava.LuaException;
 
 import java.io.File;
@@ -56,17 +56,22 @@ import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import com.jamiexu.app.reflectmaster.LuaDexLoaders;
-
 public class FieldWindow extends Window implements OnItemClickListener, OnItemLongClickListener {
 
 
     private Button undeclared;
     private ClassLoader classLoader;
-    private List<String> luaitems = new ArrayList<>();
     private List<String> names = new ArrayList<>();
     private LuaExecutor luaExecutor;
     private LuaDexLoaders luaDexLoader;
+    private ListView list;
+    private Field[] fields;
+    private WindowManager wm;
+    private WindowManager.LayoutParams lp;
+    boolean isundeclear = false;
+    private FieldAdapter adapter;
+    private Class superCls;
+    private SharedPreferences sp;
 
 
     public FieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
@@ -76,44 +81,38 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         sp = act.getSharedPreferences(object.getClass().getCanonicalName(), act.MODE_PRIVATE);
         this.luaExecutor = LuaExecutorFactory.newInstance(act, HOnCreate.hOnCreate);
         this.luaDexLoader = new LuaDexLoaders(act);
-        myShared = new MyShared(sp, "fieldfaviroylte2");
     }
 
     @Override
     public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
 
-        WindowManager am = (WindowManager) act.getSystemService(act.WINDOW_SERVICE);
+        WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         WindowList wlist = new WindowList(act, am, false);
         wlist.setTitle("变量操作");
-        wlist.setItems(new String[]{"编辑", "收藏", "复制变量名称", "复制类名和变量名称", "复制变量名称和类型"/*,"持久化修改(构造函数后使用while(true)不断修改}"*/});
+        wlist.setItems(new String[]{"编辑", "临时保存起来", "添加到寄存器", "复制变量名称", "复制类名和变量名称", "复制变量名称和类型"/*,"持久化修改(构造函数后使用while(true)不断修改}"*/});
         wlist.setListener((adap, view, posi, l) -> {
 
             Field m = (Field) p1.getItemAtPosition(p3);
             if (posi == 0) {
-                if (m.isAccessible() == false) m.setAccessible(true);
+                if (!m.isAccessible()) m.setAccessible(true);
                 EditFieldWindow ew = new EditFieldWindow(lpparam, param, act, object, fields[p3], EditFieldWindow.TYPE_EDIT);
                 ew.show(wm, lp);
-
             } else if (posi == 1) {
-                favorite(p3, m);
+                m.setAccessible(true);
+                MasterUtils.add(act, m);
             } else if (posi == 2) {
-                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                cm.setPrimaryClip(ClipData.newPlainText("test", m.toGenericString()));
-                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
-
+                m.setAccessible(true);
+                addHashMap(m);
             } else if (posi == 3) {
-                String s = m.getName() + " " + m.getType().getName();
-                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                cm.setPrimaryClip(ClipData.newPlainText("test", s));
-                Toast.makeText(act, "复制成功:" + s, Toast.LENGTH_SHORT).show();
-
-            } else {
-
-                ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-                cm.setPrimaryClip(ClipData.newPlainText("test", "'" + m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'"));
+                Utils.writeClipboard(act, m.toGenericString()));
                 Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
-
-
+            } else if (posi == 4) {
+                String s = m.getName() + " " + m.getType().getName();
+                Utils.writeClipboard(act, s);
+                Toast.makeText(act, "复制成功:" + s, Toast.LENGTH_SHORT).show();
+            } else {
+                Utils.writeClipboard(act, m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'");
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -194,16 +193,23 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         }
     }
 
-    private ListView list;
 
-    private Field[] fields;
+    public void addHashMap(Object o) {
+        EditText editText = new EditText(act);
+        editText.setHint("保存的名称");
+        new AlertDialog.Builder(act)
+                .setTitle("添加寄存器")
+                .setView(editText)
+                .setPositiveButton("添加", (dialog, which) -> {
+                    String name = editText.getText().toString().trim();
+                    if (name.length() == 0) {
+                        Toast.makeText(act, "请输入寄存器名称", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    MasterUtils.add(act, name, o);
+                }).show();
+    }
 
-    private WindowManager wm;
-    private WindowManager.LayoutParams lp;
-    boolean isundeclear = false;
-    private FieldAdapter adapter;
-    //获取父类类名
-    private Class superCls;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -211,20 +217,12 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
 
         lp = new WindowManager.LayoutParams();
-        lp.type = lp.TYPE_APPLICATION;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
-            lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
-        else {
-            lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
-        }
-
-
+        lp.type = WindowManager.LayoutParams.TYPE_APPLICATION;
+        lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
         if (object == null) {
             Toast.makeText(act, "is null....", Toast.LENGTH_SHORT).show();
         }
-//        wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
 
-        //lp.width=-2;
         //lp.height=-2;
         final LinearLayout layout = new LinearLayout(act);
         layout.setBackgroundColor(0xFF303030);
@@ -237,7 +235,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             else
                 list.setFilterText(text);
         });
-        //layout.setBackgroundColor(Color.BLACK);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.addView(ac.getActionBar());
         final TextView
@@ -249,12 +246,9 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             } else
                 superCls = superCls.getClass();
             if (superCls == null) superCls = object.getClass();
-
-            //if(superCls.getCanonicalName().equals("java.lang.Class"))return;
             clsname.setText("当前：" + superCls.getCanonicalName());
             try {
                 Class clas = act.getClass().getClassLoader().loadClass(superCls.getCanonicalName());
-                //(superCls.getCanonicalName());
                 try {
                     object = clas.newInstance();
                     fields = object.getClass().getDeclaredFields();
@@ -270,23 +264,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             }
         });
         clsname.setOnLongClickListener(v -> {
-//            clsname.setText("当前：" + object.getClass().getCanonicalName());
-//
-//            Class clas = object.getClass();
-//            //(superCls.getCanonicalName());
-//            try {
-//                object = clas.newInstance();
-//                fields = object.getClass().getDeclaredFields();
-//                undeclared.setText("非私有变量");
-//                isundeclear = false;
-//                adapter = new FieldAdapter(act, fields, object);
-//                list.setAdapter(adapter);
-//            } catch (Exception e) {
-//                Utils.showToast(act, e.toString(), 1);
-//            }
-
-//            ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-//            cm.setPrimaryClip(ClipData.newPlainText("test", "" + object));
             Utils.writeClipboard(act, clsname.getText().toString().replace("当前：", ""));
             Utils.showToast(act, "已复制类名", 0);
 
@@ -300,19 +277,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         LinearLayout buttonLayout = new LinearLayout(act);
         buttonLayout.setBackgroundColor(0xFF303030);
 
-//		Button close = new Button(act);
-//		close.setText("close");
-//		close.setOnClickListener(new OnClickListener(){
-//
-//				@Override
-//				public void onClick(View p1)
-//				{
-//					manager.removeView(layout);
-//				}
-//			});
-//		buttonLayout.addView(close);
-//			
-//		
         Button metbod = new Button(act);
         metbod.setText("方法");
         metbod.setOnClickListener(p1 -> {
@@ -352,31 +316,19 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
 
         });
-        buttonLayout.addView(undeclared);
-        Button fa = new Button(act);
-        fa.setText("收藏");
-        fa.setOnClickListener(p1 -> showFavrite());
-        //buttonLayout.addView(fa);
-
-
-//        if (MasterUtils.isUseWindowSearch) {
-//            fa = new Button(act);
-//            fa.setText("搜索");
-//            fa.setOnClickListener(p1 -> {
-//                EditWindow window = new EditWindow(lpparam, param, act, "搜索变量", "");
-//                window.setListener(str -> list.setFilterText(str));
-//                window.show(amanager, lp);
-//            });
-//            buttonLayout.addView(fa);
-//
-//
-//        }
 
 
         Button add = new Button(act);
         add.setText("临时保存起来");
         add.setOnClickListener(p1 -> MasterUtils.add(act, object));
         buttonLayout.addView(add);
+
+        Button adds = new Button(act);
+        adds.setText("添加寄存器");
+        adds.setOnClickListener(p1 -> {
+            addHashMap(object);
+        });
+        buttonLayout.addView(adds);
 
 
         if (object instanceof Drawable || object instanceof Bitmap) {
@@ -392,22 +344,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
 
         }
-
-
-        //Toast.makeText(act,"这是一个字符,可以复制的:"+object,Toast.LENGTH_SHORT).show();
-//            Button operation = new Button(act);
-//            operation.setText("复制值");
-//            operation.setOnClickListener(new OnClickListener() {
-//
-//                @Override
-//                public void onClick(View p1) {
-//                    ClipboardManager cm = (ClipboardManager) act.getSystemService(act.CLIPBOARD_SERVICE);
-//                    cm.setPrimaryClip(ClipData.newPlainText("test", "" + object));
-//                    Toast.makeText(act, "复制成功:" + object, Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//            buttonLayout.addView(operation);
-
 
         if ("byte[]".equals(object.getClass().getCanonicalName())) {
 
@@ -520,7 +456,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
 
     private void loadLuaScriptButton() {
-        luaitems.clear();
         names.clear();
         File file = new File(Utils.BASEPATH + "/script");
         if (file.exists()) {
@@ -530,7 +465,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
                 if (fi.isFile() && (name.endsWith(".lua") || name.endsWith(".luaj"))) {
                     if (name.endsWith(".lua"))
                         names.add(name.replace(".lua", ""));
-                    luaitems.add(Utils.readText(fi.toString()));
                 }
 
             }
@@ -540,11 +474,11 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         listView.setItems(names);
         listView.setTitle("Lua脚本");
         listView.setListener((adapterView, view, i, l) -> {
-            this.luaExecutor.executeLua(act, luaitems.get(i));
+            this.luaExecutor.executeLua(act, FileUtils.getString(Utils.BASEPATH + "/script/" + names.get(i) + ".lua"));
         });
 
         listView.setOnItemLongClickListener((adapterView, view, i, l) -> {
-            ScriptWindow sc = new ScriptWindow(lpparam, param, act, object, luaitems.get(i));
+            ScriptWindow sc = new ScriptWindow(lpparam, param, act, object, FileUtils.getString(Utils.BASEPATH + "/script/" + names.get(i) + ".lua"));
             sc.show(wm, null);
             return true;
         });
@@ -552,68 +486,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         listView.show();
 
 
-    }
-
-
-    private SharedPreferences sp;
-    private MyShared myShared;
-
-    void favorite(final int p, final Field m) {
-
-        final LinearLayout layout = new LinearLayout(act);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.type = lp.TYPE_APPLICATION;
-        lp.flags = lp.FLAG_NOT_TOUCH_MODAL;
-        lp.width = 250;
-        lp.height = -1;
-        layout.setBackgroundColor(Color.DKGRAY);
-
-        final EditText edit = new EditText(act);
-        edit.setText(m.getName());
-        edit.setHint("备注");
-
-        Button save = new Button(act);
-        save.setText("收藏");
-        save.setOnClickListener(p1 -> {
-            myShared.putData(edit.getText().toString(), m.toGenericString());
-            wm.removeView(layout);
-            myShared.save();
-            Toast.makeText(act, "似乎收藏成功了", Toast.LENGTH_SHORT).show();
-        });
-        layout.addView(edit);
-        layout.addView(save);
-
-        wm.addView(layout, lp);
-
-    }
-
-    void showFavrite() {
-
-        WindowList wlist = new WindowList(act, wm);
-        final HashMap data = myShared.getData();
-        final List<String> name = myShared.getKeys();
-
-        wlist.setItems(name);
-        wlist.setTitle("我的收藏");
-        wlist.setListener((p1, p2, p3, p4) -> {
-            int p = -1;
-            String me = (String) data.get(name.get(p3));
-
-            for (int i = 0; i < fields.length; i += 1) {
-                if (fields[i].toGenericString().equals(me)) {
-                    p = i;
-                    break;
-                }
-            }
-            if (p == -1 || p > fields.length - 1) {
-                Toast.makeText(act, "长度错误," + p, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Toast.makeText(act, "长度:" + p, Toast.LENGTH_SHORT).show();
-            list.setSelection(p);
-        });
-        wlist.show();
     }
 
 

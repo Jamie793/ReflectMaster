@@ -217,7 +217,8 @@ public class MainActivity extends AppCompatActivity {
         final File file2 = new File(BASE_PATH + "lib");
         final File file3 = new File(BASE_PATH + "icon.png");
 
-        @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
+        @SuppressLint("HandlerLeak" +
+                "") final Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Utils.showToast(MainActivity.this, msg.obj.toString(), 0);

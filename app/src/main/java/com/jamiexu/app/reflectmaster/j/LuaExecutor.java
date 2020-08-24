@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.androlua.LuaDexClassLoader;
 import com.androlua.LuaThread;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
-import com.jamiexu.utils.ReflectUtils;
 import com.luajava.JavaFunction;
 import com.luajava.LuaException;
 import com.luajava.LuaState;
@@ -32,7 +31,7 @@ public class LuaExecutor {
     private Context context;
     private final StringBuilder output;
     private final HashMap<String, LuaDexClassLoader> dexCache = new HashMap<>();
-    private final Handler exeHandler = new Handler(){
+    private final Handler exeHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -72,12 +71,10 @@ public class LuaExecutor {
         L.pushJavaObject(com.jamiexu.utils.file.ZipUtils.class);
         L.setGlobal("ZipUtils");
         L.pushJavaObject(com.jamiexu.utils.file.ZipUtils.class);
-        try {
-            L.pushJavaObject(ReflectUtils.getStaticField(Class.forName("com.jamiexu.app.reflectmaster.j.MasterUtils"), "objects"));
-            L.setGlobal("ju");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        L.pushJavaObject(MasterUtils.objects);
+        L.setGlobal("jl");
+        L.pushJavaObject(MasterUtils.hashMap);
+        L.setGlobal("jh");
 
 
         L.getGlobal("package");
@@ -234,10 +231,9 @@ public class LuaExecutor {
             output.insert(0, e.toString());
         }
 
-        exeHandler.obtainMessage(0,activity).sendToTarget();
+        exeHandler.obtainMessage(0, activity).sendToTarget();
 
     }
-
 
 
     private String exeLua(String src) throws LuaException {

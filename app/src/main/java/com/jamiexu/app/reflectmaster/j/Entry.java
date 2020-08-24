@@ -37,6 +37,8 @@ public class Entry implements IXposedHookLoadPackage {
             return;
         }
 
+//        MasterUtils.loadObjects(lpparam.packageName);
+
         MasterUtils.isFloating = sharedPreferences.getBoolean("float", true);
         MasterUtils.newThread = sharedPreferences.getBoolean("newthread", false);
 
