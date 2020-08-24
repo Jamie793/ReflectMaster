@@ -274,13 +274,13 @@ public class MethodWindow extends Window implements OnItemClickListener {
                 adapter.setMethods(methods);
                 adapter.notifyDataSetChanged();
                 isundeclear = false;
-                undeclare.setText("P");
+                undeclare.setText("A");
             } else {
                 methods = object.getClass().getMethods();
                 adapter.setMethods(methods);
                 adapter.notifyDataSetChanged();
                 isundeclear = true;
-                undeclare.setText("A");
+                undeclare.setText("P");
             }
         });
         acw.addView(undeclare);
@@ -293,7 +293,7 @@ public class MethodWindow extends Window implements OnItemClickListener {
         methods = object.getClass().getDeclaredMethods();
         adapter = new MethodAdapter(act, methods);
         list.setAdapter(adapter);
-        list.setDividerHeight(5);
+        list.setDividerHeight(15);
         root.addView(list);
 
         manager.addView(root, lp);

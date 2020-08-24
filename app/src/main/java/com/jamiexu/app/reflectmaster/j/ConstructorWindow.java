@@ -37,9 +37,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class ConstructorWindow extends Window implements AdapterView.OnItemClickListener {
     private Object[] values;
     private EditText[] valuesEdit = null;
-    private int p = 0;
     private Constructor<?>[] methods;
-    private WindowManager wm;
+    private WindowManager windowManager;
     private WindowManager.LayoutParams lp;
     private ActionWindow acw;
     private ListView list;
@@ -49,7 +48,6 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
     public ConstructorWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
         super(lpparam, param, act, object);
     }
-
 
     @Override
     public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
@@ -96,15 +94,13 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
 
     }
 
-
     void runMethod(final Constructor<?> m) {
-
         values = new Object[]{};
         m.getParameterTypes();
         WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         final LinearLayout l = new LinearLayout(act);
         l.setBackgroundColor(Color.BLACK);
-        ActionWindow ac = new ActionWindow(act, wm, lp, l);
+        ActionWindow ac = new ActionWindow(act, this.windowManager, lp, l);
 
 
         l.setOrientation(LinearLayout.VERTICAL);
@@ -114,7 +110,7 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
             values = new Object[m.getParameterTypes().length];
 
             valuesEdit = new EditText[m.getParameterTypes().length];
-            p = 0;
+            int p = 0;
             for (Class type : m.getParameterTypes()) {
                 valuesEdit[p] = new EditText(act);
                 valuesEdit[p].setTextColor(Color.RED);
@@ -164,14 +160,14 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
                 Toast.makeText(act, e.toString(), Toast.LENGTH_SHORT).show();
             }
 
-            wm.removeView(l);
+            this.windowManager.removeView(l);
             LogUtils.loge("构造:" + m.getName() + " result:" + result);
 
             if (result == null) {
                 Toast.makeText(act, "result is null", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(act, result.getClass().getCanonicalName() + " ,正在打开结果,result is" + result, Toast.LENGTH_SHORT).show();
-                FieldWindow.newWindow(lpparam, param, act, result, wm);
+                FieldWindow.newWindow(lpparam, param, act, result, this.windowManager);
 
 
             }
@@ -180,13 +176,12 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         lp.width = 400;
         lp.height = 400;
         lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        wm.addView(l, lp);
+        this.windowManager.addView(l, lp);
     }
-
 
     private void runMethod_showVar(final EditText edit) {
 
-        WindowList elist = new WindowList(act, wm);
+        WindowList elist = new WindowList(act, this.windowManager);
         elist.setTitle("selece var");
         List<String> name = new ArrayList<String>();
         for (Object o : MasterUtils.objects) {
@@ -208,23 +203,18 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
 
     }
 
-
     @Override
     public void show(final WindowManager manager, WindowManager.LayoutParams lpq) {
-        wm = manager;
+        this.windowManager = manager;
         this.lp = new WindowManager.LayoutParams();
         lp.type = WindowManager.LayoutParams.TYPE_APPLICATION;
-
         lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-
         final LinearLayout root = new LinearLayout(act);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(0xFF303030);
 
-
         acw = new ActionWindow(act, manager, lp, root);
         root.addView(acw.getActionBar());
-
 
         TextView title = new TextView(act);
         title.setText("    构造函数");
@@ -232,7 +222,6 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         title.setWidth(root.getWidth());
         title.setTextColor(Color.WHITE);
         root.addView(title);
-
 
         EditText editText = new EditText(act);
         editText.setHint("过滤函数");
@@ -259,9 +248,8 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
         });
         root.addView(editText);
 
-
         list = new ListView(act);
-        list.setDividerHeight(5);
+        list.setDividerHeight(15);
         list.setTextFilterEnabled(true);
         list.setFastScrollEnabled(true);
         LinearLayout buttonLayout = new LinearLayout(act);
@@ -276,20 +264,19 @@ public class ConstructorWindow extends Window implements AdapterView.OnItemClick
                 adapter.setMethods(methods);
                 adapter.notifyDataSetChanged();
                 isundeclear = false;
-                undeclare.setText("P");
+                undeclare.setText("A");
             } else {
                 methods = object.getClass().getConstructors();
                 adapter.setMethods(methods);
                 adapter.notifyDataSetChanged();
                 isundeclear = true;
-                undeclare.setText("A");
+                undeclare.setText("P");
             }
 
         });
         acw.addView(undeclare);
 
 
-        Button fa = null;
         HorizontalScrollView ho = new HorizontalScrollView(act);
         ho.addView(buttonLayout);
         root.addView(ho);

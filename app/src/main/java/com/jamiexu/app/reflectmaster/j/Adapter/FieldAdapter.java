@@ -1,5 +1,6 @@
 package com.jamiexu.app.reflectmaster.j.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 
@@ -62,6 +63,7 @@ public class FieldAdapter extends BaseAdapter implements Filterable {
         return fields[p1].hashCode();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int p1, View p2, ViewGroup p3) {
         LinearLayout layout = new LinearLayout(context);
@@ -71,17 +73,17 @@ public class FieldAdapter extends BaseAdapter implements Filterable {
         TextView type = new TextView(context);
         TextView value = new TextView(context);
 
-        name.setText(fields[p1].getName());
+        name.setText("Name：" + fields[p1].getName());
 
-        type.setText(fields[p1].getType().getCanonicalName());
+        type.setText("Type：" + fields[p1].getType().getCanonicalName());
         if (!fields[p1].isAccessible()) fields[p1].setAccessible(true);
         try {
-            value.setText(MasterUtils.getObjectString(fields[p1].get(obj)));
+            value.setText("Value：" + MasterUtils.getObjectString(fields[p1].get(obj)));
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        name.setTextColor(Color.WHITE);
-        type.setTextColor(Color.GREEN);
+        name.setTextColor(Color.GREEN);
+        type.setTextColor(Color.WHITE);
         value.setTextColor(Color.WHITE);
         layout.addView(name);
         layout.addView(type);

@@ -4,6 +4,7 @@ package com.jamiexu.app.reflectmaster.j.Adapter;
  * Created by formatfa on 18-5-12.
  */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -15,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +58,7 @@ public class ConstructorAdapter extends BaseAdapter implements Filterable {
         return methods[p1].hashCode();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int p1, View p2, ViewGroup p3) {
         LinearLayout layout = new LinearLayout(context);
@@ -66,23 +67,23 @@ public class ConstructorAdapter extends BaseAdapter implements Filterable {
         layout.setOrientation(LinearLayout.VERTICAL);
         TextView name = new TextView(context);
         TextView params = new TextView(context);
-        TextView returntype = new TextView(context);
 
-        name.setText(methods[p1].getName());
+        name.setText("Name：" + methods[p1].getName());
 
         StringBuilder sb = new StringBuilder();
         for (Type p : methods[p1].getGenericParameterTypes()) {
-            sb.append(p.toString() + ",");
+            sb.append(p.toString()).append(";");
         }
-        params.setText(sb.toString());
+
+
+        params.setText("ParamterType：" + sb.toString());
         if (!methods[p1].isAccessible()) methods[p1].setAccessible(true);
 
-        name.setTextColor(Color.WHITE);
-        params.setTextColor(Color.GREEN);
-        returntype.setTextColor(Color.RED);
+        name.setTextColor(Color.GREEN);
+        params.setTextColor(Color.WHITE);
         layout.addView(name);
-        layout.addView(params);
-        layout.addView(returntype);
+        if (sb.length() != 0)
+            layout.addView(params);
         return layout;
     }
 

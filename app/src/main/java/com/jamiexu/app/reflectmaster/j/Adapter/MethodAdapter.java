@@ -1,5 +1,6 @@
 package com.jamiexu.app.reflectmaster.j.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -53,6 +54,7 @@ public class MethodAdapter extends BaseAdapter implements Filterable {
         return methods[p1].hashCode();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int p1, View p2, ViewGroup p3) {
         LinearLayout layout = new LinearLayout(context);
@@ -63,21 +65,23 @@ public class MethodAdapter extends BaseAdapter implements Filterable {
         TextView params = new TextView(context);
         TextView returntype = new TextView(context);
 
-        returntype.setText(methods[p1].getGenericReturnType().toString());
-        name.setText(methods[p1].getName());
+        returntype.setText("ReturnType：" + methods[p1].getGenericReturnType());
+        name.setText("Name:" + methods[p1].getName());
 
         StringBuilder sb = new StringBuilder();
         for (Type p : methods[p1].getGenericParameterTypes()) {
-            sb.append(p.toString() + ",");
+            sb.append(p.toString()).append(";");
         }
-        params.setText(sb.toString());
+
+        params.setText("ParamterType：" + sb.toString());
         if (!methods[p1].isAccessible()) methods[p1].setAccessible(true);
 
-        name.setTextColor(Color.WHITE);
-        params.setTextColor(Color.GREEN);
+        name.setTextColor(Color.GREEN);
+        params.setTextColor(Color.WHITE);
         returntype.setTextColor(Color.WHITE);
         layout.addView(name);
-        layout.addView(params);
+        if (sb.length() != 0)
+            layout.addView(params);
         layout.addView(returntype);
         return layout;
     }

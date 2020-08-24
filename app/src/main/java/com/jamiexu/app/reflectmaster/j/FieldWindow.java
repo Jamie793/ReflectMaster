@@ -276,24 +276,27 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
 
         undeclared = new Button(act);
-        undeclared.setText("私有变量");
+        undeclared.setText("P");
+        undeclared.setTextColor(Color.WHITE);
+        undeclared.setBackground(null);
         undeclared.setOnClickListener(p1 -> {
             if (isundeclear) {
                 fields = object.getClass().getDeclaredFields();
                 adapter.setFields(fields);
                 adapter.notifyDataSetChanged();
                 isundeclear = false;
-                undeclared.setText("非私有变量");
+                undeclared.setText("A");
             } else {
                 fields = object.getClass().getFields();
                 adapter.setFields(fields);
                 adapter.notifyDataSetChanged();
                 isundeclear = true;
-                undeclared.setText("私有变量");
+                undeclared.setText("P");
             }
 
 
         });
+        ac.addView(undeclared);
 
 
         Button add = new Button(act);
@@ -394,6 +397,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         list.setOnItemClickListener(this);
         list.setOnItemLongClickListener(this);
         list.setBackgroundColor(0xFF303030);
+        list.setDividerHeight(15);
 
         fields = object.getClass().getDeclaredFields();
 
