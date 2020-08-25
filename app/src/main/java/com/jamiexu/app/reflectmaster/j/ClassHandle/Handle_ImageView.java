@@ -31,7 +31,7 @@ public class Handle_ImageView extends ClassHandle {
             Drawable draw = ((ImageView) obj).getDrawable();
             if(draw == null)
                 return;
-            ImageWindow iw = new ImageWindow(null, null, act, draw);
+            ImageWindow iw = new ImageWindow(this.context,null, null, act, draw);
             iw.show(WindowUtils.getWm(act), WindowUtils.getLp());
 
         });

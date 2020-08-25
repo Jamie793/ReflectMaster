@@ -54,7 +54,7 @@ public class EditFieldWindow extends Window {
 
 
         Button button = new Button(this.act);
-        button.setBackgroundColor(0xFF303030);
+        button.setBackgroundColor(0xFF2196F3);
         button.setTextColor(Color.WHITE);
         button.setText("修改");
         button.setOnClickListener(p1 -> {
@@ -71,7 +71,7 @@ public class EditFieldWindow extends Window {
 
         Button button2 = new Button(this.act);
         button2.setText("持久修改");
-        button2.setBackgroundColor(0xFF303030);
+        button2.setBackgroundColor(0xFF2196F3);
         button2.setTextColor(Color.WHITE);
         button2.setOnClickListener(p1 -> {
             new Thread(() -> {

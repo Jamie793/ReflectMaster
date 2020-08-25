@@ -22,6 +22,7 @@ public class ViewLineView extends View implements OnTouchListener {
     private long startTime;
     private Context context;
     private List<View> views;
+    private Canvas canvas;
     private Paint paint;
     private ViewLineClickListener viewLineClickListener;
 
@@ -83,6 +84,7 @@ public class ViewLineView extends View implements OnTouchListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        this.canvas = canvas;
         for (View v : views) {
             if (v instanceof ViewGroup)
                 paint.setColor(Color.BLUE);

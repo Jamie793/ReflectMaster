@@ -2,26 +2,34 @@ package com.jamiexu.app.reflectmaster.j;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.jamiexu.app.reflectmaster.MainActivity;
+import com.jamiexu.app.reflectmaster.j.widget.SaveFileDialog;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-
-import android.graphics.drawable.Drawable;
-import android.graphics.Canvas;
-import android.graphics.PixelFormat;
-
 public class ImageWindow extends Window {
-    Bitmap bmp = null;
+    private Bitmap bmp = null;
+    private Context context;
+
+    public ImageWindow(Context context, XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
+        super(lpparam, param, act, object);
+        this.context = context;
+    }
 
     @Override
     public void show(final WindowManager manager, WindowManager.LayoutParams lp) {
@@ -33,54 +41,43 @@ public class ImageWindow extends Window {
         else if (object instanceof Drawable) {
             bmp = drawableToBitmap((Drawable) object);
         }
-
         final LinearLayout root = new LinearLayout(act);
         root.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout buttonLayout = new LinearLayout(act);
-
         ActionWindow ac = new ActionWindow(act, WindowUtils.getWm(act), WindowUtils.getLp(), root);
-
 
         Button save = new Button(act);
         save.setText("保存");
-        save.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View p1) {
-                String path = String.format("/sdcard/%s%d.png", object.getClass().getName(), System.currentTimeMillis());
-                String s = "保存成功:" + path;
-                try {
-                    bmp.compress(Bitmap.CompressFormat.PNG, 10, new FileOutputStream(path));
-                } catch (FileNotFoundException e) {
-                    s = e.toString();
-                }
-                Toast.makeText(act, s, Toast.LENGTH_SHORT).show();
+        save.setBackgroundColor(0xFF2196F3);
+        save.setTextColor(Color.WHITE);
+        save.setOnClickListener(v -> {
+            try {
+                String path = MainActivity.BASE_PATH + System.currentTimeMillis() + ".png";
+                bmp.compress(Bitmap.CompressFormat.PNG, 10, new FileOutputStream(path));
+                Toast.makeText(act, "图片已保存到目录：" + path, Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
-        buttonLayout.addView(save);
+        save.setOnLongClickListener(p1 -> {
+            EditText editText = new EditText(context);
+            editText.setHint("保存的路径");
+            new SaveFileDialog(this.act, "保存图片：", "输入路径", (path, fileOutputStream) -> {
+                bmp.compress(Bitmap.CompressFormat.PNG, 10, fileOutputStream);
+                Toast.makeText(act, "图片已保存到目录：" + path, Toast.LENGTH_LONG).show();
+            }).show();
 
-//		Button cancel = new Button(act);
-//		cancel.setText("cancel");
-//		cancel.setOnClickListener(new OnClickListener(){
-//
-//				@Override
-//				public void onClick(View p1)
-//				{
-//					manager.removeView(root);
-//				}
-//			});
-//		buttonLayout.addView(cancel);
-//		
+            return true;
+        });
 
         root.addView(ac.getActionBar());
-        root.addView(buttonLayout);
+        root.addView(save);
 
 
         ImageView image = new ImageView(act);
-
         root.addView(image);
-
         lp.width = -1;
+
+
         lp.height = -1;
         if (bmp != null) {
             image.setImageBitmap(bmp);
@@ -89,10 +86,6 @@ public class ImageWindow extends Window {
         } else
             Toast.makeText(act, "null.....", Toast.LENGTH_SHORT).show();
         manager.addView(root, lp);
-    }
-
-    public ImageWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
-        super(lpparam, param, act, object);
     }
 
 

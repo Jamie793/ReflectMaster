@@ -2,23 +2,21 @@ package com.jamiexu.app.reflectmaster.j.ClassHandle;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import com.jamiexu.app.reflectmaster.j.FieldWindow;
-import com.jamiexu.app.reflectmaster.j.widget.WindowList;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.jamiexu.app.reflectmaster.j.FieldWindow;
+import com.jamiexu.app.reflectmaster.j.widget.WindowList;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView;
-
 public class Handle_ArrayList extends ClassHandle {
 
-    ArrayList list;
+    private ArrayList<Object> list;
+    private Context context;
+    private Object object;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -29,14 +27,12 @@ public class Handle_ArrayList extends ClassHandle {
         layout.addView(button);
     }
 
-    Context context;
-    Object obj;
 
-    public Handle_ArrayList(Context context, Object obj) {
-        super(context, obj);
+    public Handle_ArrayList(Context context, Object object) {
+        super(context, object);
         this.context = context;
-        this.obj = obj;
-        list = (ArrayList) obj;
+        this.object = object;
+        list = new ArrayList<>((List<?>) object);
     }
 
 
@@ -44,7 +40,7 @@ public class Handle_ArrayList extends ClassHandle {
         final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 
         WindowList wl = new WindowList(context, wm);
-        List<String> st = new ArrayList<String>();
+        List<String> st = new ArrayList<>();
 
         for (Object o : list) st.add(o.toString());
         wl.setItems(st);

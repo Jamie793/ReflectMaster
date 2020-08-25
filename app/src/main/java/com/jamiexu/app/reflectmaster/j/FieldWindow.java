@@ -1,7 +1,6 @@
 package com.jamiexu.app.reflectmaster.j;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -34,6 +33,7 @@ import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_TextView;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_View;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ViewGroup;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
+import com.jamiexu.app.reflectmaster.j.widget.SaveFileDialog;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
 import com.jamiexu.utils.file.FileUtils;
 import com.luajava.LuaException;
@@ -45,6 +45,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import dalvik.system.DexClassLoader;
@@ -306,7 +307,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             Button viewImage = new Button(act);
             viewImage.setText("View IMG");
             viewImage.setOnClickListener(p1 -> {
-                ImageWindow img = new ImageWindow(lpparam, param, act, object);
+                ImageWindow img = new ImageWindow(this.act, lpparam, param, act, object);
                 img.show(this.windowManager, this.layoutParams);
             });
             buttonLayout.addView(viewImage);
@@ -314,35 +315,34 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
             Button operation = new Button(act);
             operation.setText("Write");
-            operation.setOnClickListener(p1 -> {
+            operation.setOnClickListener(v -> {
+                String path = MainActivity.BASE_PATH + System.currentTimeMillis() + ".bin";
                 try {
-                    EditText editText = new EditText(this.act);
-                    editText.setHint("保存的路径");
-                    new AlertDialog.Builder(this.act)
-                            .setTitle("保存文件")
-                            .setView(editText)
-                            .setPositiveButton("保存", (dialog, which) -> {
-                                String path = editText.getText().toString().trim();
-                                if (path.length() == 0) {
-                                    Toast.makeText(this.act, "请输入路径", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-                                try {
-                                    FileOutputStream os = new FileOutputStream(path);
-                                    os.write((byte[]) object);
-                                    os.flush();
-                                    os.close();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }).show();
-                } catch (Exception e) {
-                    Toast.makeText(act, "错误", Toast.LENGTH_SHORT).show();
+                    FileOutputStream os = new FileOutputStream(path);
+                    os.write((byte[]) object);
+                    os.flush();
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                Toast.makeText(act, "写出成功:" + MainActivity.BASE_PATH + System.currentTimeMillis() + ".bin", Toast.LENGTH_SHORT).show();
+                Utils.showToast(act, "数据已保存到目录：" + path, Toast.LENGTH_SHORT);
             });
-            buttonLayout.addView(operation);
 
+            operation.setOnLongClickListener(v -> {
+                new SaveFileDialog(act, "保存数据：", "保存路径",
+                        (path, fileOutputStream) -> {
+                            try {
+                                fileOutputStream.write((byte[]) object);
+                                Utils.showToast(act, "数据已保存到路径:" +
+                                        path, Toast.LENGTH_SHORT);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }).show();
+                return true;
+            });
+
+            buttonLayout.addView(operation);
         } else if (object instanceof ArrayList)
             new Handle_ArrayList(act, object).handle(buttonLayout);
         else if (object instanceof ViewGroup)
@@ -369,9 +369,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         buttonLayout.addView(button);
 
 
-        button = new
-
-                Button(act);
+        button = new Button(act);
         button.setText("MR");
         button.setOnClickListener(p1 ->
 
@@ -381,9 +379,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         });
         buttonLayout.addView(button);
 
-        button = new
-
-                Button(act);
+        button = new Button(act);
         button.setText("FC");
         button.setOnClickListener(p1 ->
                 findClass());
@@ -458,10 +454,11 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         editWindow.setListener(str -> {
 
             try {
-                Class cls = act.getClass().getClassLoader().loadClass(str);
+                Class<?> cls = HOnCreate.lpparam.classLoader.loadClass(str);
                 Toast.makeText(act, cls + "", Toast.LENGTH_SHORT).show();
                 if (cls == null && lpparam != null) cls = lpparam.classLoader.loadClass(str);
                 try {
+                    assert cls != null;
                     FieldWindow.newFieldWindow(lpparam, param, act, cls.newInstance(), this.windowManager);
                 } catch (Exception e) {
                     Toast.makeText(act, e.toString(), Toast.LENGTH_SHORT).show();

@@ -2,7 +2,6 @@ package com.jamiexu.app.reflectmaster.j;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +12,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 /**
- * Created by formatfa on 18-4-29.
+ * Created by Jamiexu on 2020-08-25.
  */
 
 
@@ -65,6 +64,7 @@ public class EditWindow extends Window {
         Button button = new Button(act);
         button.setText("确定");
         button.setTextColor(Color.WHITE);
+        button.setBackgroundColor(0xFF2196F3);
         button.setOnClickListener(p1 -> {
             if (listener != null) {
                 listener.onEdited(value.getText().toString());
@@ -79,8 +79,7 @@ public class EditWindow extends Window {
     }
 
     public interface EditWindowListener {
-        public void onEdited(String str);
-
+        void onEdited(String str);
     }
 
 }
