@@ -67,7 +67,7 @@ android {
 
 dependencies {
     implementation files('libs/lua.aar')
-    implementation files('libs/YoumiSdk_v8.3.0_2018-10-11.aar')
+//    implementation files('libs/YoumiSdk_v8.3.0_2018-10-11.aar')
     implementation files('libs/JamiexuUtils.jar')
     compileOnly files('libs/api-82.jar')
     implementation 'com.android.support.constraint:constraint-layout:2.0.0'

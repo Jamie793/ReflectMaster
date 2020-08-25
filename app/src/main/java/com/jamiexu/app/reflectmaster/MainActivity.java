@@ -50,8 +50,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import cds.sdg.sdf.AdManager;
-import cds.sdg.sdf.nm.sp.SpotManager;
 import dalvik.system.DexClassLoader;
 
 

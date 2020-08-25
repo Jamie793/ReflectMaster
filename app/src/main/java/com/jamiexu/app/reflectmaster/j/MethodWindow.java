@@ -122,7 +122,7 @@ public class MethodWindow extends Window implements OnItemClickListener {
         button.setBackgroundColor(0xFF2196F3);
         button.setOnClickListener(v -> {
             for (int i = 0; i < editTextArrayList.size(); i++) {
-                valueArrayList.add(parseValue(typeArrayList.get(i), editTextArrayList.get(i).
+                valueArrayList.add(MasterUtils.parseValue(typeArrayList.get(i), editTextArrayList.get(i).
                         getText().toString()));
             }
 
@@ -147,47 +147,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
         windowManager.addView(layout, layoutParams);
     }
 
-    private Object parseValue(String clas, String value) {
-        Object result = null;
-        if (value.contains("$st")) {
-            int index = Integer.parseInt(value.substring(3));
-            if (index < MasterUtils.objects.size() - 1 && index > 0)
-                result = MasterUtils.get(index);
-        } else if (value.contains("$sr")) {
-            String key = value.substring(3);
-            if (MasterUtils.hashMap.containsKey(key))
-                result = MasterUtils.hashMap.get(key);
-        } else if (value.contains("$null")) {
-        } else {
-            switch (clas) {
-                case "java.lang.CharSequence":
-                case "java.lang.String":
-                    result = value;
-                    break;
-                case "int":
-                case "java.lang.Integer":
-                    result = Integer.valueOf(value);
-                    break;
-                case "boolean":
-                case "java.lang.Boolean":
-                    result = (value.equals("true") || value.equals("t") || value.equals("1"));
-                    break;
-                case "char":
-                case "java.lang.Character":
-                    result = (char) Integer.parseInt(value);
-                case "byte":
-                case "java.lang.Byte":
-                    result = (byte) Integer.parseInt(value);
-                case "double":
-                case "java.lang.Double":
-                    result = Double.valueOf(value);
-                case "float":
-                case "java.lang.Float":
-                    result = Float.valueOf(value);
-            }
-        }
-        return result;
-    }
 
 
     @SuppressLint("SetTextI18n")

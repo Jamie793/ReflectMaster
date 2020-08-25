@@ -10,6 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
+
 import java.lang.reflect.Field;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -58,13 +60,14 @@ public class EditFieldWindow extends Window {
         button.setTextColor(Color.WHITE);
         button.setText("修改");
         button.setOnClickListener(p1 -> {
-            Object result = MasterUtils.baseTypeParse(field.getType().getCanonicalName(), value.getText().toString());
+            Object result = MasterUtils.parseValue(field.getType().getCanonicalName(),
+                    value.getText().toString());
             try {
                 field.set(object, result);
             } catch (IllegalAccessException | IllegalArgumentException e) {
                 Toast.makeText(act, "set value err:" + e.toString(), Toast.LENGTH_SHORT).show();
             }
-            Toast.makeText(act, "修改完成", Toast.LENGTH_SHORT).show();
+            Utils.showToast(act, "修改完成", Toast.LENGTH_SHORT);
             windowManager.removeView(layout);
         });
         layout.addView(button);
@@ -77,10 +80,11 @@ public class EditFieldWindow extends Window {
             new Thread(() -> {
                 while (true) {
                     try {
-                        Object result = MasterUtils.baseTypeParse(field.getType().getCanonicalName(), value.getText().toString());
+                        Object result = MasterUtils.parseValue(field.getType().getCanonicalName(),
+                                value.getText().toString());
                         field.set(object, result);
                     } catch (IllegalAccessException | IllegalArgumentException e) {
-                        Toast.makeText(act, "set value err:" + e.toString(), Toast.LENGTH_SHORT).show();
+                        Utils.showToast(act, "set value err:" + e.toString(), Toast.LENGTH_SHORT);
                     }
                 }
             }).start();

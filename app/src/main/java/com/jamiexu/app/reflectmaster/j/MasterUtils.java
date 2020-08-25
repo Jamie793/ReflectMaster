@@ -9,9 +9,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jamiexu.app.reflectmaster.j.Data.ReflectData;
+import com.jamiexu.utils.reflect.ReflectUtils;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class MasterUtils {
 
@@ -21,8 +26,8 @@ public class MasterUtils {
     @SuppressLint("StaticFieldLeak")
     public static Activity nowAct;
     public static boolean isFloating = true, newThread = false;
-    public static List<Object> objects = new ArrayList<>();
-    public static HashMap<String, Object> hashMap = new HashMap<>();
+    public static List<ReflectData> objects = new ArrayList<>();
+    public static HashMap<String, ReflectData> hashMap = new HashMap<>();
     public static List<Object> serviceobjects = new ArrayList<>();
 
 
@@ -36,7 +41,7 @@ public class MasterUtils {
         }
         int p = objects.size();
 
-        objects.add(obj);
+        objects.add(new ReflectData(context, obj));
         if (context != null)
             Toast.makeText(context, "添加到临时存储器v" + p + "成功！", Toast.LENGTH_SHORT).show();
     }
@@ -48,14 +53,18 @@ public class MasterUtils {
                 return;
             }
 
-        hashMap.put(name, obj);
+        hashMap.put(name, new ReflectData(context, obj));
         if (context != null)
             Toast.makeText(context, "添加到临时存储器：" + name + " 成功！", Toast.LENGTH_SHORT).show();
     }
 
 
     public static Object get(int i) {
-        return objects.get(i);
+        return objects.get(i).getObject();
+    }
+
+    public static Object get(String key) {
+        return Objects.requireNonNull(hashMap.get(key)).getObject();
     }
 
 
@@ -119,70 +128,90 @@ public class MasterUtils {
         return result;
     }
 
-
-    //将基本类型的字符转换为对象,寄存器的值 startwith $Fnumber ,like $F0
-    public static Object baseTypeParse(String conciaType, String value) {
+    public static Object parseValue(String clas, String value) {
         Object result = null;
-        if (value.startsWith("$F")) {
-
-            result = objects.get(Integer.parseInt(value.substring(2)));
-
-            return result;
+        if (value.contains("$st")) {
+            int index = Integer.parseInt(value.substring(3));
+            if (index < MasterUtils.objects.size() && index >= 0) {
+                ReflectData object = MasterUtils.objects.get(index);
+                if (object.getObject().getClass().isAssignableFrom(Field.class)) {
+                    Field field = (Field) object.getObject();
+                    result = ReflectUtils.getFieldValue(field, object.getContext());
+                }
+            }
+        } else if (value.contains("$sr")) {
+            String key = value.substring(3);
+            if (MasterUtils.hashMap.containsKey(key)) {
+                ReflectData object = MasterUtils.hashMap.get(key);
+                if (Objects.requireNonNull(object).getObject().getClass().isAssignableFrom(Field.class)) {
+                    Field field = (Field) object.getObject();
+                    result = ReflectUtils.getFieldValue(field, object.getContext());
+                }
+            }
+        } else if (value.contains("$null")) {
+        } else {
+            switch (clas) {
+                case "java.lang.CharSequence":
+                case "java.lang.String":
+                    result = value;
+                    break;
+                case "int":
+                case "java.lang.Integer":
+                    result = Integer.valueOf(value);
+                    break;
+                case "boolean":
+                case "java.lang.Boolean":
+                    result = (value.equals("true") || value.equals("t") || value.equals("1"));
+                    break;
+                case "char":
+                case "java.lang.Character":
+                    result = (char) Integer.parseInt(value);
+                case "byte":
+                case "java.lang.Byte":
+                    result = (byte) Integer.parseInt(value);
+                case "double":
+                case "java.lang.Double":
+                    result = Double.valueOf(value);
+                case "float":
+                case "java.lang.Float":
+                    result = Float.valueOf(value);
+                case "long":
+                case "java.lang.Long":
+                    result = Long.parseLong(result + "");
+                    break;
+            }
         }
-        switch (conciaType) {
-            case "int":
-                result = Integer.parseInt(value);
-                break;
-            case "boolean":
-                if ("true".equals(value))
-                    result = true;
-                else
-                    result = false;
-                break;
-            case "long":
-                result = Long.parseLong(value);
-                break;
-            case "byte":
-                result = Byte.parseByte(value);
-                break;
 
+        if (value.matches(":\\$(\\w)$")) {
+            String suffix = value.substring(value.lastIndexOf(":$") + 2);
+            switch (suffix) {
+                case "s":
+                    result += "";
+                    break;
+                case "i":
+                    result = Integer.parseInt(result + "");
+                    break;
+                case "z":
+                    String r = result + "";
+                    result = r.equals("t") || r.equals("1") || r.equals("true");
+                    break;
+                case "c":
+                    result = (char) Integer.parseInt(result + "");
+                    break;
+                case "l":
+                    result = Long.parseLong(result + "");
+                    break;
+                case "f":
+                    result = Float.parseFloat(result + "");
+                    break;
+                case "d":
+                    result = Double.parseDouble(result + "");
+                    break;
 
-            default:
-                result = value;
-
-
+            }
         }
         return result;
     }
-
-    public static Class parseClass(String clz, ClassLoader loader) throws ClassNotFoundException {
-        Class result;
-        switch (clz) {
-
-            case "int":
-                result = int.class;
-                break;
-            case "boolean":
-                result = boolean.class;
-                break;
-            case "long":
-                result = long.class;
-                break;
-            case "short":
-                result = boolean.class;
-                break;
-            case "char":
-                result = char.class;
-                break;
-            case "byte":
-                result = byte.class;
-                break;
-            default:
-                result = loader.loadClass(clz);
-        }
-        return result;
-    }
-
 
     public static boolean isBaseArray(String cancio) {
 
