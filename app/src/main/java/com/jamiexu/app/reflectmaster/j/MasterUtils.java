@@ -131,7 +131,7 @@ public class MasterUtils {
     public static Object parseValue(String clas, String value) {
         Object result = null;
         if (value.contains("$st")) {
-            int index = Integer.parseInt(value.substring(3));
+            int index = Integer.parseInt(value.replaceAll(":\\$(\\w)", "").substring(3));
             if (index < MasterUtils.objects.size() && index >= 0) {
                 ReflectData object = MasterUtils.objects.get(index);
                 if (object.getObject().getClass().isAssignableFrom(Field.class)) {
@@ -140,7 +140,7 @@ public class MasterUtils {
                 }
             }
         } else if (value.contains("$sr")) {
-            String key = value.substring(3);
+            String key = value.substring(3).replaceAll(":\\$(\\w)", "");
             if (MasterUtils.hashMap.containsKey(key)) {
                 ReflectData object = MasterUtils.hashMap.get(key);
                 if (Objects.requireNonNull(object).getObject().getClass().isAssignableFrom(Field.class)) {
@@ -182,7 +182,7 @@ public class MasterUtils {
             }
         }
 
-        if (value.matches(":\\$(\\w)$")) {
+        if (value.contains(":$")) {
             String suffix = value.substring(value.lastIndexOf(":$") + 2);
             switch (suffix) {
                 case "s":
