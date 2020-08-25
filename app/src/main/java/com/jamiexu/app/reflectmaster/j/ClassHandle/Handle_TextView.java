@@ -23,13 +23,11 @@ public class Handle_TextView extends ClassHandle {
 
 
     private Context context;
-    private Object obj;
     private TextView text;
 
     public Handle_TextView(Context context, Object obj) {
         super(context, obj);
         this.context = context;
-        this.obj = obj;
         text = (TextView) obj;
 
 

@@ -45,7 +45,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import dalvik.system.DexClassLoader;
@@ -54,9 +53,9 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class FieldWindow extends Window implements OnItemClickListener, OnItemLongClickListener {
 
+//  Update by Jamiexu 2020-08-25
 
     private Button undeclared;
-    private ClassLoader classLoader;
     private List<String> names = new ArrayList<>();
     private LuaExecutor luaExecutor;
     private LuaDexLoaders luaDexLoader;
@@ -71,7 +70,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
     public FieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
         super(lpparam, param, act, object);
-        this.classLoader = act.getClassLoader();
+        ClassLoader classLoader = act.getClassLoader();
         this.windowManager = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
         this.layoutParams = new WindowManager.LayoutParams();
         this.layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION;
@@ -342,7 +341,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             });
 
             buttonLayout.addView(operation);
-        } else if (object instanceof ArrayList)
+        } else if (object instanceof List)
             new Handle_ArrayList(act, object).handle(buttonLayout);
         else if (object instanceof ViewGroup)
             new Handle_ViewGroup(act, object).handle(buttonLayout);

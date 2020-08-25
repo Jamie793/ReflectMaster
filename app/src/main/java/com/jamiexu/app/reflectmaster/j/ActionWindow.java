@@ -11,26 +11,18 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 public class ActionWindow {
+
+    //  Update by Jamiexu 2020-08-25
+
+
     private Context context;
     private WindowManager manager;
     private WindowManager.LayoutParams lp;
     private View view;
     private int startX, startY, nowX, nowY;
-    private ActionSearchCallback searchCallback;
     private LinearLayout rootLayout;
     private LinearLayout contain;
-    private Button test;
-    private Button close;
-    private Button move;
-    private EditText search;
 
-    public ActionSearchCallback getSearchCallback() {
-        return searchCallback;
-    }
-
-    public void setSearchCallback(ActionSearchCallback searchCallback) {
-        this.searchCallback = searchCallback;
-    }
 
     public ActionWindow(Context context, WindowManager manager, WindowManager.LayoutParams lp, View view) {
 
@@ -51,20 +43,20 @@ public class ActionWindow {
         rootLayout.setBackgroundColor(0xFFDDDADA);
         this.contain = new LinearLayout(context);
 
-        test = new Button(context);
+        Button test = new Button(context);
         test.setText("Zoom");
         test.setTextColor(0xFFFFFFFF);
         test.setOnTouchListener(new ResizsListener(false));
         test.setBackground(null);
 
-        close = new Button(context);
+        Button close = new Button(context);
         close.setText("close");
         close.setTextColor(0xFFFFFFFF);
         close.setOnClickListener(p1 -> manager.removeView(view));
         close.setBackground(null);
 
 
-        move = new Button(context);
+        Button move = new Button(context);
         move.setText("Drag");
         move.setTextColor(0xFFFFFFFF);
         move.setBackground(null);

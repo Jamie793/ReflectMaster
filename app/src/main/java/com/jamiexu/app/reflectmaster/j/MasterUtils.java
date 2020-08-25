@@ -1,5 +1,6 @@
 package com.jamiexu.app.reflectmaster.j;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -13,8 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MasterUtils {
-    public static Activity nowAct;
 
+    //  Update by Jamiexu 2020-08-25
+
+
+    @SuppressLint("StaticFieldLeak")
+    public static Activity nowAct;
     public static boolean isFloating = true, newThread = false;
     public static List<Object> objects = new ArrayList<>();
     public static HashMap<String, Object> hashMap = new HashMap<>();

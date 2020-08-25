@@ -41,11 +41,10 @@ public class Handle_ArrayList extends ClassHandle {
 
         WindowList wl = new WindowList(context, wm);
         List<String> st = new ArrayList<>();
-
         for (Object o : list) st.add(o.toString());
         wl.setItems(st);
         wl.setListener((p1, p2, p3, p4) -> FieldWindow.newWindow(null, null, context, list.get(p3), wm));
-        wl.setTitle("ArrayListHandle,len:" + list.size());
+        wl.setTitle("   List Len:" + list.size());
         wl.show();
 
     }

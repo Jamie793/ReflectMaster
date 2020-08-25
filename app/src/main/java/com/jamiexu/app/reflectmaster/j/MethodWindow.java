@@ -1,14 +1,11 @@
 package com.jamiexu.app.reflectmaster.j;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -27,12 +24,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class MethodWindow extends Window implements OnItemClickListener {
+
+//    Update by Jamiexu 2020-08-25
+
     private Method[] methods;
     private WindowManager wm;
     private WindowManager.LayoutParams lp;
@@ -191,24 +190,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
     }
 
 
-    //临时变量
-    @SuppressLint("SetTextI18n")
-    private void runMethod_showVar(final EditText edit) {
-
-        WindowList elist = new WindowList(act, wm);
-        elist.setTitle("selece var");
-        List<String> name = new ArrayList<>();
-        for (Object o : MasterUtils.objects) {
-
-            name.add(o.getClass().getCanonicalName());
-
-        }
-        elist.setItems(name);
-        elist.setListener((p1, p2, p3, p4) -> edit.setText("$F" + p3));
-        elist.show();
-
-    }
-
     @SuppressLint("SetTextI18n")
     @Override
     public void show(final WindowManager manager, WindowManager.LayoutParams lpq) {
@@ -293,42 +274,5 @@ public class MethodWindow extends Window implements OnItemClickListener {
         manager.addView(root, lp);
     }
 
-    class Listener implements OnLongClickListener {
-        @Override
-        public boolean onLongClick(View p1) {
-            runMethod_showVar(edit);
-            return true;
-        }
-
-        EditText edit;
-
-        public Listener(EditText edit) {
-            this.edit = edit;
-        }
-
-        public void onClick(View p1) {
-        }
-    }
-
-    //点击bool类型的
-    static class ChooseableListener implements OnClickListener {
-        EditText editText;
-        String[] values;
-
-        public ChooseableListener(EditText editText, String[] values) {
-            this.editText = editText;
-            this.values = values;
-        }
-
-        public ChooseableListener(EditText editText) {
-            this.editText = editText;
-        }
-
-        @Override
-        public void onClick(View v) {
-            AlertDialog.Builder ab = new AlertDialog.Builder(editText.getContext());
-            ab.setItems(values, (dialog, which) -> editText.setText(values[which])).show();
-        }
-    }
 
 }

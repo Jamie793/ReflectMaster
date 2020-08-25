@@ -27,10 +27,14 @@ import de.robv.android.xposed.XposedBridge;
 
 public class LuaExecutor {
 
+//    Create by Jamiexu 2020-08-25
+
     private LuaState L;
     private Context context;
     private final StringBuilder output;
     private final HashMap<String, LuaDexClassLoader> dexCache = new HashMap<>();
+
+    @SuppressLint("HandlerLeak")
     private final Handler exeHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -44,7 +48,8 @@ public class LuaExecutor {
                         .setNegativeButton("复制", (dialog, which) -> {
                             Utils.writeClipboard(activity, output.toString());
                             Toast.makeText(activity, "已复制到剪切板", Toast.LENGTH_SHORT).show();
-                        }).setNeutralButton("清空", (dialog, which) -> output.setLength(0)).show().setCancelable(false);
+                        }).setNeutralButton("清空", (dialog, which) -> output.setLength(0))
+                        .show().setCancelable(false);
             }
         }
     };
@@ -82,7 +87,6 @@ public class LuaExecutor {
         L.setField(-2, "path");
         L.pop(1);
         initLuaFunction();
-        //        XposedBridge.log("LuaJava=>Init successfult");
     }
 
 
@@ -255,11 +259,6 @@ public class LuaExecutor {
 
     }
 
-
-//    public void imp(String name) {
-//        sourceCode.append("luajava.loaded[\"" + name + "\"] = jc.getClass().getClassLoader().loadClass(\"" + name + "\")");
-//        sourceCode.append("import \"" + name + "\"");
-//    }
 
     private String errorReason(int error) {
         switch (error) {

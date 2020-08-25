@@ -23,6 +23,9 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class ImageWindow extends Window {
+
+//  Update by Jamiexu 2020-08-25
+
     private Bitmap bmp = null;
     private Context context;
 

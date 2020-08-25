@@ -48,10 +48,9 @@ public class Handle_Set extends ClassHandle {
         final WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 
         WindowList wl = new WindowList(context, wm);
-        List<String> st = new ArrayList<String>();
-
+        List<String> st = new ArrayList<>();
         final List<Object> objects = new ArrayList<>();
-        final Iterator iterator = set.iterator();
+        final Iterator<?> iterator = set.iterator();
         int i = 0;
         while (iterator.hasNext()) {
             Object ob = iterator.next();
@@ -60,7 +59,7 @@ public class Handle_Set extends ClassHandle {
         }
         wl.setItems(st);
         wl.setListener((p1, p2, p3, p4) -> FieldWindow.newWindow(null, null, context, objects.get(p3), wm));
-        wl.setTitle("SetHandle,len:" + objects.size());
+        wl.setTitle("   Set Len:" + objects.size());
         wl.show();
 
     }
