@@ -79,7 +79,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
         this.luaExecutor = LuaExecutorFactory.newInstance(act, HOnCreate.hOnCreate);
         this.luaDexLoader = new LuaDexLoaders(act);
-
     }
 
     @Override

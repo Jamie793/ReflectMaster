@@ -23,10 +23,11 @@ import com.jamiexu.app.reflectmaster.j.Adapter.MethodAdapter;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -38,8 +39,6 @@ public class MethodWindow extends Window implements OnItemClickListener {
     private ListView list;
     private MethodAdapter adapter;
     private boolean isDeclared;
-    private Object[] values;
-    private EditText[] valuesEdit = null;
 
     public MethodWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object) {
         super(lpparam, param, act, object);
@@ -89,112 +88,108 @@ public class MethodWindow extends Window implements OnItemClickListener {
     }
 
     //运行函数
+    @SuppressLint("SetTextI18n")
     void runMethod(final Method m) {
 
-        values = new Object[]{};
-        m.getParameterTypes();
-        WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+        ArrayList<EditText> editTextArrayList = new ArrayList<>();
+        ArrayList<String> typeArrayList = new ArrayList<>();
+        ArrayList<Object> valueArrayList = new ArrayList<>();
 
-        final LinearLayout l = new LinearLayout(act);
-        l.setBackgroundColor(Color.BLACK);
-        ActionWindow ac = new ActionWindow(act, wm, lp, l);
+        WindowManager windowManager = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.width = 400;
+        layoutParams.height = 400;
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 
+        final LinearLayout layout = new LinearLayout(act);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setBackgroundColor(0xFF303030);
+        ActionWindow actionWindow = new ActionWindow(act, wm, lp, layout);
+        layout.addView(actionWindow.getActionBar());
 
-        l.setOrientation(LinearLayout.VERTICAL);
-        l.addView(ac.getActionBar());
+        Class<?>[] paramterTypes = m.getParameterTypes();
+        for (Class<?> c : paramterTypes) {
+            EditText editText = new EditText(this.act);
+            editText.setHint("输入参数值");
+            editText.setWidth(lp.width);
+            editTextArrayList.add(editText);
+            typeArrayList.add(c.getCanonicalName());
+            layout.addView(editText);
+        }
+        Button button = new Button(this.act);
+        button.setText("RUN");
+        button.setTextColor(Color.WHITE);
+        button.setWidth(lp.width);
+        button.setBackgroundColor(0xFF2196F3);
+        button.setOnClickListener(v -> {
+            for (int i = 0; i < editTextArrayList.size(); i++) {
+                valueArrayList.add(parseValue(typeArrayList.get(i), editTextArrayList.get(i).
+                        getText().toString()));
+            }
 
-        if (m.getParameterTypes().length > 0) {
-            values = new Object[m.getParameterTypes().length];
-
-            valuesEdit = new EditText[m.getParameterTypes().length];
-            int p = 0;
-            for (Class type : m.getParameterTypes()) {
-                valuesEdit[p] = new EditText(act);
-                valuesEdit[p].setTextColor(Color.RED);
-                valuesEdit[p].setHint(type.getCanonicalName());
-
-                valuesEdit[p].setOnLongClickListener(new Listener(valuesEdit[p]));
-                switch (Objects.requireNonNull(type.getCanonicalName())) {
-                    case "int":
-                        valuesEdit[p].setText("0");
-                        break;
-                    case "boolean":
-
-                        valuesEdit[p].setText("false");
-                        valuesEdit[p].setOnClickListener(new ChooseableListener(valuesEdit[p], new String[]{"true", "false"}));
-                        break;
-                    case "long":
-                        valuesEdit[p].setText("0");
-
-
+            Utils.showToast(act, Arrays.toString(valueArrayList.toArray(new Object[0])),
+                    Toast.LENGTH_SHORT);
+            try {
+                Object result = m.invoke(object, valueArrayList.toArray(new Object[0]));
+                if (result == null) {
+                    Utils.showToast(act, "result is void...", Toast.LENGTH_SHORT);
+                } else {
+                    FieldWindow.newFieldWindow(lpparam, param, act, result, windowManager);
+                    Utils.showToast(act, "result is opened", Toast.LENGTH_SHORT);
                 }
-                l.addView(valuesEdit[p]);
-                p += 1;
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            valueArrayList.clear();
+        });
 
+
+        layout.addView(button);
+        windowManager.addView(layout, layoutParams);
+    }
+
+    private Object parseValue(String clas, String value) {
+        Object result = null;
+        if (value.contains("$st")) {
+            int index = Integer.parseInt(value.substring(3));
+            if (index < MasterUtils.objects.size() - 1 && index > 0)
+                result = MasterUtils.get(index);
+        } else if (value.contains("$sr")) {
+            String key = value.substring(3);
+            if (MasterUtils.hashMap.containsKey(key))
+                result = MasterUtils.hashMap.get(key);
+        } else if (value.contains("$null")) {
+        } else {
+            switch (clas) {
+                case "java.lang.CharSequence":
+                case "java.lang.String":
+                    result = value;
+                    break;
+                case "int":
+                case "java.lang.Integer":
+                    result = Integer.valueOf(value);
+                    break;
+                case "boolean":
+                case "java.lang.Boolean":
+                    result = (value.equals("true") || value.equals("t") || value.equals("1"));
+                    break;
+                case "char":
+                case "java.lang.Character":
+                    result = (char) Integer.parseInt(value);
+                case "byte":
+                case "java.lang.Byte":
+                    result = (byte) Integer.parseInt(value);
+                case "double":
+                case "java.lang.Double":
+                    result = Double.valueOf(value);
+                case "float":
+                case "java.lang.Float":
+                    result = Float.valueOf(value);
             }
         }
-        Button run = new Button(act);
-        run.setText("运行");
-        run.setOnClickListener(p1 -> {
-
-            if (m.getParameterTypes().length > 0)
-                for (int i = 0; i < m.getParameterTypes().length; i += 1) {
-                    Class<?> c = m.getParameterTypes()[i];
-                    String s = valuesEdit[i].getText().toString();
-                    if (s.startsWith("$F")) {
-                        values[i] = MasterUtils.objects.get(Integer.parseInt(s.substring(2)));
-                    } else if (s.equals("$null")) {
-                        values[i] = null;
-                    } else {
-                        switch (Objects.requireNonNull(c.getCanonicalName())) {
-                            case "int":
-
-                                int va = Integer.parseInt(s);
-                                values[i] = va;
-                                break;
-                            case "boolean":
-
-                                if (s.equals("true")) values[i] = true;
-                                else values[i] = false;
-                                break;
-                            case "long":
-                                long lo = Long.parseLong(s);
-                                values[i] = lo;
-                                break;
-                            default:
-                                values[i] = s;
-                        }
-
-                    }
-
-
-                }
-
-            Object result = null;
-            try {
-                result = m.invoke(object, values);
-            } catch (Exception e) {
-                Toast.makeText(act, e.toString(), Toast.LENGTH_SHORT).show();
-            }
-
-            wm.removeView(l);
-            LogUtils.loge("invoke:" + m.getName() + " result:" + result);
-
-            if (result == null) {
-                Toast.makeText(act, "result is null", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(act, result.getClass().getCanonicalName() + " ,正在打开结果,result is" + result, Toast.LENGTH_SHORT).show();
-                FieldWindow.newWindow(lpparam, param, act, result, wm);
-
-
-            }
-        });
-        l.addView(run);
-        lp.width = 400;
-        lp.height = 400;
-        lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        wm.addView(l, lp);
+        return result;
     }
+
 
     //临时变量
     @SuppressLint("SetTextI18n")
