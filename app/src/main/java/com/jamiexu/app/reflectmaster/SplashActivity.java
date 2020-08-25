@@ -1,13 +1,15 @@
 package com.jamiexu.app.reflectmaster;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 
 import cds.sdg.sdf.AdManager;
 import cds.sdg.sdf.nm.cm.ErrorCode;
@@ -16,7 +18,6 @@ import cds.sdg.sdf.nm.sp.SpotListener;
 import cds.sdg.sdf.nm.sp.SpotManager;
 
 public class SplashActivity extends Activity {
-    private Context mContext = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +27,7 @@ public class SplashActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_splash);
 
-        AdManager.getInstance(this).init("06b37aa999cc0e9d", "a7d94676d73d86c2", false);
+        AdManager.getInstance(this).init("06b37aa999cc0e9d", "a7d94676d73d86c2", true);
         setupSplashAd();
     }
 
@@ -35,23 +36,23 @@ public class SplashActivity extends Activity {
      */
     private void setupSplashAd() {
         // 创建开屏容器
-        final RelativeLayout splashLayout = (RelativeLayout) findViewById(R.id.rl_splash);
+        final RelativeLayout splashLayout = findViewById(R.id.rl_splash);
         RelativeLayout.LayoutParams params =
                 new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.addRule(RelativeLayout.ABOVE, R.id.view_divider);
 
         // 对开屏进行设置
         SplashViewSettings splashViewSettings = new SplashViewSettings();
-        		// 设置是否展示失败自动跳转，默认自动跳转
-        		splashViewSettings.setAutoJumpToTargetWhenShowFailed(false);
+        // 设置是否展示失败自动跳转，默认自动跳转
+        splashViewSettings.setAutoJumpToTargetWhenShowFailed(true);
         // 设置跳转的窗口类
         splashViewSettings.setTargetClass(MainActivity.class);
         // 设置开屏的容器
         splashViewSettings.setSplashViewContainer(splashLayout);
 
         // 展示开屏广告
-        SpotManager.getInstance(mContext)
-                .showSplash(mContext, splashViewSettings, new SpotListener() {
+        SpotManager.getInstance(this)
+                .showSplash(this, splashViewSettings, new SpotListener() {
 
                     @Override
                     public void onShowSuccess() {
@@ -98,41 +99,23 @@ public class SplashActivity extends Activity {
     }
 
 
-    /**
-     * 打印调试级别日志
-     *
-     * @param format
-     * @param args
-     */
     protected void logDebug(String format, Object... args) {
         logMessage(Log.DEBUG, format, args);
     }
 
-    /**
-     * 打印信息级别日志
-     *
-     * @param format
-     * @param args
-     */
     protected void logInfo(String format, Object... args) {
         logMessage(Log.INFO, format, args);
     }
 
-    /**
-     * 打印错误级别日志
-     *
-     * @param format
-     * @param args
-     */
     protected void logError(String format, Object... args) {
         logMessage(Log.ERROR, format, args);
     }
 
 
-
     private void logMessage(int level, String format, Object... args) {
         String formattedString = String.format(format, args);
         String TAG = "splash_activity_tag";
+//        Utils.showToast(this,formattedString, Toast.LENGTH_SHORT);
         switch (level) {
             case Log.DEBUG:
                 Log.d(TAG, formattedString);
@@ -149,8 +132,8 @@ public class SplashActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // 开屏展示界面的 onDestroy() 回调方法中调用
-//        SpotManager.getInstance(mContext).onDestroy();
+        SpotManager.getInstance(this).onDestroy();
+        SpotManager.getInstance(this).onAppExit();
     }
 
 }

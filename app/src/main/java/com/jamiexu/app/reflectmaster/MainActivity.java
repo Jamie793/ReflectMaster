@@ -18,12 +18,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-
-import com.jamiexu.app.reflectmaster.j.MasterUtils;
-
-import com.jamiexu.app.reflectmaster.j.reflectmaster.CoreInstall;
-import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
-
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -41,6 +35,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jamiexu.app.reflectmaster.j.MasterUtils;
+import com.jamiexu.app.reflectmaster.j.reflectmaster.CoreInstall;
+import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import com.jamiexu.utils.file.FileUtils;
 import com.jamiexu.utils.file.ZipUtils;
 import com.luajava.LuaException;
@@ -53,6 +50,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import cds.sdg.sdf.AdManager;
+import cds.sdg.sdf.nm.sp.SpotManager;
 import dalvik.system.DexClassLoader;
 
 
