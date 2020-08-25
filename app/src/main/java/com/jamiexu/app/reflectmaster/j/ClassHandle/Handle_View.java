@@ -5,7 +5,7 @@ import android.content.Context;
 
 import com.jamiexu.app.reflectmaster.j.FieldWindow;
 import com.jamiexu.app.reflectmaster.j.WindowUtils;
-import com.jamiexu.utils.ReflectUtils;
+import com.jamiexu.utils.reflect.ReflectUtils;
 
 import android.view.View;
 import android.widget.Button;

@@ -21,54 +21,19 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
     private Context context;
     private WindowManager manager;
     private LinearLayout layout;
-    private LinearLayout buttonLayout;
     private ListView lv;
     private TextView titleview;
     private OnItemClickListener listener;
     private String title;
     private ListAdapter adapter;
     private AdapterView.OnItemLongClickListener onLongClickListener;
-    private boolean isearch;
+    private WindowManager.LayoutParams layoutParam;
 
-
-    public WindowList(Context context, WindowManager manager, boolean isearch) {
-        this.context = context;
-        this.manager = manager;
-        this.isearch = isearch;
-        layoutParam = new WindowManager.LayoutParams();
-        layoutParam.x = 0;
-        layoutParam.y = 0;
-        layoutParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        layoutParam.type = WindowManager.LayoutParams.TYPE_APPLICATION;
-
-        layout = new LinearLayout(context);
-        layout.setBackgroundColor(Color.DKGRAY);
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-
-        ActionWindow ar = new ActionWindow(context, manager, layoutParam, layout);
-        layout.addView(ar.getActionBar());
-        titleview = new TextView(context);
-        titleview.setTextColor(Color.WHITE);
-        layout.addView(titleview);
-
-        buttonLayout = new LinearLayout(context);
-        buttonLayout.setOrientation(LinearLayout.VERTICAL);
-        layout.addView(buttonLayout);
-
-        lv = new ListView(context);
-        lv.setFastScrollEnabled(true);
-        lv.setOnItemClickListener(this);
-        lv.setOnItemLongClickListener(this);
-        layout.addView(lv);
-
-    }
 
 
     public WindowList(Context context, WindowManager manager) {
         this.context = context;
         this.manager = manager;
-        this.isearch = isearch;
         layoutParam = new WindowManager.LayoutParams();
         layoutParam.x = 0;
         layoutParam.y = 0;
@@ -86,7 +51,7 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         titleview.setTextColor(Color.WHITE);
         layout.addView(titleview);
 
-        buttonLayout = new LinearLayout(context);
+        LinearLayout buttonLayout = new LinearLayout(context);
         buttonLayout.setOrientation(LinearLayout.VERTICAL);
         layout.addView(buttonLayout);
 
@@ -120,7 +85,6 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         show(500, 500);
     }
 
-    WindowManager.LayoutParams layoutParam;
 
     public void show(int w, int h) {
         layoutParam.width = w;

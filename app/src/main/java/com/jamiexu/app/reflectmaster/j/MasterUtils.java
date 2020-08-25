@@ -36,7 +36,7 @@ public class MasterUtils {
             Toast.makeText(context, "添加到临时存储器v" + p + "成功！", Toast.LENGTH_SHORT).show();
     }
 
-    public static void add(Context context, String name, Object obj) {
+    private static void add(Context context, String name, Object obj) {
         if (hashMap.containsKey(name))
             if (context != null) {
                 Toast.makeText(context, "添加失败，寄存器名称已存在", Toast.LENGTH_SHORT).show();
@@ -46,50 +46,15 @@ public class MasterUtils {
         hashMap.put(name, obj);
         if (context != null)
             Toast.makeText(context, "添加到临时存储器：" + name + " 成功！", Toast.LENGTH_SHORT).show();
-
-//        File file = new File(MainActivity.BASE_PATH + "objs/" + HOnCreate.lpparam.packageName + ".obj");
-//        if (!file.getParentFile().exists())
-//            file.getParentFile().mkdir();
-//        try {
-//            Gson gson = new Gson();
-//            gson.toJson(hashMap);
-//            gson.toString();
-//            FileUtils.putString(file.toString(),gson.toString());
-//            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file));
-//            objectOutputStream.writeObject(hashMap);
-//            objectOutputStream.flush();
-//            objectOutputStream.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
-
-//    public static void loadObjects(String packageName) {
-//        File file = new File(MainActivity.BASE_PATH + "objs/" + packageName + ".obj");
-//        if (!file.exists())
-//            return;
-//
-//        Gson gson = new Gson();
-//        hashMap = gson.fromJson(FileUtils.getString(file.toString()),HashMap.class);
-//
-////        try {
-////            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
-////            Object o = objectInputStream.readObject();
-////            hashMap = (HashMap<String, Object>) o;
-////            XposedBridge.log("反序列化" + hashMap);
-////            objectInputStream.close();
-////        } catch (IOException | ClassNotFoundException e) {
-////            e.printStackTrace();
-////        }
-//    }
 
     public static Object get(int i) {
         return objects.get(i);
     }
 
 
-    public static void addHashMap(Context context,Object o) {
+    public static void addHashMap(Context context, Object o) {
         EditText editText = new EditText(context);
         editText.setHint("保存的名称");
         new AlertDialog.Builder(context)
@@ -120,38 +85,21 @@ public class MasterUtils {
 
 
     public static String getObjectString(Object obj) {
-
         String result = null;
-
         if (obj != null) {
             String clz = obj.getClass().getCanonicalName();
-
             if (clz != null)
                 switch (clz) {
                     case "java.lang.String":
-                        result = (String) obj;
-                        break;
                     case "java.lang.Boolean":
-                        result = String.valueOf((Boolean) obj);
-                        break;
                     case "java.lang.Integer":
-                        result = String.valueOf((Integer) obj);
-                        break;
                     case "java.lang.Long":
-                        result = String.valueOf((Long) obj);
-                        break;
                     case "java.lang.Short":
-                        result = String.valueOf((Short) obj);
-                        break;
                     case "java.lang.Character":
-
-                        result = String.valueOf((Character) obj);
-                        break;
+                    case "char":
                     case "byte":
-                        result = String.valueOf((Byte) obj);
-
+                        result = obj + "";
                         break;
-
                     default:
                         if (obj instanceof TextView) {
                             result = ((TextView) obj).getText().toString();
@@ -159,20 +107,10 @@ public class MasterUtils {
                             result = ((Button) obj).getText().toString();
                         } else if (obj instanceof EditText) {
                             result = ((EditText) obj).getText().toString();
-                        } else if (obj instanceof ArrayList) {
-                            ArrayList li = (ArrayList) obj;
-                            result = "" + li.size();
-                            if (li.size() > 0) result += "," + li.get(0);
-                        } else if (obj instanceof List) {
-                            List li = (List) obj;
-                            result = "" + li.size();
-                            if (li.size() > 0) result += "," + li.get(0);
                         }
                 }
-
         } else
             result = "null";
-        if (result == null) return "";
         return result;
     }
 

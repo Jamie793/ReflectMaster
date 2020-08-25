@@ -85,7 +85,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
     public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
 
         WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
-        WindowList wlist = new WindowList(act, am, false);
+        WindowList wlist = new WindowList(act, am);
         wlist.setTitle("变量操作");
         wlist.setItems(new String[]{"编辑", "临时保存起来", "添加到寄存器", "复制变量名称", "复制类名和变量名称", "复制变量名称和类型"/*,"持久化修改(构造函数后使用while(true)不断修改}"*/});
         wlist.setListener((adap, view, posi, l) -> {
@@ -399,26 +399,24 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         editText.setTextSize(14);
         editText.setWidth(layout.getWidth());
         editText.setHintTextColor(Color.WHITE);
-        editText.addTextChangedListener(new
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                                                TextWatcher() {
-                                                    @Override
-                                                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-                                                    }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 0)
+                    listView.clearTextFilter();
+                listView.setFilterText(s.toString());
+            }
 
-                                                    @Override
-                                                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                                        if (s.length() == 0)
-                                                            listView.clearTextFilter();
-                                                        listView.setFilterText(s.toString());
-                                                    }
+            @Override
+            public void afterTextChanged(Editable s) {
 
-                                                    @Override
-                                                    public void afterTextChanged(Editable s) {
-
-                                                    }
-                                                });
+            }
+        });
         layout.addView(editText);
 
 
@@ -491,7 +489,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
             }
 
         }
-        WindowList listView = new WindowList(act, this.windowManager, false);
+        WindowList listView = new WindowList(act, this.windowManager);
         listView.setItems(names);
         listView.setTitle("    Lua脚本");
         listView.setListener((adapterView, view, i, l) -> {

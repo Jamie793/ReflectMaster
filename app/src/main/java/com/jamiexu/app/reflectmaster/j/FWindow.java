@@ -12,15 +12,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Environment;
-import com.jamiexu.app.reflectmaster.j.Adapter.ObjectAdapter;
-import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
-import com.jamiexu.app.reflectmaster.j.widget.ViewLineClickListener;
-import com.jamiexu.app.reflectmaster.j.widget.ViewLineView;
-import com.jamiexu.app.reflectmaster.j.widget.WindowList;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -31,7 +24,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Method;
+import com.jamiexu.app.reflectmaster.j.Adapter.ObjectAdapter;
+import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
+import com.jamiexu.app.reflectmaster.j.widget.ViewLineClickListener;
+import com.jamiexu.app.reflectmaster.j.widget.ViewLineView;
+import com.jamiexu.app.reflectmaster.j.widget.WindowList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,51 +38,30 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class FWindow {
 
-    private XC_LoadPackage.LoadPackageParam lpparam;
-    private XC_MethodHook.MethodHookParam param;
-    private Context act;
-    private Object obj;
-    private int startX = 0, startY = 0, nowX = 0, nowY = 0;
-    private LinearLayout layout;
-    private WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams();
+    private Object object;
     private View floating;
-    private WindowManager wm;
+    private Context activity;
+    private LinearLayout layout;
     private boolean isMenu = true;
+    private WindowManager windowManager;
+    private XC_MethodHook.MethodHookParam param;
+    private XC_LoadPackage.LoadPackageParam lpparam;
+    private int startX = 0, startY = 0, nowX = 0, nowY = 0;
+    private WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams();
 
 
     public FWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam method) {
-        if (!MasterUtils.isFloating) return;
-        this.lpparam = lpparam;
-        this.param = method;
-        act = (Context) method.thisObject;
-        obj = act;
-        init();
+        this(lpparam, method, null);
     }
 
-//    public FWindow(Context activity, Dialog dialog) {
-//        if (!MasterUtils.isFloating) return;
-//        act = activity;
-//        obj = act;
-//        this.dialog = dialog;
-//        if (dialog != null)
-//            Toast.makeText(act, "创建Dialog窗口", Toast.LENGTH_SHORT).show();
-//        else
-//            Toast.makeText(act, "创建测试窗口", Toast.LENGTH_SHORT).show();
-//
-//        init();
-//    }
-
-    public FWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam method, Object object) {
+    public FWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam method, Activity activity) {
         if (!MasterUtils.isFloating) return;
         this.lpparam = lpparam;
         this.param = method;
-        try {
-            Method getActivity = (object.getClass().getDeclaredMethod("getActivity", new Class[]{}));
-            this.act = (Activity) getActivity.invoke(object, new Object[]{});
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (activity != null) {
+            this.activity = activity;
+            this.object = activity;
         }
-        this.obj = object;
         init();
     }
 
@@ -96,17 +73,10 @@ public class FWindow {
         return button;
     }
 
-    private void getscreensize(WindowManager.LayoutParams lp) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(displayMetrics);
-        lp.width = displayMetrics.widthPixels / 2;
-        lp.height = (displayMetrics.heightPixels / 4) * 3;
-    }
-
 
     @SuppressLint("SetTextI18n")
     private void init() {
-        wm = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+        this.windowManager = (WindowManager) this.activity.getSystemService(Context.WINDOW_SERVICE);
         layoutParam.width = 500;
         layoutParam.height = 500;
         layoutParam.x = 0;
@@ -114,64 +84,56 @@ public class FWindow {
         layoutParam.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         layoutParam.type = WindowManager.LayoutParams.TYPE_APPLICATION;
         layoutParam.format = PixelFormat.RGBA_8888;
-//
-//
-        layout = new LinearLayout(act);
+
+        layout = new LinearLayout(this.activity);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setBackgroundColor(Color.rgb(255, 250, 250));
 
-        TextView text = new TextView(act);
+        TextView text = new TextView(this.activity);
         layout.addView(text);
-        text.setText(act.getClass().getName());
-        text.setOnClickListener((v) -> Utils.writeClipboard(act, text.getText().toString()));
+        text.setText(this.activity.getClass().getName());
+        text.setOnClickListener((v) -> Utils.writeClipboard(this.activity, text.getText().toString()));
         text.setTextColor(Color.BLACK);
         text.setOnClickListener(p1 -> {
             showActivity();
         });
 
-        Button field = newButton(act);
-
-        field.setText("当前Activity");
-
+        Button field = newButton(this.activity);
+        field.setText("Current Activity");
         layout.addView(field);
         field.setOnClickListener(p1 -> {
-            FieldWindow fw = new FieldWindow(lpparam, param, act, obj);
-            fw.show(wm, layoutParam);
+            FieldWindow fw = new FieldWindow(lpparam, param, this.activity, this.object);
+            fw.show(this.windowManager, layoutParam);
         });
 
 
-        Button res = newButton(act);
-
-        res.setText("View获取(子)");
-
+        Button res = newButton(this.activity);
+        res.setText("View views");
         layout.addView(res);
         res.setOnClickListener(p1 -> {
-            wm.removeView(layout);
+            this.windowManager.removeView(layout);
             loadViews(false);
         });
 
-        Button hide = newButton(act);
-        hide.setText("隐藏");
+        Button hide = newButton(this.activity);
+        hide.setText("Hide");
         layout.addView(hide);
         hide.setOnClickListener(p1 -> swicthWindow(false));
 
-        Button exit = newButton(act);
-
-        exit.setText("退出");
-
+        Button exit = newButton(this.activity);
+        exit.setText("Exit");
         layout.addView(exit);
         exit.setOnClickListener(p1 -> swicthWindow(true));
 
         swicthWindow(false);
-
     }
 
     private void showActivity() {
-        final SharedPreferences sp = act.getSharedPreferences("actlast", act.MODE_PRIVATE);
+        final SharedPreferences sp = this.activity.getSharedPreferences("actlast", Context.MODE_PRIVATE);
 
-        PackageManager pm = act.getPackageManager();
+        PackageManager pm = this.activity.getPackageManager();
         try {
-            PackageInfo info = pm.getPackageInfo(act.getPackageName(), pm.GET_ACTIVITIES);
+            PackageInfo info = pm.getPackageInfo(this.activity.getPackageName(), PackageManager.GET_ACTIVITIES);
 
             ActivityInfo[] acs = info.activities;
             List<String> name = new ArrayList<String>();
@@ -187,7 +149,7 @@ public class FWindow {
                 }
                 aname.add(actname);
                 if (id != 0) {
-                    String labei = act.getResources().getString(id);
+                    String labei = this.activity.getResources().getString(id);
                     name.add(labei);
                 } else {
                     name.add(actname);
@@ -195,16 +157,16 @@ public class FWindow {
             }
             int lastClick = -1;
             lastClick = sp.getInt("select", -1);
-            WindowList wlist = new WindowList(act, wm);
+            WindowList wlist = new WindowList(this.activity, this.windowManager);
             wlist.setItems(name);
             wlist.setTitle("Activity启动");
             wlist.setListener((p1, p2, p3, p4) -> {
                 sp.edit().putInt("select", p3).apply();
                 try {
-                    Intent i = new Intent(act, act.getClassLoader().loadClass(aname.get(p3)));
-                    act.startActivity(i);
+                    Intent i = new Intent(this.activity, this.activity.getClassLoader().loadClass(aname.get(p3)));
+                    this.activity.startActivity(i);
                 } catch (ClassNotFoundException e) {
-                    Toast.makeText(act, e.toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this.activity, e.toString(), Toast.LENGTH_LONG).show();
                 }
             });
             wlist.show();
@@ -213,25 +175,26 @@ public class FWindow {
             }
 
         } catch (PackageManager.NameNotFoundException e) {
-            Toast.makeText(act, e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this.activity, e.toString(), Toast.LENGTH_LONG).show();
 
         }
 
 
     }
 
-    private void showObjects(String title, final List<Object> obs) {
-        if (obs.size() == 0) {
-            Toast.makeText(act, "没有对象。", Toast.LENGTH_SHORT).show();
+    private void showObjects(final List<View> views) {
+        if (views.size() == 0) {
+            Toast.makeText(this.activity, "Nothing", Toast.LENGTH_SHORT).show();
             return;
         }
-        WindowList wlist = new WindowList(act, wm);
-        ObjectAdapter oba = new ObjectAdapter(act, obs);
-
-        //wlist.setItems(names);
-        wlist.setAdaptet(oba);
-        wlist.setTitle(title);
-        wlist.setListener((p1, p2, p3, p4) -> FieldWindow.newWindow(lpparam, param, act, obs.get(p3), wm));
+        WindowList wlist = new WindowList(this.activity, this.windowManager);
+        ObjectAdapter objectAdapter = new ObjectAdapter(this.activity, views);
+        wlist.setAdaptet(objectAdapter);
+        wlist.setTitle("   Tap Views");
+        wlist.getListView().setDividerHeight(15);
+        wlist.setListener((p1, p2, p3, p4) ->
+                FieldWindow.newWindow(lpparam, param, this.activity, views.get(p3),
+                        this.windowManager));
         wlist.show(-2, -2);
 
     }
@@ -239,12 +202,12 @@ public class FWindow {
     private void swicthWindow(boolean isExit) {
         if (isMenu) {
             if (floating != null)
-                wm.removeView(layout);
+                this.windowManager.removeView(layout);
             layoutParam.width = 100;
             layoutParam.height = 100;
             if (!isExit) {
                 if (floating == null) {
-                    ImageView imageView = new ImageView(act);
+                    ImageView imageView = new ImageView(this.activity);
                     imageView.setImageBitmap(BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/icon.png"));
                     floating = imageView;
                     floating.setOnTouchListener(new OnTouchListener() {
@@ -266,7 +229,7 @@ public class FWindow {
                                     nowY = (int) p2.getRawY();
                                     layoutParam.x += nowX - startX;
                                     layoutParam.y += nowY - startY;
-                                    wm.updateViewLayout(floating, layoutParam);
+                                    windowManager.updateViewLayout(floating, layoutParam);
                                     startX = nowX;
                                     startY = nowY;
                                     break;
@@ -284,16 +247,16 @@ public class FWindow {
                     });
 
                 }
-                wm.addView(floating, layoutParam);
+                this.windowManager.addView(floating, layoutParam);
             }
             isMenu = false;
         } else {
             if (floating != null)
-                wm.removeView(floating);
+                this.windowManager.removeView(floating);
             layoutParam.width = 400;
             layoutParam.height = -2;
             if (!isExit)
-                wm.addView(layout, layoutParam);
+                this.windowManager.addView(layout, layoutParam);
             isMenu = true;
         }
     }
@@ -302,7 +265,7 @@ public class FWindow {
     private void showViewsLine(Window window, boolean includeViewGroup) {
         List<View> list = getAllChildViews(window.getDecorView());
         for (int i = 0; i < list.size(); i += 1) {
-            if (includeViewGroup == true)
+            if (includeViewGroup)
                 if (list.get(i) instanceof ViewGroup) {
                     list.remove(i);
                     i = 0;
@@ -310,32 +273,27 @@ public class FWindow {
         }
 
         final WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.type = lp.TYPE_APPLICATION;
-        lp.flags = lp.FLAG_NOT_FOCUSABLE;
+        lp.type = WindowManager.LayoutParams.TYPE_APPLICATION;
+        lp.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         lp.width = -1;
         lp.height = -1;
 
         lp.format = PixelFormat.RGBA_8888;
 
-        final ViewLineView vlv = new ViewLineView(act, list);
-        vlv.setListener(new ViewLineClickListener() {
-
+        final ViewLineView vlv = new ViewLineView(this.activity, list, new ViewLineClickListener() {
             @Override
             public void onClick(ViewLineView obj, List<View> views) {
-                List<Object> r = new ArrayList<>();
-                for (View view : views) r.add(view);
-                showObjects("点击范围内的views", r);
+                showObjects(views);
             }
-
 
             @Override
             public void onLongClick(ViewLineView obj) {
-                wm.removeView(vlv);
-                wm.addView(layout, layoutParam);
+                windowManager.removeView(obj);
+                windowManager.addView(layout, layoutParam);
             }
         });
 
-        wm.addView(vlv, lp);
+        this.windowManager.addView(vlv, lp);
     }
 
     private List<View> getAllChildViews(View view) {
@@ -344,7 +302,6 @@ public class FWindow {
             ViewGroup vp = (ViewGroup) view;
             for (int i = 0; i < vp.getChildCount(); i++) {
                 View viewchild = vp.getChildAt(i);
-
                 allchildren.add(viewchild);
                 //再次 调用本身（递归）
                 allchildren.addAll(getAllChildViews(viewchild));

@@ -22,7 +22,6 @@ import android.widget.Toast;
 import com.jamiexu.app.reflectmaster.j.Adapter.MethodAdapter;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
-import com.jamiexu.utils.ReflectUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ public class MethodWindow extends Window implements OnItemClickListener {
     @Override
     public void onItemClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
         WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
-        WindowList wlist = new WindowList(act, am, false);
+        WindowList wlist = new WindowList(act, am);
         wlist.setTitle("方法操作");
         wlist.setItems(new String[]{"运行", "临时保存起来", "添加到寄存器", "复制函数名称", "复制类名和函数名", "复制类和函数名(hook脚本使用)"});
         wlist.setListener((adap, view, posi, l) -> {

@@ -2,7 +2,15 @@ package com.jamiexu.app.reflectmaster.j;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.system.Os;
 import android.view.KeyEvent;
+
+import com.jamiexu.app.reflectmaster.MainActivity;
+import com.jamiexu.utils.file.FileUtils;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -37,7 +45,20 @@ public class Entry implements IXposedHookLoadPackage {
             return;
         }
 
-//        MasterUtils.loadObjects(lpparam.packageName);
+
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            try {
+                PrintWriter printWriter = new PrintWriter(new FileOutputStream(MainActivity.BASE_PATH + "error.log"));
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                printWriter.close();
+                XposedBridge.log("ReflectMasterCrashError=>" + FileUtils.getString(MainActivity.BASE_PATH + "error.log"));
+                System.exit(0);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+
+        });
 
         MasterUtils.isFloating = sharedPreferences.getBoolean("float", true);
         MasterUtils.newThread = sharedPreferences.getBoolean("newthread", false);

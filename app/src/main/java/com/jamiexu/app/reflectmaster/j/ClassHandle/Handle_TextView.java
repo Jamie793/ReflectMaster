@@ -42,10 +42,8 @@ public class Handle_TextView extends ClassHandle {
         if (s.length() > 50) s = s.substring(25);
         Button button = new Button(context);
         button.setText("Copy text");
-        button.setTextColor(Color.RED);
         button.setOnClickListener(p1 -> {
             Utils.writeClipboard(this.context, text.getText().toString());
-            Toast.makeText(context, "复制成功:" + text.getText().toString(), Toast.LENGTH_SHORT).show();
         });
 
         layout.addView(button);

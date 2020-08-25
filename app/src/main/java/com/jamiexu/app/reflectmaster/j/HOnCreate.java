@@ -3,6 +3,7 @@ package com.jamiexu.app.reflectmaster.j;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.widget.Toast;
 
 import com.jamiexu.app.reflectmaster.LuaDexLoaders;
 import com.jamiexu.app.reflectmaster.Utils.Utils;
@@ -45,7 +46,6 @@ public class HOnCreate extends XC_MethodHook {
         if (luaDexLoader == null)
             luaDexLoader = new LuaDexLoaders((Context) param.thisObject);
 
-
         String luajavaPath = ((Context) param.thisObject).getApplicationInfo().dataDir + "/app_lib";
 
         String cpu = com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils.getCpu();
@@ -54,7 +54,7 @@ public class HOnCreate extends XC_MethodHook {
         Utils.setLuaJavaSoPath(luajavaPath + "/libJamieReflectMasterluajava.so");
         MasterUtils.nowAct = (Activity) param.thisObject;
 
-        FWindow jf = new FWindow(lpparam, param);
+        FWindow jf = new FWindow(lpparam, param, (Activity) param.thisObject);
         if (!Entry.isFirst) {
             initLua((Context) param.thisObject, lpparam.packageName, jf);
         }
