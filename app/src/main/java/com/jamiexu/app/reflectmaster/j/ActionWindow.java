@@ -44,20 +44,20 @@ public class ActionWindow {
         this.contain = new LinearLayout(context);
 
         Button test = new Button(context);
-        test.setText("Zoom");
+        test.setText("Z");
         test.setTextColor(0xFFFFFFFF);
         test.setOnTouchListener(new ResizsListener(false));
         test.setBackground(null);
 
         Button close = new Button(context);
-        close.setText("close");
+        close.setText("C");
         close.setTextColor(0xFFFFFFFF);
         close.setOnClickListener(p1 -> manager.removeView(view));
         close.setBackground(null);
 
 
         Button move = new Button(context);
-        move.setText("Drag");
+        move.setText("D");
         move.setTextColor(0xFFFFFFFF);
         move.setBackground(null);
 

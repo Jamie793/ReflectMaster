@@ -41,7 +41,7 @@ public class TextAdapter extends BaseAdapter {
     @Override
     public View getView(int p1, View p2, ViewGroup p3) {
         TextView tv = new TextView(context);
-        tv.setHeight(60);
+//        tv.setHeight(60);
         tv.setTextSize(16);
         tv.setGravity(Gravity.CENTER | Gravity.LEFT);
         tv.setText("  " + items[p1]);

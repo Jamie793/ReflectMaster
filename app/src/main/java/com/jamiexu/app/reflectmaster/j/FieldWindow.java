@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -19,6 +20,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,12 +28,14 @@ import com.jamiexu.app.reflectmaster.LuaDexLoaders;
 import com.jamiexu.app.reflectmaster.MainActivity;
 import com.jamiexu.app.reflectmaster.factory.LuaExecutorFactory;
 import com.jamiexu.app.reflectmaster.j.Adapter.FieldAdapter;
+import com.jamiexu.app.reflectmaster.j.Adapter.RegisterAdapter;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ArrayList;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ImageView;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_Set;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_TextView;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_View;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ViewGroup;
+import com.jamiexu.app.reflectmaster.j.Data.ReflectData;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
 import com.jamiexu.app.reflectmaster.j.widget.SaveFileDialog;
 import com.jamiexu.app.reflectmaster.j.widget.WindowList;
@@ -80,59 +84,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         this.luaDexLoader = new LuaDexLoaders(act);
     }
 
-    @Override
-    public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
-
-        WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
-        WindowList wlist = new WindowList(act, am);
-        wlist.setTitle("变量操作");
-        wlist.setItems(new String[]{"编辑", "临时保存起来", "添加到寄存器", "复制变量名称", "复制类名和变量名称", "复制变量名称和类型"/*,"持久化修改(构造函数后使用while(true)不断修改}"*/});
-        wlist.setListener((adap, view, posi, l) -> {
-
-            Field m = (Field) p1.getItemAtPosition(p3);
-            if (posi == 0) {
-                if (!m.isAccessible()) m.setAccessible(true);
-                EditFieldWindow ew = new EditFieldWindow(lpparam, param, act, object, fields[p3]);
-                ew.show(this.windowManager, this.layoutParams);
-            } else if (posi == 1) {
-                m.setAccessible(true);
-                MasterUtils.add(act, m);
-            } else if (posi == 2) {
-                m.setAccessible(true);
-                MasterUtils.addHashMap(act, m);
-            } else if (posi == 3) {
-                Utils.writeClipboard(act, m.toGenericString());
-                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
-            } else if (posi == 4) {
-                String s = m.getName() + " " + m.getType().getName();
-                Utils.writeClipboard(act, s);
-                Toast.makeText(act, "复制成功:" + s, Toast.LENGTH_SHORT).show();
-            } else {
-                Utils.writeClipboard(act, m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'");
-                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
-            }
-
-        });
-        wlist.show();
-
-
-        return true;
-    }
-
-
-    @Override
-    public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
-        try {
-            newWindow(lpparam, param, act, ((Field) p1.getItemAtPosition(p3)).get(object), this.windowManager);
-
-
-        } catch (Exception e) {
-            Toast.makeText(act, e.toString(), Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-
     public static void newWindow(final XC_LoadPackage.LoadPackageParam lpparam, final XC_MethodHook.MethodHookParam param, final Context act, final Object object, final WindowManager wm) {
 
         try {
@@ -177,6 +128,7 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
     }
 
+
     @SuppressLint("ShowToast")
     public static void newFieldWindow(XC_LoadPackage.LoadPackageParam lpparam, XC_MethodHook.MethodHookParam param, Context act, Object object, WindowManager wm) {
         final WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
@@ -191,7 +143,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         }
     }
 
-
     @SuppressLint("SetTextI18n")
     @Override
     public void show(final WindowManager amanager, final WindowManager.LayoutParams lpp) {
@@ -202,9 +153,72 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
         final LinearLayout layout = new LinearLayout(act);
         layout.setBackgroundColor(0xFF303030);
-        final ActionWindow actionWindow = new ActionWindow(act, this.windowManager, this.layoutParams, layout);
         layout.setOrientation(LinearLayout.VERTICAL);
+
+        final ActionWindow actionWindow = new ActionWindow(act, this.windowManager, this.layoutParams, layout);
         layout.addView(actionWindow.getActionBar());
+
+
+        Button menuButton = new Button(this.act);
+        PopupMenu popupMenu = new PopupMenu(this.act, menuButton);
+        Menu menu = popupMenu.getMenu();
+        menu.add("STL");
+        menu.add("SRL");
+        menuButton.setTextColor(Color.WHITE);
+        menuButton.setText("M");
+        menuButton.setBackground(null);
+        menuButton.setOnClickListener((v) -> {
+            popupMenu.show();
+        });
+        popupMenu.setOnMenuItemClickListener(item -> {
+            WindowList windowList = new WindowList(act, windowManager);
+            RegisterAdapter registerAdapter = null;
+            windowList.getListView().setDividerHeight(10);
+            switch (item.getTitle().toString()) {
+                case "STL":
+                    windowList.setTitle("   TemporaryRegister Len:" + MasterUtils.objects.size());
+                    registerAdapter = new RegisterAdapter(act, MasterUtils.objects);
+                    windowList.setAdaptet(registerAdapter);
+                    break;
+                case "SRL":
+                    windowList.setTitle("   HashRegister Len:" + MasterUtils.hashMap.size());
+                    registerAdapter = new RegisterAdapter(act, MasterUtils.hashMap);
+                    windowList.setAdaptet(registerAdapter);
+                    break;
+            }
+            RegisterAdapter finalRegisterAdapter = registerAdapter;
+            windowList.setListener((parent, view, position, id) -> {
+                assert finalRegisterAdapter != null;
+                Object dataItem = finalRegisterAdapter.getItem(position);
+                if (dataItem instanceof String) {
+                    ReflectData reflectData = MasterUtils.hashMap.get(dataItem);
+                    FieldWindow.newWindow(null, null, reflectData.getContext(),
+                            reflectData.getObject(), windowManager);
+                } else {
+                    ReflectData reflectData = MasterUtils.objects.get(position);
+                    FieldWindow.newWindow(null, null, reflectData.getContext(),
+                            reflectData.getObject(), windowManager);
+                }
+            });
+            windowList.setOnItemLongClickListener((parent, view, position, id) -> {
+                assert finalRegisterAdapter != null;
+                Object dataItem = finalRegisterAdapter.getItem(position);
+                if (dataItem instanceof String) {
+                    MasterUtils.hashMap.remove(dataItem);
+                    windowList.setTitle("   HashRegister Len:" + MasterUtils.hashMap.size());
+                    finalRegisterAdapter.setItems(MasterUtils.hashMap);
+                } else {
+                    MasterUtils.objects.remove(position);
+                    windowList.setTitle("   TemporaryRegister Len:" + MasterUtils.objects.size());
+                    finalRegisterAdapter.setItems(MasterUtils.objects);
+                }
+                finalRegisterAdapter.refreshData();
+                return true;
+            });
+            windowList.show();
+            return true;
+        });
+        actionWindow.addView(menuButton);
 
 
         this.undeclared = new Button(act);
@@ -387,7 +401,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         ho.addView(buttonLayout);
         layout.addView(ho);
 
-
         EditText editText = new EditText(act);
         editText.setHint("Filter fields...");
         editText.setTextSize(14);
@@ -502,12 +515,61 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
 
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4) {
+        try {
+            newWindow(lpparam, param, act, ((Field) p1.getItemAtPosition(p3)).get(object), this.windowManager);
+
+
+        } catch (Exception e) {
+            Toast.makeText(act, e.toString(), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public boolean onItemLongClick(final AdapterView<?> p1, View p2, final int p3, long p4) {
+
+        WindowManager am = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+        WindowList wlist = new WindowList(act, am);
+        wlist.setTitle("变量操作");
+        wlist.setItems(new String[]{"编辑", "临时保存起来", "添加到寄存器", "复制变量名称", "复制类名和变量名称", "复制变量名称和类型"/*,"持久化修改(构造函数后使用while(true)不断修改}"*/});
+        wlist.setListener((adap, view, posi, l) -> {
+
+            Field m = (Field) p1.getItemAtPosition(p3);
+            if (posi == 0) {
+                if (!m.isAccessible()) m.setAccessible(true);
+                EditFieldWindow ew = new EditFieldWindow(lpparam, param, act, object, fields[p3]);
+                ew.show(this.windowManager, this.layoutParams);
+            } else if (posi == 1) {
+                m.setAccessible(true);
+                MasterUtils.add(act, m);
+            } else if (posi == 2) {
+                m.setAccessible(true);
+                MasterUtils.addHashMap(act, m);
+            } else if (posi == 3) {
+                Utils.writeClipboard(act, m.toGenericString());
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
+            } else if (posi == 4) {
+                String s = m.getName() + " " + m.getType().getName();
+                Utils.writeClipboard(act, s);
+                Toast.makeText(act, "复制成功:" + s, Toast.LENGTH_SHORT).show();
+            } else {
+                Utils.writeClipboard(act, m.getDeclaringClass().getCanonicalName() + "'," + "'" + m.toGenericString() + "'");
+                Toast.makeText(act, "复制成功:" + m.toGenericString(), Toast.LENGTH_SHORT).show();
+            }
+
+        });
+        wlist.show();
+
+
+        return true;
+    }
 
     public ArrayList<ClassLoader> getClassLoaders() {
         // TODO: Implement this method
         return luaDexLoader.getClassLoaders();
     }
-
 
     public HashMap<String, String> getLibrarys() {
         return luaDexLoader.getLibrarys();

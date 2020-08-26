@@ -2,8 +2,6 @@ package com.jamiexu.app.reflectmaster.j.widget;
 
 import android.content.Context;
 import android.graphics.Color;
-import com.jamiexu.app.reflectmaster.j.ActionWindow;
-import com.jamiexu.app.reflectmaster.j.Adapter.TextAdapter;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -13,7 +11,14 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.jamiexu.app.reflectmaster.j.ActionWindow;
+import com.jamiexu.app.reflectmaster.j.Adapter.TextAdapter;
+import com.jamiexu.app.reflectmaster.j.Data.ReflectData;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WindowList implements OnItemClickListener, AdapterView.OnItemLongClickListener {
 
@@ -28,7 +33,6 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
     private ListAdapter adapter;
     private AdapterView.OnItemLongClickListener onLongClickListener;
     private WindowManager.LayoutParams layoutParam;
-
 
 
     public WindowList(Context context, WindowManager manager) {
@@ -75,6 +79,24 @@ public class WindowList implements OnItemClickListener, AdapterView.OnItemLongCl
         TextAdapter ta = new TextAdapter(context, items);
         setAdaptet(ta);
     }
+
+    public void setItmes(ArrayList<ReflectData> objectArrayList) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (ReflectData reflectData : objectArrayList) {
+            arrayList.add(reflectData.getObject() + "");
+        }
+        setItems(arrayList.toArray(new String[0]));
+    }
+
+    public void setItmes(HashMap<String, ReflectData> reflectDataHashMap) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (Map.Entry<String, ReflectData> reflectDataEntry : reflectDataHashMap.entrySet()) {
+            arrayList.add("Name:" + reflectDataEntry.getKey() + "\nValue:" + reflectDataEntry.
+                    getValue().getObject() + "");
+        }
+        setItems(arrayList.toArray(new String[0]));
+    }
+
 
     public void setItems(List<String> items) {
         setItems(items.toArray(new String[0]));

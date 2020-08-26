@@ -20,13 +20,13 @@ import java.util.Objects;
 
 public class MasterUtils {
 
-    //  Update by Jamiexu 2020-08-25
+    //  Update by Jamiexu in 2020-08-25
 
 
     @SuppressLint("StaticFieldLeak")
     public static Activity nowAct;
     public static boolean isFloating = true, newThread = false;
-    public static List<ReflectData> objects = new ArrayList<>();
+    public static ArrayList<ReflectData> objects = new ArrayList<>();
     public static HashMap<String, ReflectData> hashMap = new HashMap<>();
     public static List<Object> serviceobjects = new ArrayList<>();
 
