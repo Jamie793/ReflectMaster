@@ -1,0 +1,43 @@
+{
+  "stringTable": {
+    "0": "E:/Programing/As/ReflectMaster/app/.cxx/cmake/release/x86",
+    "1": "--target=i686-none-linux-android22 --gcc-toolchain=E:/AndroidSDK/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=E:/AndroidSDK/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DJ_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O2 -DNDEBUG -fPIC"
+  },
+  "buildFiles": [
+    "E:\\AndroidSDK\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
+    "E:\\AndroidSDK\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+    "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86\" clean"
+  ],
+  "buildTargetsCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "J-Release-x86": {
+      "buildCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86\" J",
+      "buildType": "release",
+      "toolchain": "804634073",
+      "abi": "x86",
+      "artifactName": "J",
+      "files": [
+        {
+          "src": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\J.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "E:\\Programing\\As\\ReflectMaster\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libJ.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "804634073": {
+      "cppCompilerExecutable": "E:\\AndroidSDK\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

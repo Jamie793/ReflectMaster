@@ -1,0 +1,7 @@
+[
+{
+  "directory": "E:/Programing/As/ReflectMaster/app/.cxx/cmake/release/armeabi-v7a",
+  "command": "E:\\AndroidSDK\\ndk\\21.0.6113669\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=armv7-none-linux-androideabi22 --gcc-toolchain=E:/AndroidSDK/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=E:/AndroidSDK/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot  -DJ_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security   -Oz -DNDEBUG  -fPIC   -o CMakeFiles\\J.dir\\J.cpp.o -c E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\J.cpp",
+  "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\J.cpp"
+}
+]

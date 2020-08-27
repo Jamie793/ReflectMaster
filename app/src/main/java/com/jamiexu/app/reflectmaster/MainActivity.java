@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,10 +80,12 @@ public class MainActivity extends AppCompatActivity {
 //        FWindow(this, null);
         initData();
         firstOpen();
-        initView();
+//        initView();
         requestPermission();
         refreshApkList();
     }
+
+
 
     @SuppressLint("WorldReadableFiles")
     private void initData() {

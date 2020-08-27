@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "E:\\AndroidSDK\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
+    "E:\\AndroidSDK\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+    "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86_64\" clean"
+  ],
+  "buildTargetsCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "J-Release-x86_64": {
+      "artifactName": "J",
+      "buildCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86_64\" J",
+      "abi": "x86_64",
+      "output": "E:\\Programing\\As\\ReflectMaster\\app\\build\\intermediates\\cmake\\release\\obj\\x86_64\\libJ.so",
+      "runtimeFiles": []
+    }
+  }
+}
