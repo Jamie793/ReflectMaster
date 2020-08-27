@@ -1,0 +1,21 @@
+Executable : E:\AndroidSDK\cmake\3.10.2.4988404\bin\cmake.exe
+arguments : 
+-HE:\Programing\As\ReflectMaster\app\src\main\jni
+-DCMAKE_FIND_ROOT_PATH=E:\Programing\As\ReflectMaster\app\.cxx\cmake\debug\prefab\x86_64\prefab
+-DCMAKE_BUILD_TYPE=Debug
+-DCMAKE_TOOLCHAIN_FILE=E:\AndroidSDK\ndk\21.0.6113669\build\cmake\android.toolchain.cmake
+-DANDROID_ABI=x86_64
+-DANDROID_NDK=E:\AndroidSDK\ndk\21.0.6113669
+-DANDROID_PLATFORM=android-22
+-DCMAKE_ANDROID_ARCH_ABI=x86_64
+-DCMAKE_ANDROID_NDK=E:\AndroidSDK\ndk\21.0.6113669
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=E:\Programing\As\ReflectMaster\app\build\intermediates\cmake\debug\obj\x86_64
+-DCMAKE_MAKE_PROGRAM=E:\AndroidSDK\cmake\3.10.2.4988404\bin\ninja.exe
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_SYSTEM_VERSION=22
+-BE:\Programing\As\ReflectMaster\app\.cxx\cmake\debug\x86_64
+-GNinja
+jvmArgs : 
+
+Build command args:

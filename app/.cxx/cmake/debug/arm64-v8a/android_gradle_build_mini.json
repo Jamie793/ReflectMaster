@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "E:\\AndroidSDK\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
+    "E:\\AndroidSDK\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
+    "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\debug\\arm64-v8a\" clean"
+  ],
+  "buildTargetsCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\debug\\arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "JReflectMasterC-Debug-arm64-v8a": {
+      "artifactName": "JReflectMasterC",
+      "buildCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\debug\\arm64-v8a\" JReflectMasterC",
+      "abi": "arm64-v8a",
+      "output": "E:\\Programing\\As\\ReflectMaster\\app\\build\\intermediates\\cmake\\debug\\obj\\arm64-v8a\\libJReflectMasterC.so",
+      "runtimeFiles": []
+    }
+  }
+}

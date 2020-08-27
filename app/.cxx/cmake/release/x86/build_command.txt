@@ -1,6 +1,6 @@
 Executable : E:\AndroidSDK\cmake\3.10.2.4988404\bin\cmake.exe
 arguments : 
--HE:\Programing\As\ReflectMaster\app\src\main\cpp
+-HE:\Programing\As\ReflectMaster\app\src\main\jni
 -DCMAKE_FIND_ROOT_PATH=E:\Programing\As\ReflectMaster\app\.cxx\cmake\release\prefab\x86\prefab
 -DCMAKE_BUILD_TYPE=Release
 -DCMAKE_TOOLCHAIN_FILE=E:\AndroidSDK\ndk\21.0.6113669\build\cmake\android.toolchain.cmake

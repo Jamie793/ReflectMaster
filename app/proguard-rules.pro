@@ -65,7 +65,12 @@
 -keep class com.jamiexu.app.reflectmaster.MainActivity{
    *** getLibrarys();
    *** loadDex(***);
+   void a();
+   void b();
+   void c();
 }
+
+-keep class com.jamiexu.app.reflectmaster.j.**{*;}
 
 #-keep class formatfa.android.f.Entry {
 #public void handleLoadPackage(de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackagePara );

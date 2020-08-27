@@ -2,18 +2,18 @@
   "buildFiles": [
     "E:\\AndroidSDK\\ndk\\21.0.6113669\\build\\cmake\\platforms.cmake",
     "E:\\AndroidSDK\\ndk\\21.0.6113669\\build\\cmake\\android.toolchain.cmake",
-    "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt"
+    "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt"
   ],
   "cleanCommands": [
     "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86\" clean"
   ],
   "buildTargetsCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe  -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
-    "J-Release-x86": {
-      "artifactName": "J",
-      "buildCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86\" J",
+    "JReflectMasterC-Release-x86": {
+      "artifactName": "JReflectMasterC",
+      "buildCommand": "E:\\AndroidSDK\\cmake\\3.10.2.4988404\\bin\\ninja.exe -C \"E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\x86\" JReflectMasterC",
       "abi": "x86",
-      "output": "E:\\Programing\\As\\ReflectMaster\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libJ.so",
+      "output": "E:\\Programing\\As\\ReflectMaster\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libJReflectMasterC.so",
       "runtimeFiles": []
     }
   }

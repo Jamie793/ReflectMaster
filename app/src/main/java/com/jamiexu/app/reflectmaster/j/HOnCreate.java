@@ -6,7 +6,7 @@ import android.content.Context;
 
 import com.jamiexu.app.reflectmaster.LuaDexLoaders;
 import com.jamiexu.app.reflectmaster.Utils.Utils;
-import com.jamiexu.app.reflectmaster.factory.LuaExecutorFactory;
+import com.jamiexu.app.reflectmaster.j.factory.LuaExecutorFactory;
 import com.jamiexu.utils.file.FileUtils;
 import com.luajava.LuaException;
 
@@ -17,7 +17,6 @@ import java.util.HashMap;
 import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class HOnCreate extends XC_MethodHook {
@@ -27,7 +26,6 @@ public class HOnCreate extends XC_MethodHook {
     public static MethodHookParam beforeHookedMethod;
     public static MethodHookParam afterHookedMethod;
     public static LuaExecutor luaExecutor;
-    private final String XPOSED_PACKAGENAME = "de.robv.android.xposed";
     public static ThreadContollr threadContollr = new ThreadContollr(Thread.currentThread());
 
 
@@ -105,51 +103,6 @@ public class HOnCreate extends XC_MethodHook {
             }).start();
         }
     }
-
-    public void unXPShell() {
-
-        XposedHelpers.findAndHookMethod(Thread.class, "getStackTrace", new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                super.afterHookedMethod(param);
-                StackTraceElement[] stackTraceElements = (StackTraceElement[]) param.getResult();
-                ArrayList<StackTraceElement> stackTraceElementArrayList = new ArrayList<>();
-                for (StackTraceElement s :
-                        stackTraceElements) {
-                    if (!s.getClassName().contains(XPOSED_PACKAGENAME)) {
-                        stackTraceElementArrayList.add(s);
-                    }
-                }
-                param.setResult(stackTraceElementArrayList.toArray(new StackTraceElement[0]));
-            }
-        });
-
-
-        XposedHelpers.findAndHookMethod(Class.class, "forName", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-                if ((param.args[0] + "").contains(XPOSED_PACKAGENAME)) {
-                    param.args[0] = "Jamiexu";
-                }
-            }
-        });
-
-
-        XposedHelpers.findAndHookMethod(ClassLoader.class, "loadClass", String.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-                if ((param.args[0] + "").contains(XPOSED_PACKAGENAME)) {
-                    param.args[0] = "Jamiexu";
-                }
-            }
-        });
-
-
-
-    }
-
 
     public HashMap<String, String> getLibrarys() {
         return luaDexLoader.getLibrarys();

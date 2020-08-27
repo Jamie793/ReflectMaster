@@ -1,4 +1,4 @@
-# Install script for directory: E:/Programing/As/ReflectMaster/app/src/main/cpp
+# Install script for directory: E:/Programing/As/ReflectMaster/app/src/main/jni
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

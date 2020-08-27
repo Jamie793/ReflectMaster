@@ -12,17 +12,9 @@
 # =============================================================================
 
 #############################################
-# Rule for running custom commands.
-
-rule CUSTOM_COMMAND
-  command = $COMMAND
-  description = $DESC
-
-
-#############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__J
+rule CXX_COMPILER__JReflectMasterC
   depfile = $DEP_FILE
   deps = gcc
   command = E:\AndroidSDK\ndk\21.0.6113669\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=i686-none-linux-android22 --gcc-toolchain=E:/AndroidSDK/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=E:/AndroidSDK/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -32,17 +24,25 @@ rule CXX_COMPILER__J
 #############################################
 # Rule for linking CXX shared library.
 
-rule CXX_SHARED_LIBRARY_LINKER__J
+rule CXX_SHARED_LIBRARY_LINKER__JReflectMasterC
   command = cmd.exe /C "$PRE_LINK && E:\AndroidSDK\ndk\21.0.6113669\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=i686-none-linux-android22 --gcc-toolchain=E:/AndroidSDK/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=E:/AndroidSDK/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking CXX shared library $TARGET_FILE
   restat = $RESTAT
 
 
 #############################################
+# Rule for running custom commands.
+
+rule CUSTOM_COMMAND
+  command = $COMMAND
+  description = $DESC
+
+
+#############################################
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = E:\AndroidSDK\cmake\3.10.2.4988404\bin\cmake.exe -HE:\Programing\As\ReflectMaster\app\src\main\cpp -BE:\Programing\As\ReflectMaster\app\.cxx\cmake\release\x86
+  command = E:\AndroidSDK\cmake\3.10.2.4988404\bin\cmake.exe -HE:\Programing\As\ReflectMaster\app\src\main\jni -BE:\Programing\As\ReflectMaster\app\.cxx\cmake\release\x86
   description = Re-running CMake...
   generator = 1
 

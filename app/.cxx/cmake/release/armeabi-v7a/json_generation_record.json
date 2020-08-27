@@ -2,31 +2,31 @@
   {
     "level": "INFO",
     "message": "Start JSON generation. Platform version: 22 min SDK version: armeabi-v7a",
-    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt",
     "tag": "release|armeabi-v7a"
   },
   {
     "level": "INFO",
     "message": "Trying to locate CMake in local SDK repository.",
-    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt",
     "tag": "release|armeabi-v7a"
   },
   {
     "level": "INFO",
     "message": "- CMake found in SDK at \u0027E:\\AndroidSDK\\cmake\\3.10.2.4988404\u0027 had version \u00273.10.2\u0027",
-    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt",
     "tag": "release|armeabi-v7a"
   },
   {
     "level": "INFO",
     "message": "JSON \u0027E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\armeabi-v7a\\android_gradle_build.json\u0027 was up-to-date",
-    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt",
     "tag": "release|armeabi-v7a"
   },
   {
     "level": "INFO",
     "message": "JSON generation completed without problems",
-    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "file": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt",
     "tag": "release|armeabi-v7a"
   }
 ]

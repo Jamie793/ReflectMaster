@@ -35,6 +35,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jamiexu.app.J;
 import com.jamiexu.app.reflectmaster.j.MasterUtils;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.CoreInstall;
 import com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils;
@@ -56,10 +57,9 @@ import dalvik.system.DexClassLoader;
 public class MainActivity extends AppCompatActivity {
     private LuaDexLoaders luaDexLoader;
     public static final String BASE_PATH = Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/";
-    //    public static final String APP_INFO = "反射大师1.1\nauthor:FormatFa and JamieXu";
     public static final HashSet<String> SELECTED_APK_LIST = new HashSet<>();
     public static SharedPreferences sharedPreferences;
-    private final String PACKAGE_NAME = "packages";
+    private final String DATA_NAME = "package";
     private ListView list;
     private SwipeRefreshLayout swipeRefreshLayout;
     private final String[] permission = new String[]{
@@ -69,31 +69,24 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MasterUtils.nowAct = this;
         luaDexLoader = new LuaDexLoaders(this);
-//        FWindow(this, null);
-        initData();
-        firstOpen();
-//        initView();
+        J.init(this);
         requestPermission();
         refreshApkList();
     }
 
 
-
     @SuppressLint("WorldReadableFiles")
-    private void initData() {
+    private void a() {
         try {
-            sharedPreferences = getSharedPreferences("package", MODE_WORLD_READABLE);
+            sharedPreferences = getSharedPreferences(DATA_NAME, MODE_WORLD_READABLE);
         } catch (Exception e) {
             e.printStackTrace();
-            sharedPreferences = getSharedPreferences("package", MODE_PRIVATE);
+            sharedPreferences = getSharedPreferences(DATA_NAME, MODE_PRIVATE);
         }
         String[] packages = sharedPreferences.getString("packages", "").split(";");
         SELECTED_APK_LIST.addAll(Arrays.asList(packages));
@@ -106,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences.edit().putString("packages", stringBuilder.toString()).apply();
     }
 
-    private void initView() {
+    private void b() {
         setContentView(R.layout.apklist);
         this.list = findViewById(R.id.listview);
         this.list.setTextFilterEnabled(true);
@@ -204,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void firstOpen() {
+    private void c() {
 
         //使用协议
         if (sharedPreferences.getBoolean("first", true)) {
@@ -219,8 +212,7 @@ public class MainActivity extends AppCompatActivity {
         final File file2 = new File(BASE_PATH + "lib");
         final File file3 = new File(BASE_PATH + "icon.png");
 
-        @SuppressLint("HandlerLeak")
-        final Handler handler = new Handler() {
+        @SuppressLint("HandlerLeak") final Handler handler = new Handler() {
             @SuppressLint("HandlerLeak")
             @Override
             public void handleMessage(Message msg) {

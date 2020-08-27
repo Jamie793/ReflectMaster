@@ -1,0 +1,3 @@
+ninja: Entering directory `E:\Programing\As\ReflectMaster\app\.cxx\cmake\debug\x86'
+[1/2] Building CXX object CMakeFiles/JReflectMasterC.dir/J.cpp.o
+[2/2] Linking CXX shared library E:\Programing\As\ReflectMaster\app\build\intermediates\cmake\debug\obj\x86\libJReflectMasterC.so

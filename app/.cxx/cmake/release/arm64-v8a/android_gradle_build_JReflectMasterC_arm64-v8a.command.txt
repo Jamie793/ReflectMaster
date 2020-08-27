@@ -1,0 +1,7 @@
+Executable : E:\AndroidSDK\cmake\3.10.2.4988404\bin\ninja.exe
+arguments : 
+-C
+E:\Programing\As\ReflectMaster\app\.cxx\cmake\release\arm64-v8a
+JReflectMasterC
+jvmArgs : 
+

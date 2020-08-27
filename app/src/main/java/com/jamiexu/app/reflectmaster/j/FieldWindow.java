@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import com.jamiexu.app.reflectmaster.LuaDexLoaders;
 import com.jamiexu.app.reflectmaster.MainActivity;
-import com.jamiexu.app.reflectmaster.factory.LuaExecutorFactory;
+import com.jamiexu.app.reflectmaster.j.factory.LuaExecutorFactory;
 import com.jamiexu.app.reflectmaster.j.Adapter.FieldAdapter;
 import com.jamiexu.app.reflectmaster.j.Adapter.RegisterAdapter;
 import com.jamiexu.app.reflectmaster.j.ClassHandle.Handle_ArrayList;

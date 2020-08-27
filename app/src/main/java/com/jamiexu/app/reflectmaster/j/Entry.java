@@ -11,6 +11,7 @@ import com.jamiexu.utils.file.FileUtils;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -23,6 +24,8 @@ public class Entry implements IXposedHookLoadPackage {
     public static String id;
     public static XSharedPreferences sharedPreferences;
     public static boolean isFirst = false;
+    private final String XPOSED_PACKAGENAME = "de.robv.android.xposed";
+
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
@@ -65,6 +68,9 @@ public class Entry implements IXposedHookLoadPackage {
 
         XposedBridge.log("aim hooked");
 
+//        unXPShell();
+
+
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onCreate", Bundle.class, new HOnCreate(lpparam));
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onResume", new HOnResume());
 
@@ -81,6 +87,56 @@ public class Entry implements IXposedHookLoadPackage {
             }
         });
     }
+
+
+
+
+    public void unXPShell() {
+
+        XposedHelpers.findAndHookMethod(Thread.class, "getStackTrace", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                StackTraceElement[] stackTraceElements = (StackTraceElement[]) param.getResult();
+                ArrayList<StackTraceElement> stackTraceElementArrayList = new ArrayList<>();
+                for (StackTraceElement s :
+                        stackTraceElements) {
+                    if (!s.getClassName().contains(XPOSED_PACKAGENAME)) {
+                        stackTraceElementArrayList.add(s);
+                    }
+                }
+                param.setResult(stackTraceElementArrayList.toArray(new StackTraceElement[0]));
+            }
+        });
+
+
+        XposedHelpers.findAndHookMethod(Class.class, "forName", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                if ((param.args[0] + "").contains(XPOSED_PACKAGENAME)) {
+                    param.args[0] = "Jamiexu";
+                }
+            }
+        });
+
+
+        XposedHelpers.findAndHookMethod(ClassLoader.class, "loadClass", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                if ((param.args[0] + "").contains(XPOSED_PACKAGENAME)) {
+                    param.args[0] = "Jamiexu";
+                }
+            }
+        });
+
+
+
+    }
+
+
+
 
 
 }

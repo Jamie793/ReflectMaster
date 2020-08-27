@@ -1,4 +1,3 @@
 # ninja log v5
-0	17	0	clean	3ae3f5da55db15c4
-0	118	620193389	CMakeFiles/J.dir/J.cpp.o	af97acd8f21d8882
-119	218	620193389	E:/Programing/As/ReflectMaster/app/build/intermediates/cmake/release/obj/x86/libJ.so	bf100e2a0c99ff3c
+1	147	620197358	CMakeFiles/JReflectMasterC.dir/J.cpp.o	b161dfc7547340a4
+160	262	620197358	E:/Programing/As/ReflectMaster/app/build/intermediates/cmake/release/obj/x86/libJReflectMasterC.so	fdc3ab0cddb734ca

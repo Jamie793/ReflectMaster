@@ -100,7 +100,7 @@
       "cxxFolder": "E:\\Programing\\As\\ReflectMaster\\app\\.cxx",
       "gradleModulePathName": ":app",
       "intermediatesFolder": "E:\\Programing\\As\\ReflectMaster\\app\\build\\intermediates",
-      "makeFile": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt",
+      "makeFile": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt",
       "moduleBuildFile": "E:\\Programing\\As\\ReflectMaster\\app\\build.gradle",
       "moduleRootFolder": "E:\\Programing\\As\\ReflectMaster\\app",
       "ndkDefaultAbiList": [
@@ -168,6 +168,7 @@
       "project": {
         "compilerSettingsCacheFolder": "E:\\Programing\\As\\ReflectMaster\\.cxx",
         "cxxFolder": "E:\\Programing\\As\\ReflectMaster\\.cxx",
+        "ideBuildTargetAbi": "x86,armeabi-v7a,armeabi",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
         "isNativeCompilerSettingsCacheEnabled": false,
@@ -191,10 +192,7 @@
     "objFolder": "E:\\Programing\\As\\ReflectMaster\\app\\build\\intermediates\\cmake\\release\\obj",
     "variantName": "release",
     "validAbiList": [
-      "ARMEABI_V7A",
-      "ARM64_V8A",
-      "X86",
-      "X86_64"
+      "X86"
     ],
     "prefabDirectory": "E:\\Programing\\As\\ReflectMaster\\app\\.cxx\\cmake\\release\\prefab",
     "prefabPackageDirectoryList": []

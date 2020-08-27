@@ -100,7 +100,7 @@
       "cxxFolder": "E:\\Programing\\As\\ReflectMaster\\app\\.cxx",
       "gradleModulePathName": ":app",
       "intermediatesFolder": "E:\\Programing\\As\\ReflectMaster\\app\\build\\intermediates",
-      "makeFile": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\cpp\\CMakeLists.txt",
+      "makeFile": "E:\\Programing\\As\\ReflectMaster\\app\\src\\main\\jni\\CMakeLists.txt",
       "moduleBuildFile": "E:\\Programing\\As\\ReflectMaster\\app\\build.gradle",
       "moduleRootFolder": "E:\\Programing\\As\\ReflectMaster\\app",
       "ndkDefaultAbiList": [
