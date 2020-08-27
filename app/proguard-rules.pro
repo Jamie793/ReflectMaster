@@ -78,6 +78,17 @@
     *** getClassLoaders();
 }
 
+-keep class com.jamiexu.app.reflectmaster.j.MasterUtils{*;}
+
+-keep class com.jamiexu.app.reflectmaster.j.HOnCreate{
+    ** lpparam;
+    ** hOnCreate;
+    ** beforeHookedMethod;
+    ** afterHookedMethod;
+    ** luaExecutor;
+    ** threadContollr;
+}
+
 #-keep class formatfa.android.f.Entry {
 #public void handleLoadPackage(de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackagePara );
 #}
