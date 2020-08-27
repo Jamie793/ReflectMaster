@@ -3,7 +3,6 @@ package com.jamiexu.app.reflectmaster.j;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.widget.Toast;
 
 import com.jamiexu.app.reflectmaster.LuaDexLoaders;
 import com.jamiexu.app.reflectmaster.Utils.Utils;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import dalvik.system.DexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class HOnCreate extends XC_MethodHook {
@@ -27,6 +27,8 @@ public class HOnCreate extends XC_MethodHook {
     public static MethodHookParam beforeHookedMethod;
     public static MethodHookParam afterHookedMethod;
     public static LuaExecutor luaExecutor;
+    private final String XPOSED_PACKAGENAME = "de.robv.android.xposed";
+    public static ThreadContollr threadContollr = new ThreadContollr(Thread.currentThread());
 
 
     public HOnCreate(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -45,7 +47,6 @@ public class HOnCreate extends XC_MethodHook {
         afterHookedMethod = param;
         if (luaDexLoader == null)
             luaDexLoader = new LuaDexLoaders((Context) param.thisObject);
-
         String luajavaPath = ((Context) param.thisObject).getApplicationInfo().dataDir + "/app_lib";
 
         String cpu = com.jamiexu.app.reflectmaster.j.reflectmaster.Utils.Utils.getCpu();
@@ -103,6 +104,50 @@ public class HOnCreate extends XC_MethodHook {
                 }
             }).start();
         }
+    }
+
+    public void unXPShell() {
+
+        XposedHelpers.findAndHookMethod(Thread.class, "getStackTrace", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                StackTraceElement[] stackTraceElements = (StackTraceElement[]) param.getResult();
+                ArrayList<StackTraceElement> stackTraceElementArrayList = new ArrayList<>();
+                for (StackTraceElement s :
+                        stackTraceElements) {
+                    if (!s.getClassName().contains(XPOSED_PACKAGENAME)) {
+                        stackTraceElementArrayList.add(s);
+                    }
+                }
+                param.setResult(stackTraceElementArrayList.toArray(new StackTraceElement[0]));
+            }
+        });
+
+
+        XposedHelpers.findAndHookMethod(Class.class, "forName", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                if ((param.args[0] + "").contains(XPOSED_PACKAGENAME)) {
+                    param.args[0] = "Jamiexu";
+                }
+            }
+        });
+
+
+        XposedHelpers.findAndHookMethod(ClassLoader.class, "loadClass", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                if ((param.args[0] + "").contains(XPOSED_PACKAGENAME)) {
+                    param.args[0] = "Jamiexu";
+                }
+            }
+        });
+
+
+
     }
 
 

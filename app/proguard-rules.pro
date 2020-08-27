@@ -52,7 +52,7 @@
 -keep class com.luajava.** { *; }
 -keep class com.androlua.** { *; }
 -keep class android.widget.**
--keep class com.jamiexu.app.reflectmaster.j.** { *; }
+#-keep class com.jamiexu.app.reflectmaster.j.** { *; }
 #保留我们自定义控件（继承自View）不被混淆
 -keep public class * extends android.view.View{
     *** get*();

@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         refreshApkList();
     }
 
+    @SuppressLint("WorldReadableFiles")
     private void initData() {
         try {
             sharedPreferences = getSharedPreferences("package", MODE_WORLD_READABLE);
@@ -192,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("同意", (p1, p2) -> sharedPreferences.edit().putBoolean(
                         "first", false).apply())
                 .setNegativeButton("不同意", (p1, p2) -> finish())
-                .show();
+                .setCancelable(false).show();
         ab.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(0xFFFF4081);
         ab.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(0xFFFF4081);
     }
@@ -207,15 +208,15 @@ public class MainActivity extends AppCompatActivity {
             showHelp();
         }
 
-//        Log.i(getClass().getCanonicalName(), getApplicationInfo().sourceDir);
 
         //创建文件夹复制文件等
         final File file = new File(BASE_PATH + "lua");
         final File file2 = new File(BASE_PATH + "lib");
         final File file3 = new File(BASE_PATH + "icon.png");
 
-        @SuppressLint("HandlerLeak" +
-                "") final Handler handler = new Handler() {
+        @SuppressLint("HandlerLeak")
+        final Handler handler = new Handler() {
+            @SuppressLint("HandlerLeak")
             @Override
             public void handleMessage(Message msg) {
                 Utils.showToast(MainActivity.this, msg.obj.toString(), 0);

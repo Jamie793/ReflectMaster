@@ -225,7 +225,6 @@ public class FieldWindow extends Window implements OnItemClickListener, OnItemLo
         this.undeclared.setTextColor(Color.WHITE);
         this.undeclared.setBackground(null);
         this.undeclared.setOnClickListener(p1 -> {
-            Utils.showToast(this.act, this.isDdeclear + "", 0);
             if (this.isDdeclear) {
                 this.fields = object.getClass().getDeclaredFields();
                 this.fieldAdapter.setFields(this.fields);

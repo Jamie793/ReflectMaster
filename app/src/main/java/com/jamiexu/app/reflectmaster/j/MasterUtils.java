@@ -58,7 +58,6 @@ public class MasterUtils {
             Toast.makeText(context, "添加到临时存储器：" + name + " 成功！", Toast.LENGTH_SHORT).show();
     }
 
-
     public static Object get(int i) {
         return objects.get(i).getObject();
     }
