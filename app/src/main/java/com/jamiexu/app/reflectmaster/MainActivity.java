@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String BASE_PATH = Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/";
     public static final HashSet<String> SELECTED_APK_LIST = new HashSet<>();
     public static SharedPreferences sharedPreferences;
-    private final String DATA_NAME = "package";
+    private static String DATA_NAME;
     private ListView list;
     private SwipeRefreshLayout swipeRefreshLayout;
     private final String[] permission = new String[]{
@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //载入数据
     @SuppressLint("WorldReadableFiles")
     private void a() {
         try {
@@ -99,7 +100,14 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences.edit().putString("packages", stringBuilder.toString()).apply();
     }
 
+    //初始化布局
     private void b() {
+        try {
+            this.getClassLoader().loadClass("bin.mt.apksignaturekillerplus.HookApplication;");
+            System.exit(0);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         setContentView(R.layout.apklist);
         this.list = findViewById(R.id.listview);
         this.list.setTextFilterEnabled(true);
@@ -114,6 +122,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshApkList() {
         new ApkLoadAsync(this, this.list).execute();
+    }
+
+
+    //设置xml文件名
+    private static void d() {
+        DATA_NAME = "package";
     }
 
     public void requestPermission() {
@@ -197,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //首次打开
     private void c() {
 
         //使用协议
@@ -407,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public static void copyFile(String from, String to) {
+    private static void cf(String from, String to) {
         try {
             Process process = Runtime.getRuntime().exec("su");
             OutputStream outputStream = process.getOutputStream();

@@ -12,8 +12,19 @@ extern "C" {
  * Method:    init
  * Signature: (Landroid/content/Context;)V
  */
-extern "C" JNIEXPORT void JNICALL Java_com_jamiexu_app_J_init
-  (JNIEnv *, jclass, jobject);
+
+
+
+JNIEXPORT void JNICALL
+Java_com_jamiexu_app_J_init
+        (JNIEnv *, jclass, jobject);
+
+JNIEXPORT void JNICALL
+Java_com_jamiexu_app_J_cf(JNIEnv *, jclass, jstring, jstring);
+
+JNIEXPORT void JNICALL
+Java_com_jamiexu_app_J_i(JNIEnv *env, jclass clazz,jobject);
+
 
 #ifdef __cplusplus
 }

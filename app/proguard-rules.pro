@@ -68,9 +68,15 @@
    void a();
    void b();
    void c();
+   void d();
 }
 
--keep class com.jamiexu.app.reflectmaster.j.**{*;}
+-keep class com.jamiexu.app.reflectmaster.j.Entry{*;}
+-keep class com.jamiexu.app.reflectmaster.j.HOnCreate{
+    *** getLibrarys();
+    *** loadDex(**);
+    *** getClassLoaders();
+}
 
 #-keep class formatfa.android.f.Entry {
 #public void handleLoadPackage(de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackagePara );

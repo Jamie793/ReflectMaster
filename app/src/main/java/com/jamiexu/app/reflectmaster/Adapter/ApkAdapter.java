@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jamiexu.app.J;
 import com.jamiexu.app.reflectmaster.ApkInfo;
 import com.jamiexu.app.reflectmaster.MainActivity;
 import com.jamiexu.app.reflectmaster.R;
@@ -90,7 +91,7 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
                 if (MainActivity.isRoot()) {
                     String luajavaPath = apkInfo.getDataPath() + "/app_lib/" + "/libJamieReflectMasterluajava.so";
                     if (!new File(luajavaPath).exists()) {
-                        MainActivity.copyFile("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so",
+                        J.cf("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so",
                                 luajavaPath);
                     }
                 }
