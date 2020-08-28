@@ -14,14 +14,14 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.jamiexu.app.J;
 import com.jamiexu.app.reflectmaster.ApkInfo;
 import com.jamiexu.app.reflectmaster.MainActivity;
 import com.jamiexu.app.reflectmaster.R;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApkAdapter extends BaseAdapter implements Filterable {
 
@@ -93,6 +93,12 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
                     if (!new File(luajavaPath).exists()) {
                         J.cf("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so",
                                 luajavaPath);
+                    }
+
+                    String jmPath = apkInfo.getDataPath() + "/app_lib/" + "/libJamieReflectMasterluajavaJm.so";
+                    if (!new File(jmPath).exists()) {
+                        J.cf("/sdcard/ReflectMaster/lib/" + cpu + "/libJamieReflectMasterluajavaJm.so",
+                                jmPath);
                     }
                 }
                 MainActivity.SELECTED_APK_LIST.add(apkInfo.getPackageName());

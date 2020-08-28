@@ -15,6 +15,4 @@ public class J {
 
     public static native void i(Context j);
 
-
-
 }

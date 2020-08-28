@@ -66,10 +66,6 @@ public class Entry implements IXposedHookLoadPackage {
         MasterUtils.isFloating = sharedPreferences.getBoolean("float", true);
         MasterUtils.newThread = sharedPreferences.getBoolean("newthread", false);
 
-        XposedBridge.log("aim hooked");
-
-//        unXPShell();
-
 
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onCreate", Bundle.class, new HOnCreate(lpparam));
         XposedHelpers.findAndHookMethod("android.app.Activity", lpparam.classLoader, "onResume", new HOnResume());

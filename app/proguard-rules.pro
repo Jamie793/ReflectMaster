@@ -37,11 +37,11 @@
 -keep class android.support.**#过滤android.support.v7和v4  注意这里v4还是v7要看gradle里面compile了那个扩展包
 -keep interface android.support.constraint.** { *; }
 -keep class com.alibaba.fastjson.** {*;}    #保持第三方包fastjson不被混淆，否则会报错\
--keep	class	com.baidu.kirin.**	{	*;	}
--keep	class	com.baidu.mobstat.**	{	*;	}
--keep	class	com.baidu.bottom.**	{	*;	}
--keep class com.github.esrrhs.fakescript.** {*;}
--keep class com.jamiexu.utils.** {*;}
+#-keep	class	com.baidu.kirin.**	{	*;	}
+#-keep	class	com.baidu.mobstat.**	{	*;	}
+#-keep	class	com.baidu.bottom.**	{	*;	}
+#-keep class com.github.esrrhs.fakescript.** {*;}
+#-keep class com.jamiexu.utils.** {*;}
 #-keep class formatfa.android.f.ScriptWindow$rf {*;}
 #-keep class formatfa.android.f.ScriptWindow$io {*;}
 #-keepclassmembers class formatfa.android.f.ScriptWindow {
@@ -71,12 +71,16 @@
    void d();
 }
 
+
+
 -keep class com.jamiexu.app.reflectmaster.j.Entry{*;}
 -keep class com.jamiexu.app.reflectmaster.j.HOnCreate{
     *** getLibrarys();
     *** loadDex(**);
     *** getClassLoaders();
 }
+
+-keep class com.jamiexu.app.J{*;}
 
 -keep class com.jamiexu.app.reflectmaster.j.MasterUtils{*;}
 

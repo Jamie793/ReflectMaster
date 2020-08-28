@@ -51,6 +51,7 @@ public class HOnCreate extends XC_MethodHook {
         XposedBridge.log("CPU=>" + cpu);
 
         Utils.setLuaJavaSoPath(luajavaPath + "/libJamieReflectMasterluajava.so");
+        Utils.setJmPath(luajavaPath + "/libJamieReflectMasterluajavaJm.so");
         MasterUtils.nowAct = (Activity) param.thisObject;
 
         FWindow jf = new FWindow(lpparam, param, (Activity) param.thisObject);

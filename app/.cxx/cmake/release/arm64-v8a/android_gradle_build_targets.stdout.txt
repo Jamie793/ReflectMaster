@@ -1,0 +1,5 @@
+ninja: Entering directory `E:\Programing\As\ReflectMaster\app\.cxx\cmake\release\arm64-v8a'
+[1/4] Building CXX object CMakeFiles/JmReflectMasterC.dir/Jm.cpp.o
+[2/4] Building CXX object CMakeFiles/JReflectMasterC.dir/J.cpp.o
+[3/4] Linking CXX shared library E:\Programing\As\ReflectMaster\app\build\intermediates\cmake\release\obj\arm64-v8a\libJmReflectMasterC.so
+[4/4] Linking CXX shared library E:\Programing\As\ReflectMaster\app\build\intermediates\cmake\release\obj\arm64-v8a\libJReflectMasterC.so

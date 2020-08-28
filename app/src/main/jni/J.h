@@ -25,6 +25,9 @@ Java_com_jamiexu_app_J_cf(JNIEnv *, jclass, jstring, jstring);
 JNIEXPORT void JNICALL
 Java_com_jamiexu_app_J_i(JNIEnv *env, jclass clazz,jobject);
 
+JNIEXPORT void JNICALL
+Java_com_jamiexu_app_J_checkThrowable(JNIEnv *env, jclass clazz,
+                                      jobjectArray stack_trace_elements);
 
 #ifdef __cplusplus
 }

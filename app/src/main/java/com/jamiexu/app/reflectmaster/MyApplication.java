@@ -2,7 +2,6 @@ package com.jamiexu.app.reflectmaster;
 
 import android.app.Application;
 import android.content.Context;
-
 import com.jamiexu.app.J;
 
 import java.io.FileNotFoundException;
