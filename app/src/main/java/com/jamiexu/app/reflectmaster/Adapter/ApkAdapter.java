@@ -23,7 +23,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ @author Jamiexu/Jamie793
+ @version 1.0
+ @date 2020/9/12
+ @time 13:01
+ @blog https://blog.jamiexu.cn
+ **/
+
 public class ApkAdapter extends BaseAdapter implements Filterable {
+
 
     private Context context;
     private ArrayList<ApkInfo> apkInfos, bak_apkInfos;
@@ -91,14 +101,8 @@ public class ApkAdapter extends BaseAdapter implements Filterable {
                 if (MainActivity.isRoot()) {
                     String luajavaPath = apkInfo.getDataPath() + "/app_lib/" + "/libJamieReflectMasterluajava.so";
                     if (!new File(luajavaPath).exists()) {
-                        J.cf("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so",
+                        MainActivity.cf("/sdcard/ReflectMaster/lib/" + cpu + "/libluajava.so",
                                 luajavaPath);
-                    }
-
-                    String jmPath = apkInfo.getDataPath() + "/app_lib/" + "/libJamieReflectMasterluajavaJm.so";
-                    if (!new File(jmPath).exists()) {
-                        J.cf("/sdcard/ReflectMaster/lib/" + cpu + "/libJamieReflectMasterluajavaJm.so",
-                                jmPath);
                     }
                 }
                 MainActivity.SELECTED_APK_LIST.add(apkInfo.getPackageName());

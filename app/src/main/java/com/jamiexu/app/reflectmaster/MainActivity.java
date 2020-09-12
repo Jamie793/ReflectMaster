@@ -54,6 +54,17 @@ import java.util.HashSet;
 import dalvik.system.DexClassLoader;
 
 
+/**
+ @author Jamiexu/Jamie793
+ @version 1.0
+ @date 2020/9/12
+ @time 13:01
+ @blog https://blog.jamiexu.cn
+
+ from FormatFa open source
+ **/
+
+
 public class MainActivity extends AppCompatActivity {
     private LuaDexLoaders luaDexLoader;
     public static final String BASE_PATH = Environment.getExternalStorageDirectory().toString() + "/ReflectMaster/";
@@ -422,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private static void cf(String from, String to) {
+    public static void cf(String from, String to) {
         try {
             Process process = Runtime.getRuntime().exec("su");
             OutputStream outputStream = process.getOutputStream();

@@ -19,6 +19,15 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+
+/**
+ @author Jamiexu/Jamie793
+ @version 1.0
+ @date 2020/9/12
+ @time 13:01
+ @blog https://blog.jamiexu.cn
+ **/
+
 public class HOnCreate extends XC_MethodHook {
     public static LuaDexLoaders luaDexLoader;
     public static XC_LoadPackage.LoadPackageParam lpparam;

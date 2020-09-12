@@ -2,7 +2,6 @@ package com.jamiexu.app.reflectmaster.j;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.system.Os;
 import android.view.KeyEvent;
 
 import com.jamiexu.app.reflectmaster.MainActivity;
@@ -19,6 +18,15 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+
+
+/**
+ @author Jamiexu/Jamie793
+ @version 1.0
+ @date 2020/9/12
+ @time 13:02
+ @blog https://blog.jamiexu.cn
+ **/
 
 public class Entry implements IXposedHookLoadPackage {
     public static String id;
@@ -85,8 +93,6 @@ public class Entry implements IXposedHookLoadPackage {
     }
 
 
-
-
     public void unXPShell() {
 
         XposedHelpers.findAndHookMethod(Thread.class, "getStackTrace", new XC_MethodHook() {
@@ -128,11 +134,7 @@ public class Entry implements IXposedHookLoadPackage {
         });
 
 
-
     }
-
-
-
 
 
 }
